@@ -1,0 +1,285 @@
+
+@import "rsuite/dist/rsuite.css";
+
+.drawer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  overflow: hidden;
+  z-index: 0 !important;
+  background-color: var(--bs-drawer-overlay-bg-color);
+  animation: animation-drawer-fade-in .3s ease-in-out 1;
+}
+
+.ant-menu-submenu-title,
+.ant-menu-submenu-title {
+  color: #fff !important;
+}
+
+.ant-menu {
+  background: transparent;
+}
+
+
+.ant-menu .ant-menu-item a:hover,
+.ant-menu-item-icon:hover {
+  color: rgb(255 255 255 / 88%);
+}
+
+.ant-menu .ant-menu-item a {
+  color: rgb(255 255 255 / 88%);
+}
+
+.ant-menu .ant-menu-item .ant-menu-item-icon {
+  color: #fff !important;
+}
+
+.ant-menu-light .ant-menu-item-selected,
+:where(.css-dev-only-do-not-override-161f05s).ant-menu-light>.ant-menu .ant-menu-item-selected {
+  background-color: #2d2d2d;
+}
+
+
+
+/* 
+ */
+
+
+
+table thead th {
+  background-color: #022358 !important;
+  color: #fff !important;
+}
+
+.pagination .dt-paging-button {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-radius: .85rem !important;
+  height: 2.5rem !important;
+  min-width: 2.5rem !important;
+  font-weight: 500 !important;
+  font-size: 1.075rem !important;
+}
+
+
+
+
+
+.dt-paging-button {
+  --bs-btn-color: var(--bs-body-color);
+  outline: 0 !important;
+}
+
+.dt-paging-button {
+  --bs-btn-padding-x: 1.5rem;
+  --bs-btn-padding-y: 0.775rem;
+  --bs-btn-font-size: 1.1rem;
+  --bs-btn-font-weight: 500;
+  --bs-btn-line-height: 1.5;
+  --bs-btn-color: var(--bs-body-color);
+  --bs-btn-bg: transparent;
+  --bs-btn-border-width: 1px;
+  --bs-btn-border-color: transparent;
+  --bs-btn-border-radius: 0.85rem;
+  --bs-btn-hover-border-color: transparent;
+  --bs-btn-box-shadow: none;
+  --bs-btn-disabled-opacity: 0.65;
+  --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(var(--bs-btn-focus-shadow-rgb), .5);
+  display: inline-block;
+  padding: var(--bs-btn-padding-y) var(--bs-btn-padding-x);
+  font-family: var(--bs-btn-font-family);
+  font-size: var(--bs-btn-font-size);
+  font-weight: var(--bs-btn-font-weight);
+  line-height: var(--bs-btn-line-height);
+  color: var(--bs-btn-color);
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  user-select: none;
+  border: var(--bs-btn-border-width) solid var(--bs-btn-border-color);
+  border-radius: var(--bs-btn-border-radius);
+  background-color: var(--bs-btn-bg);
+  box-shadow: var(--bs-btn-box-shadow);
+  transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+.dt-paging-button.current {
+  z-index: 3 !important;
+  color: #fff !important;
+  background-color: #2C9AFF !important;
+  /* border-color: var(--bs-pagination-active-border-color) !important; */
+}
+
+.dt-search {
+  margin-bottom: 15px !important;
+
+}
+
+.dt-input {
+  display: block;
+  padding: .775rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--bs-gray-700);
+  appearance: none;
+  background-color: var(--bs-body-bg);
+  background-clip: padding-box;
+  border: 1px solid var(--bs-gray-300);
+  border-radius: .85rem;
+  box-shadow: false;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+
+.p-calendar.p-component {
+  width: 100% !important;
+
+
+}
+
+input.p-component {
+  width: 100% !important;
+  display: block;
+  padding: .775rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--bs-gray-700);
+  appearance: none;
+  background-color: #f9f9f9;
+  background-clip: padding-box;
+  border: 1px solid #f9f9f9;
+  border-radius: .85rem;
+  box-shadow: false;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+
+
+.disabled {
+  opacity: 0.5 !important;
+  /* Réduit l'opacité */
+  pointer-events: none !important;
+  /* Désactive les événements de souris */
+  background-color: #f0f0f0 !important;
+  /* Couleur de fond gris clair */
+  filter: grayscale(100%) !important;
+  /* Applique un filtre de grisage */
+  border-radius: var(--bs-card-border-radius);
+  box-shadow: var(--bs-card-box-shadow);
+  pointer-events: none !important;
+
+}
+
+
+.deleteCategorie-input {
+  position: relative;
+  right: 0;
+  float: right;
+  margin: 15px;
+  font-size: 15px;
+  cursor: pointer;
+  background-color: #e7e7e7;
+  padding: 8px 9px;
+  border-radius: 25px;
+  color: #2c9afe;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.custom-tooltip {
+    background-color: #fff; /* Couleur de fond personnalisée */
+    color: #333;            /* Couleur de texte personnalisée */
+    padding: 8px;           /* Espacement intérieur */
+    border-radius: 7px;     /* Bordures arrondies */
+    box-shadow: rgba(7, 65, 210, 0.1) 0px 9px 30px;
+
+    
+  }
+
+  .custom-tooltip .tippy-arrow {
+    color: #fff; /* Assure que la flèche prend la même couleur que le fond */
+  }
+  
+  .custom-tooltip[data-placement^='top'] .tippy-arrow {
+    border-top-color: #fff !important; /* Couleur de la flèche pour les tooltips en haut */
+  }
+  
+  .custom-tooltip[data-placement^='bottom'] .tippy-arrow {
+    border-bottom-color: #fff !important; /* Couleur de la flèche pour les tooltips en bas */
+  }
+  
+  .custom-tooltip[data-placement^='left'] .tippy-arrow {
+    border-left-color: #fff; /* Couleur de la flèche pour les tooltips à gauche */
+  }
+  
+  .custom-tooltip[data-placement^='right'] .tippy-arrow {
+    border-right-color: #fff !important; /* Couleur de la flèche pour les tooltips à droite */
+  }
+  
+
+
+  /* TooltipStyles.css */
+.custom-tooltip {
+  background-color: #fff; /* Couleur de fond personnalisée */
+  color: #333;            /* Couleur de texte personnalisée */
+  padding: 8px;           /* Espacement intérieur */
+  border-radius: 7px;     /* Bordures arrondies */
+  box-shadow: rgba(7, 65, 210, 0.1) 0px 9px 30px;
+
+  
+}
+
+.custom-tooltip .tippy-arrow {
+  color: #fff; /* Assure que la flèche prend la même couleur que le fond */
+}
+
+.custom-tooltip[data-placement^='top'] .tippy-arrow {
+  border-top-color: #fff !important; /* Couleur de la flèche pour les tooltips en haut */
+}
+
+.custom-tooltip[data-placement^='bottom'] .tippy-arrow {
+  border-bottom-color: #fff !important; /* Couleur de la flèche pour les tooltips en bas */
+}
+
+.custom-tooltip[data-placement^='left'] .tippy-arrow {
+  border-left-color: #fff; /* Couleur de la flèche pour les tooltips à gauche */
+}
+
+.custom-tooltip[data-placement^='right'] .tippy-arrow {
+  border-right-color: #fff !important; /* Couleur de la flèche pour les tooltips à droite */
+}
+
+
+.rs-picker-toggle-wrapper {
+  min-width: 80px !important;
+}
+
+.rs-picker-toggle .rs-picker-toggle-placeholder, .rs-input::placeholder, .form-control::placeholder {
+  color: #98a1b7 !important;
+  font-size: 14px !important;
+}
+
+.rs-picker-has-value .rs-btn .rs-picker-toggle-value, .rs-picker-has-value .rs-picker-toggle .rs-picker-toggle-value {
+  color: #071437 !important;
+}
+
+.ant-menu-submenu-title:hover, .ant-menu-sub .ant-menu-item:hover{
+  background-color: #2D2D2F !important;
+}
+
+th, td{
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+}
+
+th{
+  text-transform: uppercase !important;
+  font-weight: bold !important;
+}

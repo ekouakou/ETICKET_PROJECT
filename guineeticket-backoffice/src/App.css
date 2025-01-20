@@ -1,0 +1,5 @@
+@import "rsuite/dist/rsuite.css";
+
+.rs-picker{
+    width: 100% !important;
+}

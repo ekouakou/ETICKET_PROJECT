@@ -1,0 +1,84 @@
+{
+  "name": "guineeticket",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.2",
+    "@fortawesome/free-brands-svg-icons": "^6.5.2",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "@splidejs/react-splide": "^0.7.12",
+    "@splidejs/splide": "^4.1.4",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@tippyjs/react": "^4.2.6",
+    "ajv": "^6.12.6",
+    "ajv-keywords": "^3.5.2",
+    "axios": "^1.7.2",
+    "country-flag-icons": "^1.5.14",
+    "dom-to-image": "^2.6.0",
+    "hopscotch": "^0.3.1",
+    "html-to-image": "^1.11.11",
+    "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.10.2",
+    "intl-tel-input": "^25.2.1",
+    "jspdf": "^2.5.1",
+    "libphonenumber-js": "^1.11.18",
+    "lucide-react": "^0.469.0",
+    "react": "^18.3.1",
+    "react-apple-signin-auth": "^1.1.0",
+    "react-bootstrap": "^2.10.3",
+    "react-content-loader": "^7.0.2",
+    "react-dom": "^18.3.1",
+    "react-google-login": "^5.2.2",
+    "react-helmet": "^6.1.0",
+    "react-icons": "^5.3.0",
+    "react-joyride": "^2.9.3",
+    "react-loading-skeleton": "^3.5.0",
+    "react-modal": "^3.16.1",
+    "react-phone-input-2": "^2.15.1",
+    "react-phone-number-input": "^3.4.11",
+    "react-router-dom": "^6.23.1",
+    "react-scripts": "5.0.1",
+    "react-share-social": "^0.1.60",
+    "react-shepherd": "^6.1.6",
+    "react-shimmer-effect": "^1.0.9",
+    "react-slick": "^0.30.2",
+    "react-switch": "^7.0.0",
+    "react-to-pdf": "^1.0.1",
+    "react-toastify": "^10.0.5",
+    "reactour": "^1.19.4",
+    "rsuite": "^5.76.2",
+    "shepherd.js": "^14.3.0",
+    "slick-carousel": "^1.8.1",
+    "styled-components": "^6.1.14",
+    "sweetalert2": "^11.12.1",
+    "sweetalert2-react-content": "^5.0.7",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

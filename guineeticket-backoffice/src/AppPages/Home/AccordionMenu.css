@@ -1,0 +1,18 @@
+.menu-sub {
+    display: none;
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+  }
+  
+  .menu-sub.open {
+    display: block;
+  }
+  
+  .menu-arrow.open {
+    transform: rotate(180deg);
+  }
+  
+  .menu-arrow {
+    transition: transform 0.3s ease;
+  }
+  

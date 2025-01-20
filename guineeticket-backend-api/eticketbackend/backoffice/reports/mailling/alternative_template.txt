@@ -1,0 +1,19 @@
+Confirmation de votre inscription
+Bonjour [STR_FIRSTLASTNAME],
+
+Merci de vous être inscrit à notre service ! Nous avons bien reçu votre demande et nous vous confirmons que votre inscription est maintenant complète.
+
+Pour avoir accès votre espace client, veuillez cliquer sur le bouton ci-dessous :
+Identifiant: [STR_LOGIN]
+Mot de paase: [STR_PASSWORD]
+
+Mon espace client.
+Vous pouvez consulter l'historique de vos tickets via cet espace.
+
+Merci et à bientôt,
+
+L'équipe [STR_AGENAME]
+
+Si vous avez des questions, n'hésitez pas à nous contacter à [STR_SOCMAIL].
+
+[STR_SOCNAME], [STR_SOCADRESSE].

@@ -1,0 +1,70 @@
+version: '3.8'
+services:
+  guineeticket-frontend:
+    build:
+      context: ./guineeticket-frontend
+    ports:
+      - "3001:80"
+    container_name: guineeticket-frontend
+    restart: always
+    platform: linux/amd64
+    environment:
+      - REACT_APP_API_URL=http://guineeticket-backend-api/
+
+  guineeticket-backoffice:
+    build:
+      context: ./guineeticket-backoffice
+    ports:
+      - "9080:80"
+    container_name: guineeticket-backoffice
+    restart: always #unless-stopped
+    platform: linux/amd64
+
+
+  guineeticket-backend-api:
+    build:
+      context: ./guineeticket-backend-api
+    ports:
+      - "80:80"
+    container_name: guineeticket-backend-api
+    depends_on:
+      - db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+
+  db:
+    image: mysql:8.0
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+    ports:
+      - "3306:3306"
+    restart: always
+    platform: linux/amd64
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./eticket_db.sql:/docker-entrypoint-initdb.d/eticket_db.sql
+      - ./db/init-scripts/create_user.sql:/docker-entrypoint-initdb.d/create_user.sql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin-container
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+      - PMA_USER=${DB_USER}
+      - PMA_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "8081:80"
+    restart: always
+    platform: linux/amd64
+    depends_on:
+      - db
+
+volumes:
+  db_data:

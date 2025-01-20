@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket</title>
+    <style>
+        .flyer:before {
+            position: absolute;
+            -webkit-backdrop-filter: blur(30px);
+            backdrop-filter: blur(30px);
+            content: "";
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(180deg, rgba(0, 18, 50, 0.134891) 0%, #110b0a 90%);
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div id="ticket-details" style="min-height: 400px !important; width: 60%; margin: auto;">
+        <div style="display: flex; height: 100% !important; align-items: stretch;">
+            <div id="affiche" style="position: relative; min-height: 400px; width: 100%; padding-right: 15px; padding-left: 15px; flex: 0 0 66.6667%; max-width: 66.6667%; display: flex; flex-direction: column;">
+                <div class="flyer" style="padding: 25px; height: 100%; position: relative; background-size: cover; background-position: center center; background-image: url('http://localhost/backoffice/images/product/1723975404-2024-10-11-avant-premiere-boyorodjan.png');">
+                    <div style="display: flex; flex-wrap: wrap; height: 100%;">
+                        <!-- <div style="flex: 0 0 58%; max-width: 58%; display: flex; flex-direction: column; margin-right: 2px;">
+                            <div id="image2" style="background-image: url('http://localhost/backoffice/images/product/1723975404-2024-10-11-avant-premiere-boyorodjan.png'); background-position: center center; background-size: cover; opacity: 0.4; border-radius: 10px; min-height: 100px; height: 100%; position: relative;">
+                                <div style="content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 10px; background: linear-gradient(90deg, rgba(0, 18, 50, 0.134891) 10%, #110b0a 80%); z-index: 1;"></div>
+                            </div>
+                        </div> -->
+                        <div style="flex-direction: column; z-index: 1000;">
+                            <div class="c">
+                                <img src="http://guineeticket.com/backoffice/images/product/guineeticket.png" alt="Logo de l'entreprise" style="max-width: 100%; height: auto;">
+                            </div>
+                            <div style="width: 100%; padding: 0; border-bottom: 1px dotted #fff;">
+                                <div style="font-size: 1.5rem; color: #fff; font-family: Arial, sans-serif; font-weight: bold;">Lipsum generator: Lorem Ipsum - All the facts</div>
+                                <div class="description" style="margin-top:5px;  margin-bottom: 10px; color: #fff; font-family: Arial, sans-serif;">                                        <span style="font-size: 0.875rem; color: #ffd214;"> Stade national</span>
+                                </div>
+                            </div>
+
+                            <div style="width: 100%; padding: 0; ">
+                                <div style="font-size: 0.875rem; font-weight: bold; font-family: Arial, sans-serif; margin-top: 0.25rem; display: flex; justify-content: space-between;">
+                                    <span style="font-size: 0.875rem; font-weight: bold; padding: 0; color: #fff; font-family: Arial, sans-serif;">
+                                        <i class="fas fa-calendar-alt" style="font-size: 0.875rem; color: #fff;"></i>
+                                        <span style="font-size: 0.875rem; color: #ffd214;"> 27/07/2024</span>
+                                        &nbsp; | &nbsp;
+                                        <i class="far fa-clock" style="font-size: 0.875rem;"></i>
+                                        <span style="font-size: 0.875rem; color: #ffd214;"> 08:00</span>
+                                    </span>
+                                </div>
+                                <div style="font-size: 2rem; border-bottom: 1px dotted #fff; color: #fc0001; font-family: Arial, sans-serif; font-weight: bold;">7.000.000 GNF</div>
+                                <div  style="display: flex;">
+                                    <div style="margin-top: 10px;">
+                                        <img src="http://guineeticket.com/backoffice/images/product/guineeticket.png" width="50" style=" height: auto;" alt="Logo">
+                                    </div>
+                                    <div style="margin-top: 10px; margin-left: 10px;">
+                                        <div class="title" style="color: #fff; font-family: Arial, sans-serif; font-weight: bold;">Ylou le boss</div>
+                                        <div class="description" style="color: #fff; font-family: Arial, sans-serif; font-weight: bold;">0749345289</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <img src="http://localhost/backoffice/images/product/lafourcade-filigrane3.png" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.5; z-index: 2;" alt="Overlay Image">
+
+            </div>
+            <div id="qr-code" style="display: flex; flex-direction: column; flex: 0 0 33.3333%; max-width: 33.3333%; justify-content: space-between;">
+                <img src="http://localhost/backoffice/images/product/4s36fuFKPx8OSWovL6Sk.png" style="display: block; margin-left: auto; margin-right: auto; width: 300px;" alt="QR Code">
+                <div style="width: 100%; margin-top: 0; border: 1px dotted #6c757d;">
+                    <p style="font-size: 0.5rem; line-height: 10px; margin-top: 0; font-family: Arial, sans-serif; font-weight: bold;">Ce billet est valable pour une entrée unique à l'événement. Chaque billet possède un QR code unique qui sera scanné à l'entrée. Conservez ce billet en bon état jusqu'à la fin de l'événement, car il sera nécessaire pour toute ré-entrée ou pour toute vérification éventuelle.</p>
+                    <div class="flight-details">
+                        <div style="font-size: 0.875rem; font-weight: bold; margin-top: 0.25rem; display: flex; justify-content: space-between; font-family: Arial, sans-serif;">
+                            <span style="font-size: 0.875rem; font-weight: bold; padding: 0; color: #6c757d; font-family: Arial, sans-serif;">
+                                <i class="fas fa-calendar-alt" style="font-size: 0.875rem; color: #dc3545;"></i>
+                                <span style="font-size: 0.875rem; color: #6c757d;"> 27/07/2024</span>
+                                &nbsp; | &nbsp;
+                                <i class="far fa-clock" style="font-size: 0.875rem;"></i>
+                                <span style="font-size: 0.875rem; color: #6c757d;"> 08:00</span>
+                            </span>
+                        </div>
+                    </div>
+                    <div style="position: relative; width: 100%; display: flex; justify-content: center;">
+                        <img src="http://guineeticket.com/backoffice/images/product/guineeticket.png" style="display: block; margin-left: auto; margin-right: auto;" width="60" alt="Barcode">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
