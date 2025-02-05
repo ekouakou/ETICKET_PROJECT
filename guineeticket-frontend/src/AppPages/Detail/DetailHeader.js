@@ -109,10 +109,11 @@ const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
         }}
       >
         <div className="container  banner-heightbook-sections detail-banner">
-          <div className="item__cover">
+          <div className="item__cover_">
             <img
               src={urlBaseImage + evenement.STR_EVEPIC}
               alt={evenement.STR_EVEPIC}
+              className="img-fluid"
             />
           </div>
           {/* <img className='card mb-6 img-fluid w-100 h-100 '  style={{maxHeight:500}} src={urlBaseImage + evenement.STR_EVEPIC} alt={evenement.STR_EVEPIC} /> */}

@@ -1575,3 +1575,29 @@ p {
   justify-content: flex-end;
   gap: 0.5rem;
 }
+
+
+
+
+.item__cover_ {
+  height: 550px !important; /* Ajuste selon ton besoin */
+  width: 100% !important;
+  /* overflow: hidden !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center;
+  background-color: #f0f0f0 !important; Optionnel, juste pour le fond */
+}
+
+
+.img-fluid {
+  width: 100%;
+  height: 100%;
+}
+
+.item__cover_ img {
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 10px !important;
+
+}

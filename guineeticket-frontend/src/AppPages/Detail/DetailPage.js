@@ -19,8 +19,7 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import { Helmet } from "react-helmet";
 import { useLocation } from "react-router-dom";
 import BannerSkeleton from "../Skeleton/BannerSkeleton";
-import {SkeletonElement,Card,TimerSkeleton,QuantitySelector,DeliveryOptions,FormFields,DescriptionSkeleton,OrganizatorSkeleton,ReservationUpdateSkeleton,
-} from "./TicketFormSkeleton";
+import {SkeletonElement,Card,TimerSkeleton,QuantitySelector,DeliveryOptions,FormFields,DescriptionSkeleton,OrganizatorSkeleton,ReservationUpdateSkeleton,} from "./TicketFormSkeleton";
 import { Modal,Placeholder,Loader,ButtonToolbar,Divider,/*Button*/} from "rsuite";
 import TermsAndConditions from "../../AppComponents/TermsAndConditions";
 import PaymentFormSkeleton from "../Skeleton/PaymentFormSkeleton";
@@ -31,7 +30,6 @@ import EventSkeleton from "../Skeleton/EventSkeleton";
 
 import useFetchData from "../../services/useFetchData";
 import { urlBaseImage, rootUrl } from "../../services/urlUtils";
-import { useForm } from "react-hook-form";
 
 
 const mode = JSON.parse(localStorage.getItem("appMode"));
