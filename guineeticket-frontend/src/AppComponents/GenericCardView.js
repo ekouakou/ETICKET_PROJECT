@@ -178,15 +178,13 @@ const GenericCardView = ({
                               >
                                 <Modal.Header>
                                   <Modal.Title className="text-theme">
-                                    Partager l'événement
+                                    Détail du ticket
                                   </Modal.Title>
                                 </Modal.Header>
                                 <Modal.Body>
                                   {selectedTicket && (
                                     <>
-
                                       <EventTicket ticketSelected={selectedTicket} urlBaseImage={urlBaseImage} />
-
 
                                     </>
                                   )}
@@ -194,32 +192,26 @@ const GenericCardView = ({
                                 <Modal.Footer>
                                   <Button
                                     onClick={handleClose}
-                                    appearance="primary"
+                                    appearance="secondary"
                                   >
                                     Fermer
+                                  </Button>
+                                  <Button
+                                    onClick={handleClose}
+                                    appearance="Seccess"
+                                  >
+                                    Télécharger
+                                  </Button>
+                                  <Button
+                                    onClick={handleClose}
+                                    appearance="primary"
+                                  >
+                                    Partager
                                   </Button>
                                 </Modal.Footer>
                               </Modal>
                             </>
                           )}
-                          {/* {onToggleStatus && (
-                            <button
-                              onClick={() => {
-                                const newStatus = item.status === "enable" ? "disable" : "enable";
-                                if (window.confirm(toggleStatusConfirmMessage(item.id, newStatus))) {
-                                  handleApiCall({
-                                    mode: "updateStatus",
-                                    id: item.id,
-                                    status: newStatus
-                                  });
-                                }
-                              }}
-                              className={`p-2 rounded ${item.status === "enable" ? "bg-yellow-50 hover:bg-yellow-100 text-yellow-600" : "bg-green-50 hover:bg-green-100 text-green-600"}`}
-                              title={item.status === "enable" ? "Désactiver" : "Activer"}
-                            >
-                              <Power size={10} />
-                            </button>
-                          )} */}
                         </div>
                       </div>
                     </div>
