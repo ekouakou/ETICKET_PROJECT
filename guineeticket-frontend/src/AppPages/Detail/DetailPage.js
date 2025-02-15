@@ -19,8 +19,24 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import { Helmet } from "react-helmet";
 import { useLocation } from "react-router-dom";
 import BannerSkeleton from "../Skeleton/BannerSkeleton";
-import {SkeletonElement,Card,TimerSkeleton,QuantitySelector,DeliveryOptions,FormFields,DescriptionSkeleton,OrganizatorSkeleton,ReservationUpdateSkeleton,} from "./TicketFormSkeleton";
-import { Modal,Placeholder,Loader,ButtonToolbar,Divider,/*Button*/} from "rsuite";
+import {
+  SkeletonElement,
+  Card,
+  TimerSkeleton,
+  QuantitySelector,
+  DeliveryOptions,
+  FormFields,
+  DescriptionSkeleton,
+  OrganizatorSkeleton,
+  ReservationUpdateSkeleton,
+} from "./TicketFormSkeleton";
+import {
+  Modal,
+  Placeholder,
+  Loader,
+  ButtonToolbar,
+  Divider /*Button*/,
+} from "rsuite";
 import TermsAndConditions from "../../AppComponents/TermsAndConditions";
 import PaymentFormSkeleton from "../Skeleton/PaymentFormSkeleton";
 import TicketFormSkeleton from "../Skeleton/TicketFormSkeleton";
@@ -30,7 +46,6 @@ import EventSkeleton from "../Skeleton/EventSkeleton";
 
 import useFetchData from "../../services/useFetchData";
 import { urlBaseImage, rootUrl } from "../../services/urlUtils";
-
 
 const mode = JSON.parse(localStorage.getItem("appMode"));
 const STR_EVESTATUTFREE = localStorage.getItem("STR_EVESTATUTFREE");
@@ -68,17 +83,19 @@ function Detail() {
   const [selectedOption, setSelectedOption] = useState(paymentOptions[0].id);
   const [paymentStarted, setPaymentSarted] = useState(false);
   const [conditionsAccepted, setConditionsAccepted] = useState(false);
-  const [selectedGetitcketOption, setSelectedGetitcketOption] = useState(1);
-  const [telephone, setTelephone] = useState("");
+  // const [selectedGetitcketOption, setSelectedGetitcketOption] = useState(1);
+  const [selectedGetitcketOption, setSelectedGetitcketOption] = useState([1]);
+
+  const [STR_TICPHONE, setTicketTelephone] = useState("");
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
   const [quantiteTicketGratuit, setQuantiteTicketGratuit] = useState("");
-  const [emailPaiement, setEmailPaiement] = useState("");
-  const [email, setEmail] = useState("");
+  const [STR_CLIMAIL, setClientEmail] = useState("");
+  const [STR_TICMAIL, setTicketEmail] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [confirmWhatsappNumber, setConfirmWhatsappNumber] = useState("");
 
-  const [mtnPhonePayment, setMtnPhonePayment] = useState("");
+  const [STR_CLIPHONE, setClientPhone] = useState("");
   const [orangePhonePayment, setOrangePhonePayment] = useState("");
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -94,10 +111,17 @@ function Detail() {
     setConditionsAccepted(false);
   }, [loading]);
 
-  if (paymentCompleted === true) { setLoading(false); setPaymentCompleted(true); }
+  if (paymentCompleted === true) {
+    setLoading(false);
+    setPaymentCompleted(true);
+  }
 
   useEffect(() => {
-    if (count > 0) { setShowGetTicket(true); } else { setShowGetTicket(false); }
+    if (count > 0) {
+      setShowGetTicket(true);
+    } else {
+      setShowGetTicket(false);
+    }
   }, [count]);
 
   useEffect(() => {
@@ -108,17 +132,27 @@ function Detail() {
     }
   }, [cartItems]);
 
-
-  const { data: eventDetails, loadings, error, } = useFetchData(process.env.REACT_APP_TICKET_MANAGER_API_URL, {mode: process.env.REACT_APP_GET_EVENEMENT_MODE, LG_EVEID: localStorage.getItem("LG_EVEID")});
-
-  
+  const {
+    data: eventDetails,
+    loadings,
+    error,
+  } = useFetchData(process.env.REACT_APP_TICKET_MANAGER_API_URL, {
+    mode: process.env.REACT_APP_GET_EVENEMENT_MODE,
+    LG_EVEID: localStorage.getItem("LG_EVEID"),
+  });
 
   const handleOptionClick = (optionId) => {
     setSelectedOption(optionId);
   };
 
-  const handleOptionGetitcketChange = (e) => {
-    setSelectedGetitcketOption(parseInt(e.target.value));
+
+  const handleOptionGetitcketChange = (event) => {
+    const value = parseInt(event.target.value);
+    setSelectedGetitcketOption((prev) =>
+      prev.includes(value)
+        ? prev.filter((option) => option !== value)
+        : [...prev, value]
+    );
   };
 
   // Fonction pour valider un email
@@ -131,20 +165,16 @@ function Detail() {
     const { name, value } = e.target;
 
     const updateField = {
-      STR_TICPHONE: () => {
-        setTelephone(value);
-        setMtnPhonePayment(value); // Mise à jour du champ MTN
-      },
       STR_TICMAIL: () => {
-        setEmail(value);
-        setEmailPaiement(value); // Mise à jour de l'email dans le paiement
+        setTicketEmail(value);
       },
       STR_FIRSTNAME: () => setNom(value),
       STR_LASTNAME: () => setPrenom(value),
-      STR_TICMAILPAIEMENT: () => setEmailPaiement(value),
-      whatsappNumber: () => setWhatsappNumber(value),
-      confirmWhatsappNumber: () => setConfirmWhatsappNumber(value),
-      STR_TICPHONEPAYMENT_MTN: () => setMtnPhonePayment(value),
+      STR_CLIMAIL: () => {
+        setClientEmail(value);
+      },
+      STR_CLIPHONE: () => setClientPhone(value),
+      STR_TICPHONE: () => setTicketTelephone(value), // Synchronise le numéro de téléphone principal
       STR_TICPHONEPAYMENT_ORANGE: () => setOrangePhonePayment(value),
     };
 
@@ -156,35 +186,45 @@ function Detail() {
   // À l'intérieur de votre composant
   // Fonction pour gérer le changement de la case à cocher
 
-  const totalAmount = cartItems.reduce( (total, item) => total + item.totalPrice, 0);
-
+  const totalAmount = cartItems.reduce(
+    (total, item) => total + item.totalPrice,
+    0
+  );
 
   const handlePayment = async () => {
     if (!conditionsAccepted) return;
-  
+
     const selectedPaymentOption = paymentOptions.find(
       (option) => option.id === selectedOption
     );
-  
+
     if (!isCartValid()) return;
-  
+
     const params = createPaymentParams(selectedPaymentOption);
-  
+
     let paymentWindow = null;
-    if (selectedOption === 1) {paymentWindow = window.open("", "_blank");}// Ouvrir une fenêtre temporaire avant la requête
-  
+    if (selectedOption === 1) {
+      paymentWindow = window.open("", "_blank");
+    } // Ouvrir une fenêtre temporaire avant la requête
+
     try {
       setLoading(true);
       const paymentResponse = await initiatePayment(params);
-      if (!paymentResponse.success) { throw new Error(paymentResponse.error); }
+      if (!paymentResponse.success) {
+        throw new Error(paymentResponse.error);
+      }
       const { token_notification, payment_url } = paymentResponse.data;
       setTokenNotification(token_notification);
       setPaymentProvider(selectedPaymentOption.STR_PROVIDER);
-  
-      // Mettre à jour l'URL de la fenêtre ouverte
-      if (selectedOption === 1 && paymentWindow) { paymentWindow.location.href = payment_url; }
-      startPaymentMonitoring( token_notification, selectedPaymentOption.STR_PROVIDER );
 
+      // Mettre à jour l'URL de la fenêtre ouverte
+      if (selectedOption === 1 && paymentWindow) {
+        paymentWindow.location.href = payment_url;
+      }
+      startPaymentMonitoring(
+        token_notification,
+        selectedPaymentOption.STR_PROVIDER
+      );
     } catch (error) {
       if (paymentWindow) {
         paymentWindow.close();
@@ -192,12 +232,12 @@ function Detail() {
       handlePaymentError(error);
     }
   };
-  
 
   // Fonctions utilitaires
   const isCartValid = () => {
     return (
-      quantiteTicketGratuit != 0 || quantiteTicketGratuit != null ||
+      quantiteTicketGratuit != 0 ||
+      quantiteTicketGratuit != null ||
       localStorage.getItem("cartItems") != "" ||
       localStorage.getItem("cartItems") != null
     );
@@ -209,7 +249,7 @@ function Detail() {
         ? JSON.stringify([
             {
               LG_EVEID: eventDetails.LG_EVEID,
-              STR_TICMAIL: email,
+              STR_TICMAIL: STR_TICMAIL,
               LG_LSTID: eventDetails.LG_LSTID,
               STR_EVENAME: eventDetails.STR_EVENAME,
               STR_EVEPIC_PANIER: eventDetails.STR_EVEPIC_PANIER,
@@ -223,12 +263,25 @@ function Detail() {
 
     return {
       mode: process.env.REACT_APP_CREATE_TICKET_MODE,
-      STR_TICMAIL: email,
+      STR_CLIMAIL: STR_CLIMAIL,
+      STR_TICMAIL: STR_TICMAIL,
+      STR_CLIFIRSTNAME: nom,
+      STR_TICPHONE: STR_TICPHONE,
+      STR_TICCANAL: JSON.stringify([
+        {
+          typecanal: "SMS",
+          value: STR_TICPHONE,
+        },
+        {
+          typecanal: "WHATSAPP",
+          value: STR_TICPHONE,
+        },
+        { typecanal: "MAIL", value: STR_TICMAIL },
+      ]),
+      STR_CLILASTNAME: prenom,
       STR_CURRENCY: selectedPaymentOption.STR_CURRENCY,
-      STR_TICPHONE: selectedOption === 1 ? telephone : mtnPhonePayment,
+      STR_CLIPHONE: STR_CLIPHONE,
       STR_PROVIDER: selectedPaymentOption.STR_PROVIDER,
-      STR_TICPHONEPAYMENT:
-        selectedOption === 1 ? orangePhonePayment : mtnPhonePayment,
       LG_EVEGLOBALID: cartItems,
     };
   };
@@ -326,18 +379,18 @@ function Detail() {
   // Vérifier les champs et l'email à chaque changement
   useEffect(() => {
     if (
-      telephone.trim() &&
-      mtnPhonePayment.trim() &&
+      STR_TICPHONE.trim() &&
+      STR_CLIPHONE.trim() &&
       nom.trim() &&
       prenom.trim() &&
-      validateEmail(emailPaiement)
+      validateEmail(STR_CLIMAIL)
     ) {
       setIsFormValid(true); // Tous les champs sont remplis et l'email est valide
     } else {
       setIsFormValid(false); // Un ou plusieurs champs sont vides ou l'email est invalide
       setConditionsAccepted(false); // Décoche la case si les champs ne sont pas valides
     }
-  }, [telephone, nom, prenom, emailPaiement]);
+  }, [STR_TICPHONE, nom, prenom, STR_CLIMAIL]);
 
   // Gestion de la case à cocher
   const handleConditionsChange = (e) => {
@@ -353,9 +406,8 @@ function Detail() {
   };
 
   const handleCancelCommande = () => {
-    // clearCart();
-    localStorage.removeItem("cartItems");
-    // Vous pouvez gérer la quantité totale ici (par exemple, mettre à jour un état)
+    clearCart(); // Vide le panier en utilisant la fonction du contexte
+    localStorage.removeItem("cartItems"); // Supprime les items du localStorage
   };
 
   const [datePassed, setDatePassed] = useState(false);
@@ -464,218 +516,142 @@ function Detail() {
                                       Obtenir mon ticket
                                     </h1>
                                     <div className="text-muted fw-semibold fs-4 text-theme">
-                                      Comment voulez vous recevoir votre Ticket
+                                      Comment voulez-vous recevoir votre Ticket
                                       ?
                                     </div>
                                   </div>
 
-                                  <div className=" bgi-no-repeat bgi-position-center bgi-size-cover card-rounded w-100">
+                                  <div className="row bgi-no-repeat bgi-position-center bgi-size-cover card-rounded w-100">
                                     <div className="row mb-10">
-                                      <div className="col-xl-3 col-lg-4 col-md-4 col-xs-12 col-12 d-flex flex-column h-100 mb-4">
-                                        <label
-                                          className={`btn btn-outline btn-outline-dashed d-flex text-start p-6 ${
-                                            selectedGetitcketOption === 1
-                                              ? "btn-active-light-primary active"
-                                              : ""
-                                          }`}
-                                          data-kt-button="true"
+                                      {[
+                                        {
+                                          value: 1,
+                                          label: "Sms",
+                                          icon: "assets/media/chatting.png",
+                                        },
+                                        {
+                                          value: 2,
+                                          label: "WhatsApp",
+                                          icon: "assets/media/whatsapp.png",
+                                        },
+                                        {
+                                          value: 3,
+                                          label: "Email",
+                                          icon: "assets/media/enveloppe.png",
+                                        },
+                                      ].map((option) => (
+                                        <div
+                                          key={option.value}
+                                          className="col-xl-3 col-lg-4 col-md-4 col-xs-6 col-6 mb-4"
                                         >
-                                          <span className="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
-                                            <input
-                                              className="form-check-input"
-                                              type="radio"
-                                              name="ticket_option"
-                                              value={1}
-                                              checked={
-                                                selectedGetitcketOption === 1
-                                              }
-                                              onChange={
-                                                handleOptionGetitcketChange
-                                              }
-                                            />
-                                          </span>
-                                          <span className="ms-10">
-                                            <span className="fs-4 fw-bold text-gray-800 d-block text-theme">
-                                              {" "}
-                                              <img
-                                                className=""
-                                                width={20}
-                                                src="assets/media/chatting.png"
-                                              />{" "}
-                                              Sms{" "}
+                                          <label
+                                            className={`btn btn-outline btn-outline-dashed d-flex text-start p-6 ${
+                                              selectedGetitcketOption.includes(
+                                                option.value
+                                              )
+                                                ? "btn-active-light-primary active"
+                                                : ""
+                                            } ${
+                                              option.value === 1
+                                                ? "disabled"
+                                                : ""
+                                            }`}
+                                            data-kt-button="true"
+                                          >
+                                            <span className="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
+                                              <input
+                                                className="form-check-input"
+                                                type="checkbox"
+                                                name="ticket_option"
+                                                value={option.value}
+                                                checked={selectedGetitcketOption.includes(
+                                                  option.value
+                                                )}
+                                                onChange={
+                                                  handleOptionGetitcketChange
+                                                }
+                                              />
                                             </span>
-                                          </span>
-                                        </label>
-                                      </div>
-                                      <div className="col-xl-3 col-lg-4 col-md-4 col-xs-12 col-12 d-flex flex-column mb-4">
-                                        <label
-                                          className={`btn btn-outline btn-outline-dashed d-flex text-start p-6 ${
-                                            selectedGetitcketOption === 2
-                                              ? "btn-active-light-primary active"
-                                              : " "
-                                          }`}
-                                          data-kt-button="true"
-                                        >
-                                          <span className="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
-                                            <input
-                                              className="form-check-input"
-                                              type="radio"
-                                              name="ticket_option"
-                                              value={2}
-                                              checked={
-                                                selectedGetitcketOption === 2
-                                              }
-                                              onChange={
-                                                handleOptionGetitcketChange
-                                              }
-                                            />
-                                          </span>
-                                          <span className="ms-10">
-                                            <span className="fs-4 fw-bold text-gray-800 d-block text-theme">
-                                              {" "}
-                                              <img
-                                                className=""
-                                                width={20}
-                                                src="assets/media/whatsapp.png"
-                                              />{" "}
-                                              Whatsapp{" "}
+                                            <span className="ms-5">
+                                              <span className="fs-4 fw-bold text-gray-800 d-block text-theme">
+                                                <img
+                                                  className=""
+                                                  width={20}
+                                                  src={option.icon}
+                                                />{" "}
+                                                {option.label}
+                                              </span>
                                             </span>
-                                          </span>
-                                        </label>
-                                      </div>
-                                      <div className="col-xl-3 col-lg-4 col-md-4 col-xs-12 col-12 d-flex flex-column mb-4">
-                                        <label
-                                          className={`btn btn-outline btn-outline-dashed d-flex text-start p-6 ${
-                                            selectedGetitcketOption === 3
-                                              ? "btn-active-light-primary active"
-                                              : " "
-                                          }`}
-                                          data-kt-button="true"
-                                        >
-                                          <span className="form-check form-check-custom form-check-solid form-check-sm align-items-start mt-1">
-                                            <input
-                                              className="form-check-input"
-                                              type="radio"
-                                              name="ticket_option"
-                                              value={3}
-                                              checked={
-                                                selectedGetitcketOption === 3
-                                              }
-                                              onChange={
-                                                handleOptionGetitcketChange
-                                              }
-                                            />
-                                          </span>
-                                          <span className="ms-10">
-                                            <span className="fs-4 fw-bold text-gray-800 d-block text-theme">
-                                              {" "}
-                                              <img
-                                                className=""
-                                                width={20}
-                                                src="assets/media/enveloppe.png"
-                                              />{" "}
-                                              Email{" "}
-                                            </span>
-                                          </span>
-                                        </label>
-                                      </div>
+                                          </label>
+                                        </div>
+                                      ))}
                                     </div>
 
-                                    {selectedGetitcketOption === 1 && (
-                                      <div className="row" id="telephone">
-                                        <div className="col-md-12 fv-row">
-                                          <label className="required fs-6 fw-semibold mb-2 text-theme">
-                                            Téléphone
-                                          </label>
-                                          <div className="position-relative d-flex align-items-center">
-                                            <i className="ki-duotone ki-calendar-8 fs-2 position-absolute mx-4 text-theme">
-                                              <span className="path1" />
-                                              <span className="path2" />
-                                              <span className="path3" />
-                                              <span className="path4" />
-                                              <span className="path5" />
-                                              <span className="path6" />
-                                            </i>
-                                            <input
-                                              className="form-control form-control-solid ps-12"
-                                              placeholder="Entrez votre numéro de téléphone"
-                                              name="STR_TICPHONE"
-                                              type="tel"
-                                              value={telephone}
-                                              onChange={handleInputChange}
-                                            />
-                                          </div>
+                                    {selectedGetitcketOption.includes(1) && (
+                                      <div
+                                        className="col-md-6 fv-row"
+                                        id="STR_TICPHONE"
+                                      >
+                                        <label className="required fs-6 fw-semibold mb-2 text-theme">
+                                          Téléphone
+                                        </label>
+                                        <div className="position-relative d-flex align-items-center">
+                                          <input
+                                            className="form-control form-control-solid "
+                                            placeholder="Entrez votre numéro de téléphone"
+                                            name="STR_TICPHONE"
+                                            type="number"
+                                            value={STR_TICPHONE}
+                                            onChange={handleInputChange}
+                                          />
                                         </div>
                                       </div>
                                     )}
 
-                                    {selectedGetitcketOption === 2 && (
-                                      <div className="row" id="whatsapp">
-                                        <div className="col-md-6 fv-row">
-                                          <label className=" fs-6 fw-semibold mb-2 text-theme">
-                                            Numero whatsapp
-                                          </label>
-                                          <div className="position-relative d-flex align-items-center">
-                                            <i className="ki-duotone ki-calendar-8 fs-2 position-absolute mx-4">
-                                              <span className="path1" />
-                                              <span className="path2" />
-                                              <span className="path3" />
-                                              <span className="path4" />
-                                              <span className="path5" />
-                                              <span className="path6" />
-                                            </i>
-                                            <input
-                                              className="form-control form-control-solid ps-12"
-                                              placeholder="Entrez votre numéro de téléphone WhatsApp"
-                                              name="whatsappNumber"
-                                              type="tel"
-                                              value={whatsappNumber}
-                                              onChange={handleInputChange}
-                                            />
-                                          </div>
-                                        </div>
-                                        <div className="col-md-6 fv-row">
-                                          <label className=" fs-6 fw-semibold mb-2 text-theme">
-                                            Confirmé le numero
-                                          </label>
-                                          <div className="position-relative d-flex align-items-center">
-                                            <i className="ki-duotone ki-calendar-8 fs-2 position-absolute mx-4">
-                                              {" "}
-                                            </i>
-                                            <input
-                                              className="form-control form-control-solid ps-12"
-                                              placeholder="Confirmez votre numéro de téléphone WhatsApp"
-                                              name="confirmWhatsappNumber"
-                                              type="tel"
-                                              value={confirmWhatsappNumber}
-                                              onChange={handleInputChange}
-                                            />
-                                          </div>
+                                    {/* {selectedGetitcketOption.includes(2) && (
+                                      <div
+                                        className="col-md-4 fv-row"
+                                        id="whatsapp"
+                                      >
+                                        <label className="fs-6 fw-semibold mb-2 text-theme">
+                                          Numéro WhatsApp
+                                        </label>
+                                        <div className="position-relative d-flex align-items-center">
+                                          <input
+                                            className="form-control form-control-solid "
+                                            placeholder="Entrez votre numéro WhatsApp"
+                                            name="whatsappNumber"
+                                            type="tel"
+                                            value={whatsappNumber}
+                                            onChange={handleInputChange}
+                                          />
                                         </div>
                                       </div>
-                                    )}
+                                    )} */}
 
-                                    {selectedGetitcketOption === 3 && (
-                                      <div className="row" id="email">
-                                        <div className="col-md-12 fv-row">
-                                          <label className=" fs-6 fw-semibold mb-2 text-theme">
-                                            Email
-                                          </label>
-                                          <div className="position-relative d-flex align-items-center">
-                                            <input
-                                              className="form-control form-control-solid ps-12"
-                                              placeholder="Entrez votre email "
-                                              name="STR_TICMAIL"
-                                              type="email"
-                                              value={email}
-                                              onChange={handleInputChange}
-                                            />
-                                          </div>
+                                    {selectedGetitcketOption.includes(3) && (
+                                      <div
+                                        className="col-md-6 fv-row"
+                                        id="STR_TICMAIL"
+                                      >
+                                        <label className="fs-6 fw-semibold mb-2 text-theme">
+                                          Email
+                                        </label>
+                                        <div className="position-relative d-flex align-items-center">
+                                          <input
+                                            className="form-control form-control-solid "
+                                            placeholder="Entrez votre email"
+                                            name="STR_TICMAIL"
+                                            type="email"
+                                            value={STR_TICMAIL}
+                                            onChange={handleInputChange}
+                                          />
                                         </div>
                                       </div>
                                     )}
                                   </div>
-                                  <div class="fs-7 fw-semibold text-muted mt-5">
+
+                                  <div className="fs-7 fw-semibold text-muted mt-5">
                                     Champ obligatoire{" "}
                                     <span className="required"></span>
                                   </div>
@@ -707,7 +683,7 @@ function Detail() {
                                       <div className="text-muted fw-semibold fs-4 text-theme">
                                         {eventDetails.STR_EVESTATUTFREE === "0"
                                           ? "Renseignez vos informations et, acceptez les conditions générales de ventes et d’utilisation"
-                                          : "Choisissez votre méthode de payement."}
+                                          : "Choisissez votre méthode de payement en cliquant sur l'un des operateurs."}
                                       </div>
                                     </div>
                                     <div className="checkout-widget checkout-card p-0">
@@ -715,7 +691,7 @@ function Detail() {
                                         <div className="col-lg-12">
                                           <div
                                             id="payment-option-zone"
-                                            className="notice flex-column rounded border-warning border border-dashed mb-9 p-6 "
+                                            className="notice flex-column rounded border-warning_ border_ border-dashed_ mb-9 p-6 "
                                           >
                                             {eventDetails &&
                                               eventDetails.STR_EVESTATUTFREE !=
@@ -759,7 +735,7 @@ function Detail() {
                                                 id="mobile-money"
                                                 className="payment-card-form"
                                               >
-                                                {selectedOption === 2 &&
+                                                {/* {selectedOption === 2 &&
                                                   eventDetails.STR_EVESTATUTFREE !=
                                                     "0" && (
                                                     <div className="notice rounded border-success border border-dashed mb-3 p-6 w-100">
@@ -769,22 +745,9 @@ function Detail() {
                                                             Numero de paiement
                                                             MTN
                                                           </span>
-                                                          <span
-                                                            className="ms-1"
-                                                            data-bs-toggle="tooltip"
-                                                            aria-label="Specify a target name for future usage and reference"
-                                                            data-bs-original-title="Specify a target name for future usage and reference"
-                                                            data-kt-initialized="1"
-                                                          >
-                                                            <i className="ki-duotone ki-information-5 text-gray-500 fs-6">
-                                                              <span className="path1"></span>
-                                                              <span className="path2"></span>
-                                                              <span className="path3"></span>
-                                                            </i>
-                                                          </span>
                                                         </label>
                                                         <input
-                                                          type="text"
+                                                          type="number"
                                                           className="form-control form-control-solid"
                                                           id="STR_TICPHONEPAYMENT_MTN"
                                                           name="STR_TICPHONEPAYMENT_MTN"
@@ -799,7 +762,28 @@ function Detail() {
                                                         <div className="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                                                       </div>
                                                     </div>
-                                                  )}
+                                                  )} */}
+                                                <div className="notice rounded border-success border border-dashed mb-3 p-6 w-100">
+                                                  <div className="d-flex flex-column fv-row fv-plugins-icon-container">
+                                                    <label className="d-flex align-items-center fs-6 fw-semibold mb-2">
+                                                      <span className="required text-theme text-success">
+                                                        Numero de paiement
+                                                      </span>
+                                                    </label>
+                                                    <input
+                                                      type="number"
+                                                      className="form-control form-control-solid"
+                                                      id="STR_CLIPHONE"
+                                                      name="STR_CLIPHONE"
+                                                      value={STR_CLIPHONE}
+                                                      onChange={
+                                                        handleInputChange
+                                                      }
+                                                      placeholder="Nouméro de paiement"
+                                                    />
+                                                    <div className="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
+                                                  </div>
+                                                </div>
                                                 <div className="row w-100">
                                                   <div className="col-md-4 fv-row">
                                                     <label className="required fs-6 fw-semibold mb-2 text-theme">
@@ -854,18 +838,18 @@ function Detail() {
                                                       <input
                                                         type="email"
                                                         className="form-control form-control-solid bg-gray-500"
-                                                        value={emailPaiement}
+                                                        value={STR_CLIMAIL}
                                                         onChange={
                                                           handleInputChange
                                                         }
                                                         placeholder="Saisir Email"
-                                                        name="STR_TICMAILPAIEMENT"
+                                                        name="STR_CLIMAIL"
                                                       />
                                                     </div>
                                                     {!validateEmail(
-                                                      emailPaiement
+                                                      STR_CLIMAIL
                                                     ) &&
-                                                      emailPaiement && (
+                                                      STR_CLIMAIL && (
                                                         <span className="text-danger ms-2">
                                                           Format email invalide
                                                         </span>
