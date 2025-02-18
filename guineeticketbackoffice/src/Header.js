@@ -5897,6 +5897,38 @@ const Header = () => {
         </div>
         {/*end::Header container*/}
       </div>
+
+      <style>{`
+        .btn-custom:hover .menu-sub-dropdown {
+          display: block;
+        }
+
+        .dropdown-hover:hover .btn-custom {
+          display: block;
+        }
+
+        .dropdown-hover:hover .menu-sub-dropdown {
+          display: block !important;
+          z-index: 105;
+          position: fixed;
+          inset: 0px 0px auto auto;
+          margin: 0px;
+          transform: translate3d(-30px, 55px, 0px);
+        }
+
+        .dropdown-hover:hover .btn-custom {
+          display: block;
+        }
+
+        .dropdown-hover:hover .menu-sub-dropdown.show {
+          animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </>
   );
 };
