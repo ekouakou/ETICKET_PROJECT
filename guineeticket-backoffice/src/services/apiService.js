@@ -17,8 +17,8 @@ const getRootUrl = (port) => {
 const getFullUrl = () => {
   const { protocol, hostname, port } = window.location;
   const portPart = port ? `:${port}` : '';
-  return `http://www.guineeticket.com/`;
-  // return `${protocol}//${hostname}/`;
+  // return `http://www.guineeticket.com/`;
+  return `${protocol}//${hostname}/`;
 };
 
 

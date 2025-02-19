@@ -1,4 +1,3 @@
-alert("edmond kouakou");
 
 var KTComponents = {
     init: function() {

@@ -30,8 +30,8 @@ import SignIn from "./AppPages/login/SignIn";
 import SaveEvent from "./AppPages/EticketEvent/SaveEvent";
 // import EventListPage from './AppPages/EticketEvent/ListeEventData.js';
 import SaveBannerPage from "./AppPages/EticketBanner/SaveBanner.js";
-// import ClientListPage from './pageComponent/client/ClientListPage';
-// import DetailClient from './pageComponent/client/DetailClient';
+import ListeClient from './AppPages/EticketClient/ListeClient';
+import DetailClient from './AppPages/EticketClient/DetailClient';
 // import TicketListPage from './pageComponent/ticket/TicketListPage';
 // import TableauDeBord from './pageComponent/dashboard/TableauDeBord';
 import DashboardAnnonceur from "./AppPages/EticketDashboard/DashboardAnnonceur.js";
@@ -70,7 +70,6 @@ const AppContent = () => {
     eventDetails: process.env.REACT_APP_EVENT_DETAILS,
     eventList: process.env.REACT_APP_EVENT_LIST,
     saveBanner: process.env.REACT_APP_SAVE_BANNER,
-    clientList: process.env.REACT_APP_CLIENT_LIST,
     ticketList: process.env.REACT_APP_TICKET_LIST,
     detailClient: process.env.REACT_APP_DETAIL_CLIENT,
     dashboard: process.env.REACT_APP_DASHBOARD,
@@ -84,6 +83,7 @@ const AppContent = () => {
 
     ticketList: process.env.REACT_APP_LISTE_TICKET,
     clientListe: process.env.REACT_APP_LISTE_CLIENT,
+
 
     listeProfil: process.env.REACT_APP_LISTE_PROFIL,
     saveProfil: process.env.REACT_APP_SAVE_PROFIL,
@@ -287,7 +287,9 @@ const AppContent = () => {
                 <Route path="/" element={<SignIn />} />
                 <Route path="*" element={<NotFound />} />
                 <Route path={paths.saveBanner} element={<SaveBannerPage />} />
-                {/* <Route path={paths.clientList} element={<ClientListPage />} /> */}
+                <Route path={paths.clientListe} element={<ListeClient />} /> 
+                <Route path={paths.detailClient} element={<DetailClient />} /> 
+
                 {/* <Route path={paths.dashboard} element={<DashboardAnnonceur />} /> */}
                 <Route path={paths.saveEventData} element={<SaveEvent />} />
                 <Route path={paths.listeEventData} element={<ListeEvent />} />
