@@ -18,6 +18,7 @@ const getFullUrl = () => {
   const { protocol, hostname, port } = window.location;
   const portPart = port ? `:${port}` : '';
   // return `http://www.guineeticket.com/`;
+  // return `http://192.168.1.5/`;
   return `${protocol}//${hostname}/`;
 };
 

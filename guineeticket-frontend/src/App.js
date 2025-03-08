@@ -14,6 +14,9 @@ import DetailEventRedirect from './AppPages/Home/DetailEventRedirect';
 import Footer from './AppComponents/Footer/Footer';
 import ScrollToTop from './AppComponents/ScrollToTop';
 
+import PhotoFrameApp from './AppPages/Home/PhotoFrameApp';
+
+
 function App() {
   return (
     <div className="app-content">
@@ -22,6 +25,7 @@ function App() {
         <div className="content">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/PhotoFrameApp" element={<PhotoFrameApp />} />
             <Route path="/form" element={<RegisterForm />} />
             <Route path="/detail-event" element={<DetailPage />} />
             <Route path="/detail-event/:id" element={<DetailEventRedirect />} />

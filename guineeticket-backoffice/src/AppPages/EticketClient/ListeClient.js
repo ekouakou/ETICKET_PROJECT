@@ -71,7 +71,7 @@ const ListeUser = () => {
                     data={eventData}
                     columns={eventService.getColumns()}
                     tableId="eventTable"
-                    onEdit={(id) => navigate(process.env.REACT_APP_DETAIL_CLIENT, { state: { LG_UTIID: id } })}
+                    onEdit={(id) => navigate(process.env.REACT_APP_DETAIL_CLIENT, { state: { LG_CLIID: id } })}
                     onDelete={true}
                     onToggleStatus={false}
                     deleteConfirmMessage={(id) => `Êtes-vous sûr de vouloir supprimer cet utilisateur? (${id}) ?`}

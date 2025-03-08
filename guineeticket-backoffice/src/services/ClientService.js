@@ -27,7 +27,7 @@ class ClientService {
     }
   }
 
-  async getClientTickets(navigate, dateRange = { start: "2020-01-01", end: "2025-08-31" }) {
+  async getClientTickets(navigate, LG_CLIID, dateRange = { start: "2020-01-01", end: "2025-08-31" }) {
 
     const user = authService.checkAuth(navigate);
     if (!user) return false;
@@ -36,7 +36,7 @@ class ClientService {
       // fetchData({ mode: 'listUtilisateur', STR_UTITOKEN: user.STR_UTITOKEN, LG_PROID: user.LG_PROID}, apiUrl, setEventData);
       //{ mode: 'listTicket', LG_CLIID: userData.STR_CLILOGIN, DT_BEGIN: "2024-01-01", DT_END: "2024-10-06" }
       const response = await crudData(
-        { mode: 'listTicket', LG_CLIID: "IrH34HV0biMiL06EsMgO", DT_BEGIN: "2024-01-01", DT_END: "2025-10-06" },
+        { mode: 'listTicket', LG_CLIID: LG_CLIID, DT_BEGIN: "2024-01-01", DT_END: "2025-10-06" },
         process.env.REACT_APP_TICKET_MANAGER_API_URL
       );
       return response.data?.data || [];

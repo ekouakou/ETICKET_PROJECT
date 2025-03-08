@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import logo from './logo.svg';
 import './App.css';
 import LoadScripts from "./LoadScripts";
-import SideBar from "./SideBar";
+import SideBar from "./AppPage/SideBar";
 import Header from "./Header";
 import ChatDrawer from "./ChatDrawer";
 import ThemeBuilder from "./ThemeBuilder";
