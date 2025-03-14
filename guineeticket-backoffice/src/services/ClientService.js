@@ -7,6 +7,7 @@ import { crudData } from "./apiService";
 class ClientService {
   constructor() {
     this.endPoint = process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL;
+    this.TicketendPoint = process.env.REACT_APP_TICKET_MANAGER_API_URL;
   }
 
   async getEvents(navigate, dateRange = { start: "2020-01-01", end: "2025-08-31" }) {
@@ -46,19 +47,19 @@ class ClientService {
     }
   }
 
-  async updateEventStatus(navigate, eventId, status) {
+  async sendTicket(navigate, eventId, status) {
     const user = authService.checkAuth(navigate);
     if (!user) return false;
 
     try {
       await crudData(
         {
-          mode: "deleteUtilisateur",
-          LG_UTIID: eventId,
-          STR_UTISTATUT: status,
+          mode: "sendTicket",
+          LG_TICID: eventId,
+          STR_TICNAME: status,
           STR_UTITOKEN: user.STR_UTITOKEN,
         },
-        this.endPoint
+        this.TicketendPoint
       );
       return true;
     } catch (error) {
@@ -163,22 +164,12 @@ class ClientService {
       },
       { data: "DT_TCIVALIDATED", title: "Date Début" },
       { data: "DT_TCIVALIDATED", title: "Date Fin" },
-      // {
-      //   data: "STR_UTISTATUT",
-      //   title: "Statut",
-      //   render: (data) => {
-      //     const statusClass =
-      //       data === "enable" ? "badge-light-success" : "badge-light-danger";
-      //     const statusText = data === "enable" ? "Activé" : "Désactivé";
-      //     return `<span class="badge ${statusClass}">${statusText}</span>`;
-      //   },
-      // },
       {
         data: null,
         title: "Action",
         render: (data, type, row) => `
           <div class="d-flex justify-content-start">
-            <button class="btn btn-warning btn-sm me-2 action-edit" data-id="${row.LG_UTIID}">
+            <button class="btn btn-warning btn-sm me-2 send-ticket" data-id="${row.LG_TICID}" data-ticketname="${row.STR_TICNAME}">
               <i class="fa fa-share"></i>
             </button>
           

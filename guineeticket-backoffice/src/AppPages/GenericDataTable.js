@@ -11,6 +11,7 @@ const GenericDataTable = ({
   data,
   columns,
   tableId,
+  onSendTicket,
   onEdit,
   onDelete,
   onToggleStatus,
@@ -49,6 +50,28 @@ const GenericDataTable = ({
       $(`#${tableId}`).on("click", ".action-edit", function () {
         const id = $(this).data("id");
         onEdit(id);
+      });
+    }
+
+    if (onSendTicket) {
+      $(`#${tableId}`).on("click", ".send-ticket", function () {
+        const id = $(this).data("id");
+        const STR_TICNAME = $(this).data("ticketname");
+        Swal.fire({
+          title: deleteConfirmMessage(id, STR_TICNAME),
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonText: "Oui",
+          cancelButtonText: "Annuler",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            handleApiCall({
+              mode: "sendTicket",
+              id,
+              STR_TICNAME,
+            });
+          }
+        });
       });
     }
 

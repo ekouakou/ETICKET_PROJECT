@@ -84,13 +84,10 @@ const DetailClient = () => {
     }
   }, [utilisateurId]); // La fonction se déclenche quand l'ID change
 
-  const handleApiCall = async ({ mode, id, status }) => {
+  const handleApiCall = async ({ mode, id, ticketName }) => {
     let success = false;
-
-    if (mode === "delete") {
-      success = await ClientService.deleteEvent(navigate, id);
-    } else if (mode === "updateStatus") {
-      success = await ClientService.updateEventStatus(navigate, id, status);
+    if (mode === "sendTicket") {
+      success = await ClientService.sendTicket(navigate, id, ticketName);
     }
 
     if (success) {
@@ -101,22 +98,6 @@ const DetailClient = () => {
       fetchEvents(); // Rechargement des tickets après une opération
     }
   };
-
-  const ticketsData = [
-    { month: "Jan", tickets: 47 },
-    { month: "Feb", tickets: 67 },
-    { month: "Mar", tickets: 87 },
-    { month: "Apr", tickets: 115 },
-    { month: "May", tickets: 78 },
-    { month: "Jun", tickets: 62 },
-    { month: "Jul", tickets: 78 },
-    { month: "Aug", tickets: 88 },
-    { month: "Sep", tickets: 1 },
-    { month: "Oct", tickets: 1 },
-    { month: "Nov", tickets: 1 },
-    { month: "Dec", tickets: 1 },
-  ];
-
 
   return (
     <>
@@ -443,23 +424,16 @@ const DetailClient = () => {
                         </div>
                       </div>
                       <div className="row g-xxl-3">
-                      <GenericDataTable
+                        <GenericDataTable
                           data={ticketData}
                           columns={ClientService.getTicketsColumns()}
                           tableId="eventTable"
-                          onEdit={(id) =>
-                            navigate(process.env.REACT_APP_DETAIL_CLIENT, {
-                              state: { LG_CLIID: id },
-                            })
-                          }
-                          onDelete={true}
-                          onToggleStatus={true}
+                          onSendTicket={true}
                           deleteConfirmMessage={(id) =>
-                            `Êtes-vous sûr de vouloir supprimer cet utilisateur? (${id}) ?`
+                            `Êtes-vous sûr de vouloir envoyé lme ticket à cet utilisateur?`
                           }
-                          toggleStatusConfirmMessage={(id, newStatus) =>
-                            `Êtes-vous sûr de vouloir ${
-                              newStatus === "enable" ? "activer" : "désactiver"
+                          toggleStatusConfirmMessage={(id, STR_TICNAME) =>
+                            `Êtes-vous sûr de vouloir 
                             } cet utilisateur (${id}) ?`
                           }
                           handleApiCall={handleApiCall}
@@ -475,7 +449,7 @@ const DetailClient = () => {
                   <div className="card card-flush h-xl-100">
                     <div className="card-body pt-6">
                       <>
-                        
+
                       </>
                     </div>
                   </div>
