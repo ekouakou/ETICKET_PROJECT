@@ -320,7 +320,7 @@ function Detail() {
         handlePaymentError(error);
         clearInterval(intervalId);
       }
-    }, 10000);
+    }, 20000);
   };
 
   const handleVerificationResponse = (verifyData, intervalId) => {
