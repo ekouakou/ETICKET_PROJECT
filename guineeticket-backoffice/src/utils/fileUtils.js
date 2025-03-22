@@ -5,7 +5,53 @@ const CORS_PROXIES = [
   "https://api.allorigins.win/raw?url=", // Mettons celui-ci en premier car souvent plus rapide
 ];
 
-export const urlToFile = async (imageUrl, fileName = "image.jpg") => {
+// Constante pour la largeur maximale du preview
+const MAX_PREVIEW_WIDTH = 400; // Ajustez selon vos besoins
+
+// Fonction pour redimensionner une image
+const resizeImage = async (file, maxWidth) => {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        // Calculer les nouvelles dimensions en gardant le ratio
+        let width = img.width;
+        let height = img.height;
+        
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        
+        // Créer un canvas pour redimensionner
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Dessiner l'image redimensionnée
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir en blob avec une qualité réduite pour le preview
+        canvas.toBlob(
+          (blob) => {
+            resolve(new File([blob], file.name, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            }));
+          },
+          "image/jpeg",
+          0.3 // Qualité de 70%, bon compromis qualité/taille
+        );
+      };
+    };
+  });
+};
+
+export const urlToFile = async (imageUrl, fileName = "image.jpg", forPreview = false) => {
   try {
     if (!isValidUrl(imageUrl)) {
       throw new Error("URL invalide");
@@ -34,7 +80,14 @@ export const urlToFile = async (imageUrl, fileName = "image.jpg") => {
 
         if (response.ok) {
           const blob = await response.blob();
-          return new File([blob], fileName, { type: blob.type });
+          const file = new File([blob], fileName, { type: blob.type });
+          
+          // Si c'est pour un preview, on redimensionne l'image
+          if (forPreview) {
+            return await resizeImage(file, MAX_PREVIEW_WIDTH);
+          }
+          
+          return file;
         }
       } catch (proxyError) {
         lastError = proxyError;
@@ -75,8 +128,11 @@ export const handleFileChange = (
     }));
 
     if (setPreview) {
-      const previewUrl = URL.createObjectURL(fileOrUrl);
-      setPreview(previewUrl);
+      // Pour la prévisualisation, on redimensionne au besoin
+      resizeImage(fileOrUrl, MAX_PREVIEW_WIDTH).then(resizedFile => {
+        const previewUrl = URL.createObjectURL(resizedFile);
+        setPreview(previewUrl);
+      });
     }
   } else if (typeof fileOrUrl === "string" && fileOrUrl.trim() !== "") {
     const fullUrl = fileOrUrl.startsWith("http")
@@ -89,7 +145,9 @@ export const handleFileChange = (
     }));
 
     if (setPreview) {
-      setPreview(fullUrl);
+      // Ajouter un paramètre de cache-busting pour éviter le cache navigateur
+      const cacheBustUrl = `${fullUrl}?t=${Date.now()}`;
+      setPreview(cacheBustUrl);
     }
   }
 };
@@ -104,12 +162,37 @@ export const processFile = async (key, filePath, setFormData, setPreview) => {
 
   try {
     const imageUrl = `${process.env.REACT_APP_BASE_IMAGE_URL}${filePath}`;
-    const file = await urlToFile(imageUrl, extractFileName(filePath));
+    // Passer true pour indiquer que c'est pour le preview
+    const file = await urlToFile(imageUrl, extractFileName(filePath), true);
 
     if (file) {
       handleFileChange(key, file, setFormData, setPreview);
     }
   } catch (error) {
     console.error(`Erreur lors du traitement du fichier ${key}:`, error);
+  }
+};
+
+// Fonction pour précharger une image à basse résolution rapidement
+export const preloadThumbnail = async (filePath, setPreview) => {
+  if (!filePath) return;
+  
+  try {
+    const imageUrl = `${process.env.REACT_APP_BASE_IMAGE_URL}${filePath}`;
+    // Créer une URL avec paramètres pour une version plus petite (si votre backend le supporte)
+    // Par exemple: imageUrl + "?width=100"
+    const thumbnailUrl = imageUrl + "?width=100";  // Ajustez selon votre backend
+    
+    // Afficher d'abord cette miniature
+    setPreview(thumbnailUrl);
+    
+    // Puis charger la version redimensionnée complète en arrière-plan
+    const file = await urlToFile(imageUrl, extractFileName(filePath), true);
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setPreview(previewUrl);
+    }
+  } catch (error) {
+    console.error(`Erreur lors du préchargement de la miniature:`, error);
   }
 };

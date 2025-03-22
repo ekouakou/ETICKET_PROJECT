@@ -14,7 +14,8 @@ export const confirmAction = (title, actionType, formDataToSend, resetForm, endP
         confirmButtonText: actionType === 'update' ? 'Oui, Modifier!' : 'Oui, Enregistrer!',
     }).then((result) => {
         if (result.isConfirmed) {
-            setLoading(true); // Affiche le loader
+            setLoading(true); // Activer le loader UNIQUEMENT si l'utilisateur a confirmé
+            
             return crudData(formDataToSend, endPoint)
                 .then(response => {
                     const { desc_statut, code_statut } = response.data;
@@ -44,5 +45,6 @@ export const confirmAction = (title, actionType, formDataToSend, resetForm, endP
                     });
                 });
         }
+        // Si l'utilisateur annule, on ne fait rien et le loader ne s'active pas
     });
 };

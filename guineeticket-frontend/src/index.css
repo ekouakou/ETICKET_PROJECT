@@ -1666,3 +1666,38 @@ p {
 .barcode > img {
   filter: blur(5px); /* Ajuste le niveau de flou en pixels */
 }
+
+
+
+/* menu mobile */
+
+
+/* Style pour l'overlay du menu mobile */
+.mobile-menu-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Fond semi-transparent */
+  z-index: 100 !important; /* Juste en dessous du menu mobile mais au-dessus du reste */
+  backdrop-filter: blur(2px); /* Effet de flou (optionnel) */
+  animation: fadeIn 0.3s ease; /* Animation douce */
+  cursor: pointer; /* Indique que c'est cliquable */
+}
+
+/* Animation de fondu à l'entrée */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Assurez-vous que le menu mobile est au-dessus de l'overlay */
+.header__nav--active {
+  z-index: 1000;
+}
+
+/* Empêche le défilement du body quand le menu est ouvert */
+body.overflow-hidden {
+  overflow: hidden;
+}

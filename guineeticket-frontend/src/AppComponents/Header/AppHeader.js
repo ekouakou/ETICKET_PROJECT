@@ -1,12 +1,11 @@
-// Import necessary dependencies
 import React, { useState, useRef, useEffect, useContext } from "react";
-import { useTheme } from "../../contexts/ThemeProvider"; // Custom hook for theme management
+import { useTheme } from "../../contexts/ThemeProvider";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
-import LogoHeader from "./LogoHeader"; // Component for the site logo
-import PanierItem from "./PanierItem"; // Component for individual cart items
-import DropdownMenu from "./DropdownMenu"; // Custom dropdown menu component
-import { HeaderContext } from "../../contexts/HeaderContext"; // Context for header-related state
+import LogoHeader from "./LogoHeader";
+import PanierItem from "./PanierItem";
+import DropdownMenu from "./DropdownMenu";
+import { HeaderContext } from "../../contexts/HeaderContext";
 import {
   Modal,
   Button,
@@ -15,7 +14,7 @@ import {
   ButtonToolbar,
   Divider,
 } from "rsuite";
-import { CartContext } from "../../contexts/CartContext"; // Context for cart-related state
+import { CartContext } from "../../contexts/CartContext";
 import {
   faSun,
   faMoon,
@@ -24,57 +23,65 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 function Header({ onSearch }) {
-  // Theme context for toggling between light and dark themes
   const { theme, toggleTheme } = useTheme();
 
-  // State variables for managing visibility and input states
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [menuActive, setMenuActive] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
 
-  // Refs for DOM elements
   const searchInputRef = useRef(null);
   const searchIconRef = useRef(null);
   const headerNavRef = useRef(null);
   const filterFixedRef = useRef(null);
 
-  // Context values for search and cart functionality
-  const { searchTerm, setSearchTerm, handleSearchSubmit } = useContext(HeaderContext);
+  const { searchTerm, setSearchTerm, handleSearchSubmit } =
+    useContext(HeaderContext);
   const { cartItems, updateCartItems } = useContext(CartContext);
 
-  // Fetch user data from localStorage (if available)
   const user = JSON.parse(localStorage.getItem("user"));
   console.log(user);
 
-  // Menu structure (currently commented out, can be enabled if needed)
   const menus = [
-    // Example menu structure
-    // {
-    //   label: 'Home',
-    //   link: '#',
-    //   submenu: [
-    //     { label: 'Home style 1', link: 'index.html' },
-    //     { label: 'Home style 2', link: 'index2.html' },
-    //     { label: 'Home style 3', link: 'index3.html' },
-    //   ],
-    // },
+    // Menus structure here
   ];
 
-  // Toggles the visibility of the menu
+  // État pour gérer la visibilité du modal des conditions de vente
+  const [rows, setRows] = useState(0);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+  const handleEntered = () => setRows(3);
+
+  // Toggle menu and enable/disable body scroll when menu is opened
   const toggleHeaderMenu = () => {
     setMenuActive((prev) => !prev);
     if (filterFixedRef.current) {
       filterFixedRef.current.classList.toggle("filter--hidden");
     }
+
+    // Toggle body scroll when menu is active
+    if (!menuActive) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
   };
 
-  // Toggles the theme between light and dark
+  // Close mobile menu when clicking overlay
+  const closeMenu = () => {
+    setMenuActive(false);
+    if (filterFixedRef.current) {
+      filterFixedRef.current.classList.add("filter--hidden");
+    }
+    document.body.style.overflow = "";
+  };
+
   const toggleButton = () => {
     toggleTheme();
   };
 
-  // Toggles the visibility of the cart modal
   const toggleCartVisibility = (event) => {
     event.preventDefault();
     setIsCartVisible(!isCartVisible);
@@ -83,7 +90,6 @@ function Header({ onSearch }) {
     }
   };
 
-  // Closes the search input when clicking outside
   const handleClickOutside = (event) => {
     if (
       searchInputRef.current &&
@@ -94,27 +100,25 @@ function Header({ onSearch }) {
     }
   };
 
-  // Attach event listener for clicks outside the search input
   useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      // Clean up body overflow when component unmounts
+      document.body.style.overflow = "";
     };
   }, []);
 
-  // Determines if a route is active (used for NavLink)
   const isActiveFunc = (match, location) => {
     return match !== null;
   };
 
-  // Handles changes in the search input field
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
-    onSearch(value); // Propagate the search term to the parent
+    onSearch(value);
   };
 
-  // Removes an item from the cart
   const handleRemoveItem = (index) => {
     const updatedCartItems = [...cartItems];
     updatedCartItems.splice(index, 1);
@@ -122,50 +126,17 @@ function Header({ onSearch }) {
     localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
   };
 
-  // Toggles the visibility of the search input
   const toggleSearch = () => {
     setSearchActive((prev) => !prev);
   };
 
-  // Cart modal content
-  const CartModal = (
-    <Modal size="lg" show={isCartVisible} onHide={() => setIsCartVisible(false)} animation={false} centered>
-      <Modal.Header closeButton>
-        <div className="card-header pt-7">
-          <h3 className="card-title fw-bold text-gray-900 text-theme">
-            Vos commandes en cours
-          </h3>
-        </div>
-      </Modal.Header>
-      <Modal.Body>
-        <div className="hover-scroll-overlay-y pe-6 me-n6">
-          {cartItems.length === 0 ? (
-            <p className="text-theme">Votre panier est vide.</p>
-          ) : (
-            cartItems.map((item, index) => (
-              <PanierItem
-                key={index}
-                pannierData={item}
-                index={index}
-                onRemove={() => handleRemoveItem(index)}
-              />
-            ))
-          )}
-        </div>
-      </Modal.Body>
-      <Modal.Footer>
-        <NavLink exact to="/detail-event">
-          <Button variant="success">Passez à l'achat</Button>
-        </NavLink>
-        <Button variant="secondary" onClick={() => setIsCartVisible(false)}>
-          Fermer
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
-
   return (
     <>
+      {/* Overlay qui apparaît lorsque le menu mobile est actif */}
+      {menuActive && (
+        <div className="mobile-menu-overlay" onClick={closeMenu}></div>
+      )}
+
       <header id="header" className={`header ${theme}`}>
         <div className="container">
           <div className="row">
@@ -188,16 +159,16 @@ function Header({ onSearch }) {
                         href={menu.link}
                         role="button"
                         data-bs-toggle={
-                          menu.submenu.length > 0 ? "dropdown" : undefined
+                          menu.submenu?.length > 0 ? "dropdown" : undefined
                         }
                         aria-expanded="false"
                       >
                         {menu.label}{" "}
-                        {menu.submenu.length > 0 && (
+                        {menu.submenu?.length > 0 && (
                           <i className="ti ti-chevron-down" />
                         )}
                       </a>
-                      {menu.submenu.length > 0 && (
+                      {menu.submenu?.length > 0 && (
                         <ul className="dropdown-menu header__dropdown-menu">
                           {menu.submenu.map((item, subIndex) => (
                             <li key={subIndex}>
@@ -260,7 +231,7 @@ function Header({ onSearch }) {
                       type="text"
                       placeholder="Search..."
                       value={searchTerm}
-                      onChange={handleSearchChange} // Update on input change
+                      onChange={handleSearchChange}
                     />
                     <button className="header__search-button" type="button">
                       <i className="ti ti-search" />
@@ -281,14 +252,15 @@ function Header({ onSearch }) {
                     <i className="ti ti-search" />
                   </button>
 
-                  {/* Cart Dropdown */}
                   <div className="header__sign-in  mx-2">
-                    <a
-                      className="header__nav-link"
-                      role="button"
-                      onClick={toggleCartVisibility}
+                    <button
+                      className="header__nav-link mon-panier"
+                      type="button"
+                      // onClick={toggleCartVisibility}
+                      onClick={() => {
+                        handleOpen();
+                      }}
                     >
-                      {/* Replacing "Pannier" with the shopping cart icon */}
                       <FontAwesomeIcon icon={faShoppingCart} className="" />
                       <span className="conpteur-pannier">
                         {cartItems.reduce(
@@ -296,11 +268,11 @@ function Header({ onSearch }) {
                           0
                         )}
                       </span>
-                    </a>
+                    </button>
                   </div>
 
                   <div
-                    className="header__sign-in  mx-2 "
+                    className="header__sign-in mx-2 "
                     id="toggletheme"
                     onClick={toggleButton}
                   >
@@ -317,7 +289,6 @@ function Header({ onSearch }) {
                     </a>
                   </div>
 
-                  {/* User Profile Dropdown */}
                   <div className="header__profile  mx-2" id="header__profile">
                     <a
                       className="header__sign-in header__sign-in--user px-5 m-0"
@@ -351,19 +322,7 @@ function Header({ onSearch }) {
                           </NavLink>
                         </li>
                       )}
-
-                      {/* <li><a href="profile.html"><i className="ti ti-stereo-glasses" /> Subscription</a></li>
-                                  <li><a href="profile.html"><i className="ti ti-bookmark" /> Favorites</a></li>
-                                  <li><a href="profile.html"><i className="ti ti-settings" /> Settings</a></li> */}
                     </div>
-
-                    {/* <ul className="dropdown-menu dropdown-menu-end header__dropdown-menu header__dropdown-menu--user">
-                                  <li><a href="profile.html"><i className="ti ti-ghost" /> Profile</a></li>
-                                  <li><a href="profile.html"><i className="ti ti-stereo-glasses" /> Subscription</a></li>
-                                  <li><a href="profile.html"><i className="ti ti-bookmark" /> Favorites</a></li>
-                                  <li><a href="profile.html"><i className="ti ti-settings" /> Settings</a></li>
-                                  <li><a href="#"><i className="ti ti-logout" /> Logout</a></li>
-                              </ul> */}
                   </div>
                 </div>
 
@@ -378,13 +337,57 @@ function Header({ onSearch }) {
                   <span />
                   <span />
                 </button>
-                {CartModal}
               </div>
             </div>
           </div>
         </div>
-        {CartModal}
-        {/* Render the Cart Modal */}
+
+        <Modal
+          open={open}
+          onClose={handleClose}
+          onEntered={handleEntered}
+          size="md"
+        >
+          <Modal.Header closeButton>
+            <div className="card-header pt-7">
+              <h3 className="card-title fw-bold text-gray-900 text-theme">
+                Vos commandes en cours
+              </h3>
+            </div>
+          </Modal.Header>
+          <Modal.Body>
+            <div className="hover-scroll-overlay-y pe-6 me-n6">
+              {cartItems.length === 0 ? (
+                <p className="text-theme">Votre panier est vide.</p>
+              ) : (
+                cartItems.map((item, index) => (
+                  <PanierItem
+                    key={index}
+                    pannierData={item}
+                    index={index}
+                    onRemove={() => handleRemoveItem(index)}
+                  />
+                ))
+              )}
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button
+              variant="success"
+              onClick={() => {
+                handleClose();
+                // La redirection est gérée par le NavLink
+              }}
+              as={NavLink}
+              to="/detail-event"
+            >
+              Passez à l'achat
+            </Button>
+            <Button onClick={handleClose} appearance="primary" className="ms-2">
+              Fermer
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </header>
     </>
   );

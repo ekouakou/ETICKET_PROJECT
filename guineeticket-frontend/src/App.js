@@ -14,7 +14,7 @@ import DetailEventRedirect from './AppPages/Home/DetailEventRedirect';
 import Footer from './AppComponents/Footer/Footer';
 import ScrollToTop from './AppComponents/ScrollToTop';
 
-import PhotoFrameApp from './AppPages/Home/PhotoFrameApp';
+import PhotoFrameApp from './AppPages/Home/PhotoFrameApp.js';
 
 
 function App() {

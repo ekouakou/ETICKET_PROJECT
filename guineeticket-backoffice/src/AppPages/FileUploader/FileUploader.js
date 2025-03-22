@@ -1,11 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { ToastContainer, toast } from 'react-toastify';
+import {toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { Loader } from 'rsuite'; // Importation du Loader de React Suite
+import 'rsuite/dist/rsuite.min.css'; // Style de React Suite
 
 const FileUploader = ({ previewImage, onFileSelect }) => {
   const [file, setFile] = useState(null);
   const [fileSize, setFileSize] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // État pour suivre le chargement
 
   useEffect(() => {
     if (previewImage) {
@@ -25,20 +28,36 @@ const FileUploader = ({ previewImage, onFileSelect }) => {
       return;
     }
 
-    setFile({
-      file: uploadedFile,
-      preview: URL.createObjectURL(uploadedFile)
-    });
-    setFileSize(fileSizeInMB);
+    setIsLoading(true); // Activer le loader
 
-    if (onFileSelect) {
-      onFileSelect(uploadedFile);
-    }
+    // Simuler le temps de chargement de l'image
+    const img = new Image();
+    img.src = URL.createObjectURL(uploadedFile);
+    
+    img.onload = () => {
+      setFile({
+        file: uploadedFile,
+        preview: img.src
+      });
+      setFileSize(fileSizeInMB);
+
+      if (onFileSelect) {
+        onFileSelect(uploadedFile);
+      }
+      setIsLoading(false); // Désactiver le loader une fois l'image chargée
+    };
+
+    img.onerror = () => {
+      toast.error('Erreur lors du chargement de l\'image.');
+      setIsLoading(false); // Désactiver le loader en cas d'erreur
+    };
   }, [onFileSelect]);
 
   const removeFile = (e) => {
     e.stopPropagation();
-    URL.revokeObjectURL(file.preview);
+    if (file && file.preview) {
+      URL.revokeObjectURL(file.preview);
+    }
     setFile(null);
     setFileSize(null);
 
@@ -58,7 +77,11 @@ const FileUploader = ({ previewImage, onFileSelect }) => {
         </a>
       </div>
       <div className="dropzone-items wm-200px">
-        {file ? (
+        {isLoading ? (
+          <div style={styles.loaderContainer}>
+            <Loader size="md" content="Chargement en cours..." vertical />
+          </div>
+        ) : file ? (
           <div className="image-input image-input-empty image-input-outline image-input-placeholder" data-kt-image-input="true">
             <div 
               className="image-input-wrapper w-125px h-125px" 
@@ -117,6 +140,14 @@ const styles = {
     textAlign: 'center',
     cursor: 'pointer',
     marginBottom: '20px'
+  },
+  loaderContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '125px',
+    width: '125px',
+    margin: '0 auto'
   }
 };
 

@@ -30,7 +30,11 @@ import format from "date-fns/format";
 
 //
 
-import { loadStores, fetchCategorieData, useLoadStores } from "../../utils/apiUtils";
+import {
+  loadStores,
+  fetchCategorieData,
+  useLoadStores,
+} from "../../utils/apiUtils";
 import { urlToFile, processFile } from "../../utils/fileUtils";
 import { confirmAction } from "../../utils/notificationUtils";
 import { authService } from "../../services/AuthService";
@@ -264,25 +268,6 @@ const SaveEvent = () => {
 
   // ++++++++++++++++++++++++++++++++++++++++++ GESTION DES MODIFICATION D'UN EVENEMENT ++++++++++++++++++++++++++++++++++++++++++
 
-  // useEffect(() => {
-  //   if (location.state && location.state.LG_EVEID) {
-  //     setEventId(location.state.LG_EVEID);
-  //     // LISTES DES CATEGORIE DE TICKET DE L'EVENEMENT
-  //     crudData( { mode: "getEvenement", LG_EVEID: location.state.LG_EVEID }, TicketendPoint )
-  //       .then((response) => {
-  //         setEventDetails(response.data);
-  //         loadStores( { mode: "listListe", LG_TYLID: "TYPEPLACE", STR_LSTOTHERVALUE: location.state.STR_EVESTATUTFREE},
-  //           endPoint, setcategorieData, { valueKey: "LG_LSTID", labelKey: "STR_LSTDESCRIPTION" }
-  //         );
-  //         fetchCategorieData( { mode: "listCategorieplaceEvenement", LG_EVEID: location.state.LG_EVEID, }, TicketendPoint, setCategories
-  //         ); // LISTES DES CATEGORIE DE TICKET DE L'EVENEMENT
-  //       })
-  //       .catch((error) => {
-  //         console.error("Erreur lors de la récupération des données:", error);
-  //       });
-  //   }
-  // }, [location.state]);
-
   useEffect(() => {
     const eventId = location.state?.LG_EVEID;
     if (!eventId) return;
@@ -353,12 +338,7 @@ const SaveEvent = () => {
           setFormData(formattedEventData);
 
           // Traitement des fichiers
-          await Promise.all([
-            processFile("STR_EVEPIC", STR_EVEPIC,  setFormData, setPreviewPic ),
-            processFile("STR_EVEBANNER", STR_EVEBANNER,  setFormData, setPreviewPic ),
-            processFile("STR_EVEANNONCEURPIC", STR_EVEANNONCEURPIC,  setFormData, setPreviewPic )
-          ]);
-
+          
           const initialFreeEvent = STR_EVESTATUTFREE;
           setFreeEvent(initialFreeEvent);
 
@@ -392,6 +372,13 @@ const SaveEvent = () => {
           setCategories((prevCategories) =>
             prevCategories.length > 0 ? prevCategories : [1]
           );
+
+          await Promise.all([
+            processFile("STR_EVEPIC", STR_EVEPIC, setFormData, setPreviewPic),
+            processFile( "STR_EVEBANNER", STR_EVEBANNER, setFormData, setPreviewBanner),
+            processFile( "STR_EVEANNONCEURPIC", STR_EVEANNONCEURPIC, setFormData, setPreviewAnnonceurPic),
+          ]);
+
         }
       } catch (error) {
         console.error("Erreur lors de la récupération des données:", error);
@@ -1186,7 +1173,7 @@ const SaveEvent = () => {
                                               <div className="col-12">
                                                 <div className="form-group mb-5">
                                                   <label className="fs-6 form-label fw-bold text-gray-900">
-                                                  Nombre de ticket par achat
+                                                    Nombre de ticket par achat
                                                   </label>
                                                   <div className="input-group mb-3">
                                                     <input
@@ -1344,10 +1331,7 @@ const SaveEvent = () => {
                                   </div>
                                   <FileUploader
                                     onFileSelect={(file) =>
-                                      handleFileChange(
-                                        "STR_EVEANNONCEURPIC",
-                                        file
-                                      )
+                                      handleFileChange( "STR_EVEANNONCEURPIC", file )
                                     }
                                     previewImage={previewAnnoncerPic}
                                   />
@@ -1389,6 +1373,20 @@ const SaveEvent = () => {
           </div>
         </div>
       </div>
+
+      {loading && (
+        <div
+          className="position-fixed w-100 h-100 d-flex justify-content-center align-items-center"
+          style={{
+            top: 0,
+            left: 0,
+            backgroundColor: "rgba(255,255,255,0.8)",
+            zIndex: 9999,
+          }}
+        >
+          <Loader size="lg" content="Traitement en cours..." vertical />
+        </div>
+      )}
     </>
   );
 };

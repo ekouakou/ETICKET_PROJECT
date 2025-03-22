@@ -6,13 +6,13 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import { FaFacebook, FaEnvelope } from "react-icons/fa"; // Importer les icônes
 import TermsAndConditions from "../TermsAndConditions";
 import {
-    Modal,
-    // Button,
-    Placeholder,
-    Loader,
-    ButtonToolbar,
-    Divider,
-  } from "rsuite";
+  Modal,
+  // Button,
+  Placeholder,
+  Loader,
+  ButtonToolbar,
+  Divider,
+} from "rsuite";
 function Footer() {
   const { theme, toggleTheme } = useTheme();
   // État pour gérer la visibilité du modal des conditions de vente
@@ -54,7 +54,8 @@ function Footer() {
                     className="social-icon"
                   >
                     <FaFacebook size={24} className="text-theme mb-2" />
-                  </a></div>
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -74,7 +75,8 @@ function Footer() {
                     <NavLink exact to="/contactUs">
                       <a href="#">Contact</a>
                     </NavLink>
-                  </li></ul>
+                  </li>
+                </ul>
               </div>
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6 mb-30">
@@ -83,14 +85,12 @@ function Footer() {
                   <h3>Mentions légales</h3>
                 </div>
                 <ul>
-                  <li onClick={() => {
-                        handleOpen();
-                      }}>
-                    <a
-                      
-                    >
-                      Politique de confidentialité
-                    </a>
+                  <li
+                    onClick={() => {
+                      handleOpen();
+                    }}
+                  >
+                    <a>Politique de confidentialité</a>
                   </li>
                   <li>
                     <a
@@ -110,7 +110,7 @@ function Footer() {
                       Conditions générales d'utilisation
                     </a>
                   </li>
-                  </ul>
+                </ul>
               </div>
             </div>
             <div class="col-xl-3 col-lg-4 col-md-6 mb-30">
@@ -118,7 +118,8 @@ function Footer() {
                 <div class="footer-widget-heading">
                   <h3>Newsletters</h3>
                 </div>
-                <ul class="list-1 p-0"><li>
+                <ul class="list-1 p-0">
+                  <li>
                     <form className="d-flex">
                       <input
                         type="email"
@@ -141,7 +142,6 @@ function Footer() {
             </div>
           </div>
         </div>
-
       </div>
 
       <div class="copyright-area">

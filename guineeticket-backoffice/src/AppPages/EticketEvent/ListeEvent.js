@@ -20,7 +20,6 @@ const ListeEvent = () => {
   const fetchEvents = async () => {
     const events = await eventService.getEvents(navigate);
     setEventData(events);
-    // setLoading(false);
   };
 
   const handleApiCall = async ({ mode, id, status }) => {
