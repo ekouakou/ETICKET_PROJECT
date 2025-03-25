@@ -779,7 +779,7 @@ function Detail() {
                                                       onChange={
                                                         handleInputChange
                                                       }
-                                                      placeholder="Nouméro de paiement"
+                                                      placeholder="Numéro de paiement"
                                                     />
                                                     <div className="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback"></div>
                                                   </div>

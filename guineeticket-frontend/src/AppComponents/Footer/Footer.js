@@ -150,7 +150,7 @@ function Footer() {
             <div class="col-xl-6 col-lg-6 text-center text-lg-left">
               <div class="copyright-text">
                 <p>
-                  2024 &copy; Tous droits réservés <a href="#">Afridigicom</a>
+                  2025 &copy; Tous droits réservés <a href="https://afridigicom.com/">Afridigicom</a>
                 </p>
               </div>
             </div>
