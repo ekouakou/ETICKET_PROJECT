@@ -1,5 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { CartContext } from "../../contexts/CartContext";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 const PanierItem = ({ pannierData, index, onRemove }) => {
   const [quantity, setQuantity] = useState(pannierData.quantity);
@@ -72,15 +74,6 @@ const PanierItem = ({ pannierData, index, onRemove }) => {
       >
         <div className="d-flex flex-column py-2">
           <div className="d-flex align-items-center">
-            {/* <div
-              className="bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-400px min-h-sm-100 h-100  w-100px h-100px me-5 event-image "
-              style={{
-                backgroundSize: "100% 100%",
-                backgroundImage: `url(${
-                  urlBaseImage + pannierData.STR_EVEPIC
-                })`,
-              }}
-            ></div> */}
             <div className="item__cover card-rounded min-h-400px min-h-sm-100 h-100  w-100px h-100px me-5 event-image">
               <img
                 src={
@@ -98,7 +91,7 @@ const PanierItem = ({ pannierData, index, onRemove }) => {
                   {pannierData.STR_EVENAME}
                 </h5>
                 <div className="flex items-center justify-between grow eventInfo">
-                  <div id="lieu" className=" items-center  grow">
+                  <div id="lieu" className=" items-center  grow me-5">
                     {/* Icone Lieu */}
                     <div className="symbol symbol-20px symbol-circle me-3">
                       <span className="badge badge-light-warning ">
@@ -146,7 +139,7 @@ const PanierItem = ({ pannierData, index, onRemove }) => {
             className="btn btn-sm btn-light-danger btn-active-light-danger"
             onClick={onRemove}
           >
-            <i className="fas fa-trash"></i>
+            <FontAwesomeIcon icon={faTrash} />
           </button>
         </div>
       </div>

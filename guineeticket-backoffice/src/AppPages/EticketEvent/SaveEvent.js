@@ -735,11 +735,12 @@ const SaveEvent = () => {
                                       Heure de début
                                     </label>
                                     <Form.Group controlId="formDateEnd">
+                                      
                                       <TimePicker
                                         format="HH:mm"
                                         size="lg"
                                         style={{ width: "100%" }}
-                                        editable={false}
+                                        editable={true}
                                         value={formData.HR_EVEBEGIN}
                                         onChange={(e) =>
                                           handleChange(e, "HR_EVEBEGIN")

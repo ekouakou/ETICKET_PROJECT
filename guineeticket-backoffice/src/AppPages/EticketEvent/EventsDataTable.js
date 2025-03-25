@@ -2,88 +2,139 @@ import React, { useState, useEffect } from "react";
 import {
   Table,
   Pagination,
-  ButtonGroup,
   Button,
-  Toggle,
+  Space,
   Modal,
   Form,
-  Schema,
   DatePicker,
-  Loader,
-  IconButton,
-  FlexboxGrid,
-  SelectPicker,
-  Notification,
-  toaster,
+  Spin,
+  Switch,
+  Image,
+  notification,
+  Breadcrumb,
+  Typography,
+  Tag,
   Input,
-} from "rsuite";
-import "rsuite/dist/rsuite.min.css";
-import { Edit, Trash, Plus, Check, Close } from "@rsuite/icons";
+  Select,
+  Row,
+  Col,
+  Card
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  CheckOutlined,
+  CloseOutlined
+} from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import eventService from "../../services/EventService";
-import PageTitle from "../PageTitle";
-import ActionButton from "../ActionButton";
+
+const { Title } = Typography;
+const { Search } = Input;
+const { Option } = Select;
 
 const paths = JSON.parse(localStorage.getItem("appPaths"));
-
-const { Column, HeaderCell, Cell } = Table;
-
-// Création du schéma de validation
-const { StringType, DateType } = Schema.Types;
-const model = Schema.Model({
-  STR_EVENAME: StringType().isRequired("Le nom est requis"),
-  STR_EVEDESCRIPTION: StringType().isRequired("La description est requise"),
-  LG_LSTPLACEID: StringType().isRequired("Le lieu est requis"),
-  DT_EVEBEGIN: DateType().isRequired("La date de début est requise"),
-  DT_EVEEND: DateType().isRequired("La date de fin est requise"),
-});
 
 const EventsDataTable = () => {
   const navigate = useNavigate();
 
   // États pour gérer les données et l'interface
   const [events, setEvents] = useState([]);
+  const [allEvents, setAllEvents] = useState([]);  // Tous les événements non filtrés
   const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(0);
-  const [limit, setLimit] = useState(10);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pagination, setPagination] = useState({
+    current: 1,
+    pageSize: 10,
+    total: 0,
+    pageSizeOptions: [10, 20, 50, 100],
+    showSizeChanger: true
+  });
   const [currentEvent, setCurrentEvent] = useState(null);
-  const [formValue, setFormValue] = useState({});
-  const [formError, setFormError] = useState({});
   const [dateRange, setDateRange] = useState({
     start: "2020-01-01",
     end: "2025-08-31",
   });
+  const [searchText, setSearchText] = useState('');
 
   // Fonction pour charger les données
   const loadData = async () => {
     try {
       setLoading(true);
       const data = await eventService.getEvents(navigate, dateRange);
-
-      // Pagination côté client puisque l'API ne supporte pas la pagination
-      const paginatedData = data.slice((page - 1) * limit, page * limit);
+      
+      // Sauvegarder toutes les données
+      setAllEvents(data);
+      
+      // Filtrer selon le texte de recherche
+      const filteredData = filterData(data, searchText);
+      
+      // Pagination côté client
+      const { current, pageSize } = pagination;
+      const paginatedData = filteredData.slice(
+        (current - 1) * pageSize, 
+        current * pageSize
+      );
 
       setEvents(paginatedData);
-      setTotal(data.length);
+      setPagination({
+        ...pagination,
+        total: filteredData.length
+      });
       setLoading(false);
     } catch (error) {
       console.error("Erreur lors du chargement des données:", error);
-      toaster.push(
-        <Notification type="error" header="Erreur">
-          Impossible de charger les données. Veuillez réessayer.
-        </Notification>
-      );
+      notification.error({
+        message: "Erreur",
+        description: "Impossible de charger les données. Veuillez réessayer."
+      });
       setLoading(false);
     }
+  };
+  
+  // Fonction pour filtrer les données selon le texte de recherche
+  const filterData = (data, searchText) => {
+    if (!searchText) return data;
+    
+    const searchLower = searchText.toLowerCase();
+    return data.filter(event => {
+      return (
+        (event.STR_EVENAME && event.STR_EVENAME.toLowerCase().includes(searchLower)) ||
+        (event.LG_LSTPLACEID && event.LG_LSTPLACEID.toString().toLowerCase().includes(searchLower)) ||
+        (event.DT_EVEBEGIN && event.DT_EVEBEGIN.toLowerCase().includes(searchLower)) ||
+        (event.DT_EVEEND && event.DT_EVEEND.toLowerCase().includes(searchLower))
+      );
+    });
   };
 
   // Chargement initial des données
   useEffect(() => {
     loadData();
-  }, [page, limit, dateRange]);
+  }, [pagination.current, pagination.pageSize, dateRange]);
+  
+  // Effet pour gérer les changements de recherche
+  useEffect(() => {
+    if (allEvents.length > 0) {
+      const filteredData = filterData(allEvents, searchText);
+      
+      // Réinitialiser à la première page lors d'une nouvelle recherche
+      const newPagination = {
+        ...pagination,
+        current: 1,
+        total: filteredData.length
+      };
+      
+      setPagination(newPagination);
+      
+      // Appliquer la pagination aux résultats filtrés
+      const paginatedData = filteredData.slice(
+        0, 
+        pagination.pageSize
+      );
+      
+      setEvents(paginatedData);
+    }
+  }, [searchText]);
 
   // Fonction pour gérer le changement de statut
   const handleToggleStatus = async (eventId, currentStatus) => {
@@ -105,259 +156,244 @@ const EventsDataTable = () => {
 
         setEvents(updatedEvents);
 
-        toaster.push(
-          <Notification type="success" header="Succès">
-            Statut mis à jour avec succès
-          </Notification>
-        );
+        notification.success({
+          message: "Succès",
+          description: "Statut mis à jour avec succès"
+        });
       } else {
         throw new Error("Échec de la mise à jour du statut");
       }
     } catch (error) {
       console.error("Erreur lors de la mise à jour du statut:", error);
-      toaster.push(
-        <Notification type="error" header="Erreur">
-          Impossible de mettre à jour le statut
-        </Notification>
-      );
+      notification.error({
+        message: "Erreur",
+        description: "Impossible de mettre à jour le statut"
+      });
     }
   };
 
-  // Fonction pour ouvrir le modal de modification
-  // Modifiez la fonction handleEdit pour naviguer vers la page d'édition
+  // Fonction pour éditer un événement
   const handleEdit = (event) => {
     navigate(paths.saveEventData, {
       state: { LG_EVEID: event.LG_EVEID },
     });
   };
 
+  // Fonction pour supprimer un événement
   const handleDeleteClick = (event) => {
     setCurrentEvent(event);
-    try {
-      const success = eventService.deleteEvent(navigate, event.LG_EVEID);
-
-      if (success) {
-        toaster.push(
-          <Notification type="success" header="Succès">
-            Statut mis à jour avec succès
-          </Notification>
-        );
-      } else {
-        throw new Error("Échec de la mise à jour du statut");
-      }
-    } catch (error) {
-      console.error("Erreur lors de la suppression:", error);
-      toaster.push(
-        <Notification type="error" header="Erreur">
-          Impossible de supprimer l'événement
-        </Notification>
-      );
-    }
-
-    eventService.deleteEvent(navigate, event.LG_EVEID);
-    // setShowDeleteModal(true);
-  };
-
-  // Cellule personnalisée pour la colonne d'actions
-  const ActionCell = ({ rowData, dataKey, ...props }) => {
-    return (
-      <Cell {...props} style={{ padding: "6px" }}>
-        <ButtonGroup>
-          <IconButton
-            appearance="primary"
-            onClick={() => handleEdit(rowData)}
-            icon={<Edit />}
-            size="sm"
-          />
-          <IconButton
-            appearance="subtle"
-            color="red"
-            onClick={() => handleDeleteClick(rowData)}
-            icon={<Trash />}
-            size="sm"
-          />
-          <IconButton
-            appearance={
-              rowData.STR_EVESTATUT === "enable" ? "ghost" : "primary"
-            }
-            color={rowData.STR_EVESTATUT === "enable" ? "red" : "green"}
-            onClick={() =>
-              handleToggleStatus(rowData.LG_EVEID, rowData.STR_EVESTATUT)
-            }
-            icon={rowData.STR_EVESTATUT === "enable" ? <Close /> : <Check />}
-            size="sm"
-          />
-        </ButtonGroup>
-      </Cell>
-    );
-  };
-
-  // Cellule personnalisée pour l'affichage des images
-  const ImageCell = ({ rowData, dataKey, ...props }) => {
-    return (
-      <Cell {...props}>
-        {rowData[dataKey] && (
-          <img
-            src={`${process.env.REACT_APP_BASE_IMAGE_URL}${rowData[dataKey]}`}
-            alt={rowData.STR_EVENAME}
-            style={{ width: "50px", height: "50px", objectFit: "cover" }}
-          />
-        )}
-      </Cell>
-    );
-  };
-
-  // Cellule personnalisée pour l'affichage du statut avec toggle
-  const StatusCell = ({ rowData, dataKey, ...props }) => {
-    return (
-      <Cell {...props} style={{ padding: "6px" }}>
-        <Toggle
-          checked={rowData[dataKey] === "enable"}
-          onChange={() =>
-            handleToggleStatus(rowData.LG_EVEID, rowData[dataKey])
+    Modal.confirm({
+      title: "Êtes-vous sûr de vouloir supprimer cet événement?",
+      content: `L'événement "${event.STR_EVENAME}" sera supprimé définitivement.`,
+      okText: "Supprimer",
+      okType: "danger",
+      cancelText: "Annuler",
+      onOk: async () => {
+        try {
+          const success = await eventService.deleteEvent(navigate, event.LG_EVEID);
+  
+          if (success) {
+            notification.success({
+              message: "Succès",
+              description: "Événement supprimé avec succès"
+            });
+            loadData(); // Rechargement des données
+          } else {
+            throw new Error("Échec de la suppression");
           }
-          size="sm"
-          checkedChildren="Actif"
-          unCheckedChildren="Inactif"
+        } catch (error) {
+          console.error("Erreur lors de la suppression:", error);
+          notification.error({
+            message: "Erreur",
+            description: "Impossible de supprimer l'événement"
+          });
+        }
+      }
+    });
+  };
+
+  // Gestion de la pagination
+  const handleTableChange = (pagination) => {
+    setPagination(pagination);
+  };
+  
+  // Fonction pour gérer la recherche
+  const handleSearch = (value) => {
+    setSearchText(value);
+  };
+
+  // Configuration des colonnes
+  const columns = [
+    {
+      title: "Image",
+      dataIndex: "STR_EVEPIC",
+      key: "image",
+      width: 70,
+      render: (text) => (
+        text && (
+          <Image
+            src={`${process.env.REACT_APP_BASE_IMAGE_URL}${text}`}
+            alt="Événement"
+            width={50}
+            height={50}
+            style={{ objectFit: "cover" }}
+            preview={false}
+          />
+        )
+      )
+    },
+    {
+      title: "Nom",
+      dataIndex: "STR_EVENAME",
+      key: "name",
+      width: 200,
+    },
+    {
+      title: "Lieu",
+      dataIndex: "LG_LSTPLACEID",
+      key: "place",
+      width: 150,
+    },
+    {
+      title: "Date début",
+      dataIndex: "DT_EVEBEGIN",
+      key: "startDate",
+      width: 100,
+    },
+    /*{
+      title: "Date fin",
+      dataIndex: "DT_EVEEND",
+      key: "endDate",
+      width: 100,
+    },*/
+    {
+      title: "Heure début",
+      dataIndex: "HR_EVEBEGIN",
+      key: "startTime",
+      width: 100,
+    },
+    /*{
+      title: "Heure fin",
+      dataIndex: "HR_EVEEND",
+      key: "endTime",
+      width: 100,
+    },*/
+    {
+      title: "Catégories",
+      dataIndex: "categorie",
+      key: "categories",
+      width: 180,
+      render: (categories) => (
+        categories && categories.map((cat, index) => (
+          <div key={index}>
+            <small>
+              {cat.STR_LSTDESCRPTION}: {cat.DBL_ELIAMOUNT} GNF
+            </small>
+            {index < categories.length - 1 && <br />}
+          </div>
+        ))
+      )
+    },
+    {
+      title: "Statut",
+      dataIndex: "STR_EVESTATUT",
+      key: "status",
+      width: 100,
+      render: (status, record) => (
+        <Switch
+          checked={status === "enable"}
+          onChange={() => handleToggleStatus(record.LG_EVEID, status)}
+          checkedChildren={<CheckOutlined />}
+          unCheckedChildren={<CloseOutlined />}
         />
-      </Cell>
-    );
-  };
-
-  // Cellule personnalisée pour les catégories
-  const CategoriesCell = ({ rowData, dataKey, ...props }) => {
-    return (
-      <Cell
-        {...props}
-        style={{ maxWidth: "50px", maxHeight: "50px", objectFit: "cover" }}
-      >
-        {rowData.categorie &&
-          rowData.categorie.map((cat, index) => (
-            <div key={index}>
-              <small>
-                {cat.STR_LSTDESCRPTION}: {cat.DBL_ELIAMOUNT} GNF
-              </small>
-              {index < rowData.categorie.length - 1 && <br />}
-            </div>
-          ))}
-      </Cell>
-    );
-  };
-
-  // Gérer le changement de date
-  const handleDateRangeChange = (value) => {
-    setDateRange(value);
-  };
-
-  const breadcrumbs = [
-    { text: "Evenement", link: "/" },
-    { isBullet: true },
-    { text: "Liste des évènements" },
+      )
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 150,
+      fixed: "right",
+      render: (_, record) => (
+        <Space size="small">
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            size="small"
+          />
+          <Button
+            type="text"
+            danger
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteClick(record)}
+            size="small"
+          />
+          <Button
+            type={record.STR_EVESTATUT === "enable" ? "text" : "primary"}
+            danger={record.STR_EVESTATUT === "enable"}
+            icon={record.STR_EVESTATUT === "enable" ? <CloseOutlined /> : <CheckOutlined />}
+            onClick={() => handleToggleStatus(record.LG_EVEID, record.STR_EVESTATUT)}
+            size="small"
+          />
+        </Space>
+      )
+    }
   ];
 
   return (
     <div className="app-main flex-column flex-row-fluid" id="kt_app_main">
       <div className="d-flex flex-column flex-column-fluid">
         <div id="kt_app_toolbar" className="app-toolbar py-3 py-lg-6">
-          <div
-            id="kt_app_toolbar_container"
-            className="app-container container-xxl d-flex flex-stack"
-          >
-            <PageTitle
-              heading="Liste des évenements"
-              breadcrumbs={breadcrumbs}
-            />
-            <ActionButton
-              text="Ajouter un évenement"
-              link={process.env.REACT_APP_SAVE_EVENT_DATA}
-              className="btn-primary"
-            />
+          <div id="kt_app_toolbar_container" className="app-container container-xxl d-flex flex-stack">
+            {/* Titre et fil d'Ariane */}
+            <div>
+              <Title level={3}>Liste des évenements</Title>
+              <Breadcrumb items={[
+                { title: "Evenement" },
+                { title: "Liste des évènements" }
+              ]} />
+            </div>
+            
+            {/* Bouton d'ajout */}
+            <Button 
+              type="primary" 
+              icon={<PlusOutlined />}
+              onClick={() => navigate(process.env.REACT_APP_SAVE_EVENT_DATA)}
+            >
+              Ajouter un évenement
+            </Button>
           </div>
         </div>
+        
         <div id="kt_app_content" className="app-content flex-column-fluid">
-          <div
-            id="kt_app_content_container"
-            className="app-container container-xxl"
-          >
-            {loading ? (
-              <div style={{ textAlign: "center", padding: 20 }}>
-                <Loader size="lg" content="Chargement des données..." />
-              </div>
-            ) : (
-              <>
-                <Table autoHeight data={events} bordered cellBordered hover>
-                  <Column width={70} align="center">
-                    <HeaderCell>Image</HeaderCell>
-                    <ImageCell dataKey="STR_EVEPIC" />
-                  </Column>
-
-                  <Column width={200}>
-                    <HeaderCell>Nom</HeaderCell>
-                    <Cell dataKey="STR_EVENAME" />
-                  </Column>
-
-                  <Column width={150}>
-                    <HeaderCell>Lieu</HeaderCell>
-                    <Cell dataKey="LG_LSTPLACEID" />
-                  </Column>
-
-                  <Column width={100}>
-                    <HeaderCell>Date début</HeaderCell>
-                    <Cell dataKey="DT_EVEBEGIN" />
-                  </Column>
-
-                  <Column width={100}>
-                    <HeaderCell>Date fin</HeaderCell>
-                    <Cell dataKey="DT_EVEEND" />
-                  </Column>
-
-                  <Column width={100}>
-                    <HeaderCell>Heure début</HeaderCell>
-                    <Cell dataKey="HR_EVEBEGIN" />
-                  </Column>
-
-                  <Column width={100}>
-                    <HeaderCell>Heure fin</HeaderCell>
-                    <Cell dataKey="HR_EVEEND" />
-                  </Column>
-
-                  <Column width={180}>
-                    <HeaderCell>Catégories</HeaderCell>
-                    <CategoriesCell dataKey="categorie" />
-                  </Column>
-
-                  <Column width={100}>
-                    <HeaderCell>Statut</HeaderCell>
-                    <StatusCell dataKey="STR_EVESTATUT" />
-                  </Column>
-
-                  <Column width={150} fixed="right">
-                    <HeaderCell>Actions</HeaderCell>
-                    <ActionCell dataKey="id" />
-                  </Column>
-                </Table>
-
-                <div style={{ padding: "20px 0" }}>
-                  <Pagination
-                    prev
-                    next
-                    first
-                    last
-                    ellipsis
-                    boundaryLinks
-                    maxButtons={5}
-                    size="md"
-                    layout={["total", "-", "limit", "|", "pager", "skip"]}
-                    total={total}
-                    limitOptions={[10, 20, 30]}
-                    limit={limit}
-                    activePage={page}
-                    onChangePage={setPage}
-                    onChangeLimit={setLimit}
+          <div id="kt_app_content_container" className="app-container container-xxl">
+            <Card>
+              <Row gutter={[16, 16]} className="mb-4">
+                <Col xs={24} md={12}>
+                  <Search 
+                    placeholder="Rechercher par nom, lieu ou date..." 
+                    allowClear 
+                    enterButton="Rechercher" 
+                    size="middle" 
+                    onSearch={handleSearch}
+                    onChange={(e) => handleSearch(e.target.value)}
                   />
-                </div>
-              </>
-            )}
+                </Col>
+              </Row>
+              
+              <Spin spinning={loading} tip="Chargement des données...">
+                <Table
+                  columns={columns}
+                  dataSource={events}
+                  rowKey="LG_EVEID"
+                  pagination={pagination}
+                  onChange={handleTableChange}
+                  bordered
+                  size="middle"
+                  scroll={{ x: 1300 }}
+                />
+              </Spin>
+            </Card>
           </div>
         </div>
       </div>
