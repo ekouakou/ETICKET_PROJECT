@@ -25,7 +25,7 @@ const STR_EVESTATUTFREE = localStorage.getItem('STR_EVESTATUTFREE');
 
 const paymentOptions = [
     { id: 1, type: 'mobile-money', name: 'Orange Money', image: 'assets/images/payment/om.png', STR_CURRENCY: 'GNF', STR_PROVIDER: "orangemoney" },
-    { id: 2, type: 'mobile-money', name: 'Mtn Money', image: 'assets/images/payment/logo-mtn.png', STR_CURRENCY: 'GNF', STR_PROVIDER: "mtnmoney" },
+    { id: 2, type: 'mobile-money', name: 'Mtn MoMo', image: 'assets/images/payment/logo-mtn.png', STR_CURRENCY: 'GNF', STR_PROVIDER: "mtnmoney" },
 ];
 
 

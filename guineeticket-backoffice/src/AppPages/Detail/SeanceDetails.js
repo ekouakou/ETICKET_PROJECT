@@ -141,7 +141,7 @@ const SeanceDetails = ({ seanceData }) => {
                       <li>
                         <h6 className="subtitle"><span>CAT</span><span>{detail.category}</span></h6>
                         <div className="info"><span>Quantité</span> <span>{detail.quantity}</span></div>
-                        <div className="info"><span>Tarif</span> <span>{detail.price} FCFA</span></div>
+                        <div className="info"><span>Tarif</span> <span>{detail.price} GNF</span></div>
                       </li>
                     </ul>
                   ))}
@@ -149,7 +149,7 @@ const SeanceDetails = ({ seanceData }) => {
               </ul>
             </div>
             <div className="proceed-area text-center">
-              <h6 className="subtitle"><span>Total</span><span>{totalAmount.toFixed(2)} FCFA</span></h6>
+              <h6 className="subtitle"><span>Total</span><span>{totalAmount.toFixed(2)} GNF</span></h6>
               {totalAmount > 0 && (
                 <Link className="w-100" to="/paiement" onClick={handlePaymentClick}>
                   <button className="custom-button back-button">Paiement</button>

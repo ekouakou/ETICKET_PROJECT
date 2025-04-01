@@ -664,7 +664,20 @@ const SaveEvent = () => {
                                     <label className="required fs-6 form-label fw-bold text-gray-900">
                                       Lieu de l'évenement
                                     </label>
-                                    <Form.Group
+
+                                    <div className="input-group mb-5">
+                                      <input
+                                        type="text"
+                                        id="LG_LSTPLACEID"
+                                        name="LG_LSTPLACEID"
+                                        className="form-control"
+                                        placeholder="Saisir le lieu de l'événement"
+                                        value={formData.LG_LSTPLACEID}
+                                        onChange={handleInputTextChange}
+                                      />
+                                    </div>
+
+                                    {/* <Form.Group
                                       controlId="formDate"
                                       className="w-100"
                                     >
@@ -679,7 +692,7 @@ const SaveEvent = () => {
                                         placeholder="Sélectionnez un lieu" // Texte affiché par défaut
                                         className="basic-multi-select"
                                       />
-                                    </Form.Group>
+                                    </Form.Group> */}
                                   </div>
                                 </div>
                               </div>

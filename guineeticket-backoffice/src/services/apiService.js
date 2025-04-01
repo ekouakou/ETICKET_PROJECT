@@ -9,7 +9,7 @@ const getRootUrl = (port) => {
   //const baseUrl = "/backoffice/webservices/";
   // const baseUrl = "/webservices/";
   const finalPort = port ? port : defaultPort;
-  return `http://192.168.1.4:${finalPort}/`;
+  return `https://192.168.1.4:${finalPort}/`;
   //return `${originWithoutPort}:${finalPort}${baseUrl}`;
 };
 
@@ -17,9 +17,9 @@ const getRootUrl = (port) => {
 const getFullUrl = () => {
   const { protocol, hostname, port } = window.location;
   const portPart = port ? `:${port}` : '';
-  return `http://www.guineeticket.com/`;
+  // return `https://www.guineeticket.com/`;
   // return `http://192.168.1.5/`;
-  // return `${protocol}//${hostname}/`;
+  return `${protocol}//${hostname}/`;
 };
 
 

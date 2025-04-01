@@ -149,8 +149,8 @@ const BannerDataTable = () => {
       if (success) {
         // Mise à jour locale des données
         const updatedEvents = events.map((event) =>
-          event.LG_EVEID === eventId
-            ? { ...event, STR_EVESTATUT: newStatus }
+          event.LG_BANID === eventId
+            ? { ...event, STR_BANSTATUT: newStatus }
             : event
         );
 
@@ -175,7 +175,7 @@ const BannerDataTable = () => {
   // Fonction pour éditer un événement
   const handleEdit = (event) => {
     navigate(paths.saveEventData, {
-      state: { LG_EVEID: event.LG_EVEID },
+      state: { LG_BANID: event.LG_BANID },
     });
   };
 
@@ -190,7 +190,7 @@ const BannerDataTable = () => {
       cancelText: "Annuler",
       onOk: async () => {
         try {
-          const success = await eventService.deleteEvent(navigate, event.LG_EVEID);
+          const success = await eventService.deleteEvent(navigate, event.LG_BANID);
   
           if (success) {
             notification.success({
@@ -296,13 +296,13 @@ const BannerDataTable = () => {
     },
     {
       title: "Statut",
-      dataIndex: "STR_EVESTATUT",
+      dataIndex: "STR_BANSTATUT",
       key: "status",
       width: 100,
       render: (status, record) => (
         <Switch
           checked={status === "enable"}
-          onChange={() => handleToggleStatus(record.LG_EVEID, status)}
+          onChange={() => handleToggleStatus(record.LG_BANID, status)}
           checkedChildren={<CheckOutlined />}
           unCheckedChildren={<CloseOutlined />}
         />
@@ -329,10 +329,10 @@ const BannerDataTable = () => {
             size="small"
           />
           <Button
-            type={record.STR_EVESTATUT === "enable" ? "text" : "primary"}
-            danger={record.STR_EVESTATUT === "enable"}
-            icon={record.STR_EVESTATUT === "enable" ? <CloseOutlined /> : <CheckOutlined />}
-            onClick={() => handleToggleStatus(record.LG_EVEID, record.STR_EVESTATUT)}
+            type={record.STR_BANSTATUT === "enable" ? "text" : "primary"}
+            danger={record.STR_BANSTATUT === "enable"}
+            icon={record.STR_BANSTATUT === "enable" ? <CloseOutlined /> : <CheckOutlined />}
+            onClick={() => handleToggleStatus(record.LG_BANID, record.STR_BANSTATUT)}
             size="small"
           />
         </Space>
@@ -385,7 +385,7 @@ const BannerDataTable = () => {
                 <Table
                   columns={columns}
                   dataSource={events}
-                  rowKey="LG_EVEID"
+                  rowKey="LG_BANID"
                   pagination={pagination}
                   onChange={handleTableChange}
                   bordered

@@ -64,7 +64,7 @@ const PanierItem = ({ pannierData, index, onRemove }) => {
                 <span className="badge badge-light-warning ">{pannierData.category}</span>
               </div>
               <div className="fs-6 fw-semibold text-gray-500">
-                <span>{pannierData.totalPrice} FCFA</span>
+                <span>{pannierData.totalPrice} GNF</span>
               </div>
               <div className="fs-6 fw-semibold text-gray-800">
                 <i className="fas fa-calendar-alt"></i><span>{pannierData.DT_EVEBEGIN}</span> | <i className="far fa-clock"></i><span>{pannierData.HR_EVEBEGIN}</span>

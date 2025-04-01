@@ -62,7 +62,7 @@ const paymentOptions = [
   {
     id: 2,
     type: "mobile-money",
-    name: "Mtn Money",
+    name: "Mtn MoMo",
     image: "assets/images/payment/logo-mtn.png",
     STR_CURRENCY: "GNF",
     STR_PROVIDER: "mtnmoney",

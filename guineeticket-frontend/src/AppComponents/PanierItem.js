@@ -106,7 +106,7 @@ const PanierItem = ({ pannierData, index, onRemove }) => {
                       </span>
                     </div>
                     <div className="fs-6 fw-semibold text-gray-500">
-                      <span>{pannierData.totalPrice} FCFA</span>
+                      <span>{pannierData.totalPrice} GNF</span>
                     </div>
                     <div className="fs-6 fw-semibold text-gray-800 text-theme">
                       <i className="fas fa-calendar-alt"></i>
