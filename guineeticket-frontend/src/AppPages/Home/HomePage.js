@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import useFetchData from "../../services/useFetchData";
 import AppHeader from "../../AppComponents/Header/AppHeader";
 import SliderComponent from "../../AppComponents/Slider/SliderComponent";
-import { urlBaseImage, rootUrl } from "../../services/urlUtils";
+import { urlBaseImage, rootUrl , baseUrl} from "../../services/urlUtils";
 import ExpectedPremiere from "./ExpectedPremiere";
 import BannerSkeleton from "../../AppPages/Skeleton/BannerSkeleton";
 import SiteHeaderSkeleton from "../Skeleton/SiteHeaderSkeleton";
@@ -88,6 +88,7 @@ const EventList = () => {
             <ExpectedPremiere
               ImagelBaseUrl={urlBaseImage}
               fullUrl={rootUrl}
+              baseUrl={baseUrl}
               data={activitesData}
               searchTerm={searchTerm}
             />

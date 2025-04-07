@@ -18,6 +18,8 @@ import NotFound from "./AppPages/Home/NotFound";
 import ListeEvent from "./AppPages/EticketEvent/ListeEvent";
 import EventsDataTable from "./AppPages/EticketEvent/EventsDataTable";
 import ListeEventBanner from "./AppPages/EticketBanner/ListeEventBanner";
+import BannerDataTable from "./AppPages/EticketBanner/BannerDataTable";
+
 
 import SaveBanner from "./AppPages/EticketBanner/SaveBanner";
 
@@ -299,7 +301,7 @@ const AppContent = () => {
                 <Route path={paths.saveEventBanner} element={<SaveBanner />} />
                 <Route
                   path={paths.listeEventBanner}
-                  element={<ListeEventBanner />}
+                  element={<BannerDataTable />}
                 />
                 <Route path={paths.listeUtilisateurs} element={<ListeUser />} />
                 <Route path={paths.saveUtilisateurs} element={<SaveUser />} />

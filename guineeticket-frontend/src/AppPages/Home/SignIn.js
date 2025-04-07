@@ -4,6 +4,7 @@ import Footer from "../../AppComponents/Footer/Footer";
 import { useTheme } from "../../contexts/ThemeProvider";
 import { useNavigate } from "react-router-dom";
 import usePostData from "../../services/usePostData";
+import { Loader } from 'rsuite'; // Importer le Loader de React Suite
 
 const SignIn = () => {
   const { theme } = useTheme();
@@ -145,10 +146,20 @@ const SignIn = () => {
                         type="submit"
                         id="kt_sign_in_submit"
                         className="btn btn-primary"
+                        disabled={loading}
                       >
-                        <span className="indicator-label">Se connecter</span>
+                        {loading ? (
+                          <Loader content="Chargement..." />
+                        ) : (
+                          <span className="indicator-label">Se connecter</span>
+                        )}
                       </button>
                     </div>
+                    {error && (
+                      <div className="alert alert-danger" role="alert">
+                        {error}
+                      </div>
+                    )}
                   </div>
                 </form>
               </div>

@@ -1,5 +1,10 @@
 import React, { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
+import axios from 'axios';
+import usePostData from "../../services/usePostData";
+import { useNavigate } from "react-router-dom";
+
+
 
 const HeaderWrapper = () => {
   const [showDropdown, setShowDropdown] = useState(false);
@@ -7,6 +12,33 @@ const HeaderWrapper = () => {
   const handleMouseEnter = () => setShowDropdown(true);
   const handleMouseLeave = () => setShowDropdown(false);
   const handleToggle = (isOpen) => setShowDropdown(isOpen);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const { postData, loading, error: apiError } = usePostData(process.env.REACT_APP_TICKET_STATISTIQUE_API_URL);
+  const userConnectedObj = JSON.parse(localStorage.getItem('userConnectedData'));
+
+  // Fonction de déconnexion
+  const handleLogout = async () => {
+    try {
+      const params = {
+        mode: 'doDisConnexion', // Remplacez par l'ID réel de l'utilisateur
+        STR_UTITOKEN: userConnectedObj.STR_UTITOKEN, // Exemple de récupération du token depuis le localStorage
+        // Ajoutez d'autres paramètres selon vos besoins
+      };
+      const userData = await postData(params);
+      if (userData?.code_statut === "1") {
+        localStorage.setItem("user", JSON.stringify(userData));
+        navigate("/");
+      } else {
+        setError(userData?.desc_statut || "Erreur de connexion.");
+      }
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+
+  };
+
   return (
     <>
       {/*begin::Header wrapper*/}
@@ -44,7 +76,7 @@ const HeaderWrapper = () => {
                 id="user-menu-toggle"
               >
                 <img
-                  src="../assets/media/avatars/300-3.jpg"
+                  src="assets/media/avatars/300-3.jpg"
                   className="rounded-3"
                   alt="user"
                 />
@@ -54,7 +86,7 @@ const HeaderWrapper = () => {
                 <Dropdown.ItemText>
                   <div className="d-flex align-items-center px-3">
                     <div className="symbol symbol-50px me-5">
-                      <img alt="User" src="../assets/media/avatars/300-3.jpg" />
+                      <img alt="User" src="assets/media/avatars/300-3.jpg" />
                     </div>
                     <div>
                       <div className="fw-bold fs-5">Robert Fox</div>
@@ -73,7 +105,7 @@ const HeaderWrapper = () => {
                 <Dropdown.Item href="#projects">My Projects</Dropdown.Item>
                 <Dropdown.Item href="#billing">Billing</Dropdown.Item>
                 <Dropdown.Divider />
-                <Dropdown.Item href="#logout">Logout</Dropdown.Item>
+                <Dropdown.Item onClick={handleLogout}>Deconnexion</Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
           </div>

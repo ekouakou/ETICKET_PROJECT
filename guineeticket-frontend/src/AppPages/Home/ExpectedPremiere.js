@@ -38,7 +38,7 @@ import { Helmet } from "react-helmet"; // Importer Helmet
 import { useNavigate } from "react-router-dom";
 // import { Modal, Button } from "react-bootstrap";
 
-const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm }) => {
+const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm, baseUrl }) => {
 
   const [rows, setRows] = useState(0);
   const [open, setOpen] = useState(false);
@@ -86,11 +86,6 @@ const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm }) => {
     return parts[parts.length - 1];
   };
 
-  const handleClick = (event) => {
-    const { LG_EVEID, STR_EVESTATUTFREE } = event;
-    localStorage.setItem("LG_EVEID", LG_EVEID);
-    localStorage.setItem("STR_EVESTATUTFREE", STR_EVESTATUTFREE);
-  };
 
   // Group events by STR_LSTDESCRIPTION and then by LG_LSTID
   const groupedEvents = data.reduce((acc, category) => {
@@ -153,7 +148,7 @@ const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm }) => {
   const generateSharingLinks = (event) => {
     if (!event) return {};
 
-    const eventUrl = `${fullUrl}#/detail-event/${event.LG_EVEID}`;
+    const eventUrl = `${baseUrl}#/detail-event/${event.LG_EVEID}`;
     const eventImage = `${ImagelBaseUrl}${event.STR_EVEPIC}`;
 
     const eventTitle = event.STR_EVENAME;
@@ -191,7 +186,7 @@ const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm }) => {
           />
           <meta
             property="og:url"
-            content={`${fullUrl}#/detail-event/${selectedEvent.LG_EVEID}`}
+            content={`${baseUrl}#/detail-event/${selectedEvent.LG_EVEID}`}
           />
           <meta property="og:type" content="website" />
         </Helmet>
@@ -277,22 +272,12 @@ const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm }) => {
                                   <div className="item item--carousel">
                                     <Link
                                       className="w-100"
-                                      to={{
-                                        pathname:
-                                          process.env.REACT_APP_EVENT_DETAILS,
-                                      }}
-                                      onClick={() =>
-                                        localStorage.setItem(
-                                          "LG_EVEID",
-                                          event.LG_EVEID
-                                        )
-                                      }
+                                      to={`${process.env.REACT_APP_EVENT_DETAILS}/${event.LG_EVEID}`}
                                     >
                                       <div className="item__cover">
                                         <img
                                           src={
-                                            getImageName(event.STR_EVEPIC) ===
-                                              ""
+                                            getImageName(event.STR_EVEPIC) === ""
                                               ? "assets/img/bg/slide__bg-2.jpg"
                                               : ImagelBaseUrl + event.STR_EVEPIC
                                           }
@@ -306,24 +291,20 @@ const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm }) => {
                                                   : "badge-success"
                                                 }`}
                                             >
-                                              {event.STR_EVESTATUTFREE === "1"
-                                                ? "Payant"
-                                                : "Gratuit"}
+                                              {event.STR_EVESTATUTFREE === "1" ? "Payant" : "Gratuit"}
                                             </span>
                                           </div>
                                         </span>
                                       </div>
                                     </Link>
+
                                   </div>
 
                                   <div className="card-rounded-b flex flex-col gap-2 px-5 py-4.5 pt-1">
                                     <div class="flex items-center justify-between grow ">
                                       <Link
                                         className="text-lg font-medium text-gray-900 hover:text-primary truncate-text text-theme"
-                                        to={{
-                                          pathname:
-                                            process.env.REACT_APP_EVENT_DETAILS,
-                                        }}
+                                        to={`${process.env.REACT_APP_EVENT_DETAILS}/${event.LG_EVEID}`}
                                         onClick={() => {
                                           localStorage.setItem(
                                             "LG_EVEID",
@@ -384,7 +365,7 @@ const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm }) => {
                                                 />
                                                 <meta
                                                   property="og:url"
-                                                  content={`${fullUrl}#/detail-event/${selectedEvent.LG_EVEID}`}
+                                                  content={`${baseUrl}#/detail-event/${selectedEvent.LG_EVEID}`}
                                                 />
                                                 <meta
                                                   property="og:type"

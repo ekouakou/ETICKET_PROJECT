@@ -1,24 +1,38 @@
 import React, { useState } from 'react';
 import { useTheme } from '../../contexts/ThemeProvider';
 import { useNavigate } from 'react-router-dom';
-import { handleLogin } from '../../utils/formHandlers';
+import { Loader } from 'rsuite'; // Importer le Loader de React Suite
+import usePostData from "../../services/usePostData";
+
+
 
 const SignIn = () => {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  // const [loading, setLoading] = useState(false); // État pour suivre le chargement
   const navigate = useNavigate();
+  const { postData, loading, error: apiError } = usePostData(process.env.REACT_APP_TICKET_STATISTIQUE_API_URL);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
     const params = new URLSearchParams();
     params.append('mode', 'doConnexion');
     params.append('STR_UTILOGIN', email);
     params.append('STR_UTIPASSWORD', password);
 
-    handleLogin(e, params, setError, navigate, "/tableau-bord");
+    try {
+      const userData = await postData(params);
+      if (userData?.code_statut === "1") {
+        localStorage.setItem('userConnectedData', JSON.stringify(userData));
+        navigate("/tableau-bord");
+      } else {
+        setError(userData?.desc_statut || "Erreur de connexion.");
+      }
+    } catch (error) {
+      console.error("Erreur de connexion:", error);
+    }
   };
 
   return (
@@ -34,9 +48,9 @@ const SignIn = () => {
             onSubmit={handleSubmit}
           >
             <div className="text-center mb-11">
-            <a className="mb-0 mb-lg-20">
-              <img alt="Logo" src="assets/media/logos/logo_light.svg" className="h-60px h-lg-90px" />
-            </a>
+              <a className="mb-0 mb-lg-20">
+                <img alt="Logo" src="assets/media/logos/logo_light.svg" className="h-60px h-lg-90px" />
+              </a>
               <h1 className="text-gray-900 fw-bolder mb-3">Sign In</h1>
               <div className="text-gray-500 fw-semibold fs-6">
                 Your Social Campaigns
@@ -113,10 +127,20 @@ const SignIn = () => {
                 type="submit"
                 id="kt_sign_in_submit"
                 className="btn btn-primary"
+                disabled={loading}
               >
-                <span className="indicator-label">Se connecter</span>
+                {loading ? (
+                  <Loader content="Chargement..." />
+                ) : (
+                  <span className="indicator-label">Se connecter</span>
+                )}
               </button>
             </div>
+            {error && (
+              <div className="alert alert-danger mt-3" role="alert">
+                {error}
+              </div>
+            )}
             <div className="text-gray-500 text-center fw-semibold fs-6">
               Se souvenir de moi ?
               <a href="sign-up.html" className="link-primary">

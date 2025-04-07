@@ -27,8 +27,8 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/PhotoFrameApp" element={<PhotoFrameApp />} />
             <Route path="/form" element={<RegisterForm />} />
-            <Route path="/detail-event" element={<DetailPage />} />
-            <Route path="/detail-event/:id" element={<DetailEventRedirect />} />
+            <Route path="/detail-event/:PARAM_LG_EVEID" element={<DetailPage />} /> 
+            {/* <Route path="/detail-event/:id" element={<DetailEventRedirect />} /> */}
             <Route path="/signIn" element={<SignIn />} />
             <Route path="/contactUs" element={<Contact />} />
             <Route path="/aboutUs" element={<AboutUs />} />

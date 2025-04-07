@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+// import AddNewAddressForm from './AddBannerForm';
+import axios from 'axios';
 // import AddNewAddressForm from './AddBannerForm';
 import Timeline from './Timeline';
 import SalesStatisticsCard from './SalesStatisticsCard';
@@ -6,40 +8,14 @@ import SalesStatisticsCard2 from './SalesStatisticsCard2';
 import HighlightCard from './HighlightCard';
 import TicketCard from './TicketCard';
 import EventComponent from './EventComponent';
+import useFetchData from "../../services/useFetchData";
+
 
 import { BarChart, LineChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Ticket, DollarSign, Users, Eye, TrendingUp, Clock, Star, Share2, CreditCard, Activity } from 'lucide-react';
 
 import PageTitle from '../PageTitle';
 import ActionButton from '../ActionButton';
-
-const statsCards = [
-    {
-        title: "Nombre ticket",
-        value: "1,836",
-        percentage: "2.2",
-        goal: "1,048 to Goal",
-    },
-    {
-        title: "Nombre évenement",
-        value: "102",
-        percentage: "50",
-        goal: "200 to Goal",
-    },
-    {
-        title: "Montant ticket acheté",
-        value: "100.000 GNF",
-        percentage: "75",
-        goal: "€15,000 to Goal",
-    },
-
-    {
-        title: "Nombre client",
-        value: "450",
-        percentage: "80",
-        goal: "500 to Goal",
-    },
-];
 
 
 // Données de performance par type d'événement
@@ -155,6 +131,19 @@ const breadcrumbs = [
 ];
 
 const DashboardAnnonceur = () => {
+
+    const {
+        data: statsCards,
+        loading,
+        error,
+    } = useFetchData(process.env.REACT_APP_STATISTIQUE_MANAGER_API_URL, {
+        mode: process.env.REACT_APP_DASHBOARD_MODE,
+        LG_AGEID: "1",
+    });
+
+    // Ensure statsCards is an array before mapping
+    const cards = Array.isArray(statsCards) ? statsCards : [];
+
     return (
         <>
             <div className="app-page flex-column flex-column-fluid" id="kt_app_page">
@@ -172,7 +161,7 @@ const DashboardAnnonceur = () => {
                                     <div className="row">
                                         <div className='col-lg-6'>
                                             <div className='row'>
-                                                {statsCards.map((stat, index) => (
+                                                {cards.map((stat, index) => (
                                                     <div className='col-lg-6 col-xl-6  h-md-50 mb-xl-10'>
                                                         <div key={index} className="card card-flush">
                                                             {/*begin::Header*/}
