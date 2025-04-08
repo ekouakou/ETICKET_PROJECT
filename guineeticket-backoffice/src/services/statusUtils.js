@@ -1,23 +1,20 @@
-// statusUtils.js
 import { notification, Modal } from 'antd';
 import axios from 'axios';
 import { rootUrl } from "./urlUtils";
 
 /**
- * Crée des fonctions pour gérer le statut des éléments
- * 
- * Cette fonction doit être appelée à l'intérieur d'un composant React
- * car elle utilise le Hook usePostData via la fonction postData passée en paramètre
- * 
- * @param {Object} params - Paramètres de la fonction
- * @param {Function} params.setItems - Fonction setState pour mettre à jour la liste d'éléments
- * @param {Array} params.items - Liste actuelle des éléments
- * @param {Object} params.user - Informations de l'utilisateur courant
- * @param {string} params.idField - Nom du champ contenant l'identifiant de l'élément (ex: 'LG_BANID')
- * @param {string} params.statusField - Nom du champ contenant le statut de l'élément (ex: 'STR_BANSTATUT')
- * @param {string} params.mode - Mode de la requête API (ex: 'updateBanniereStatut')
- * @param {string} params.entityName - Nom de l'entité pour les messages (ex: 'Bannière')
- * @param {Function} params.postData - Fonction postData retournée par le Hook usePostData
+ * Crée des fonctions pour gérer le statut et la suppression des éléments
+ *
+ * @param {Object} params
+ * @param {Function} params.setItems - Fonction pour actualiser les données
+ * @param {Array} params.items
+ * @param {Object} params.user
+ * @param {string} params.idField
+ * @param {string} params.statusField
+ * @param {string} params.activateMode
+ * @param {string} params.deleteMode
+ * @param {string} params.entityName
+ * @param {Function} params.postData
  */
 export const createStatusManager = ({
   setItems,
@@ -25,40 +22,33 @@ export const createStatusManager = ({
   user,
   idField,
   statusField,
-  mode,
+  activateMode,
+  deleteMode,
   entityName,
   postData
 }) => {
   return {
-    // Fonction pour basculer entre enable/disable
+    // Changement de statut
     toggleStatus: async (itemId, currentStatus) => {
       try {
-
-        alert("currentStatus---" + currentStatus);
         const newStatus = currentStatus === "enable" ? "disable" : "enable";
-        alert("newStatus---" + newStatus);
+
         const userData = await postData({
-          mode: mode,
-          [statusField]: newStatus,  // This line is fixed
+          mode: activateMode,
+          [statusField]: newStatus,
           STR_UTITOKEN: user.STR_UTITOKEN,
           [idField]: itemId,
         });
-    
+
         if (userData?.code_statut === "1") {
-          // Mise à jour locale des données
-          const updatedItems = items.map((item) =>
-            item[idField] === itemId
-              ? { ...item, [statusField]: newStatus }
-              : item
-          );
-    
-          setItems(updatedItems);
-    
+          // Rafraîchir les données plutôt que modifier localement
+          setItems();
+          
           notification.success({
             message: "Succès",
             description: `Statut mis à jour avec succès`
           });
-          
+
           return true;
         } else {
           notification.error({
@@ -76,29 +66,27 @@ export const createStatusManager = ({
         return false;
       }
     },
-    
-    // Fonction pour supprimer un élément
+
+    // Suppression
     deleteItem: (item) => {
       return new Promise((resolve) => {
         Modal.confirm({
           title: `Êtes-vous sûr de vouloir supprimer cet ${entityName}?`,
-          content: `${entityName} "${item.STR_BANNAME || item.nom || item.title || item[idField]}" sera supprimé définitivement.`,
+          content: `Sera supprimé définitivement.`,
           okText: "Supprimer",
           okType: "danger",
           cancelText: "Annuler",
           onOk: async () => {
             try {
               const userData = await postData({
-                mode: mode,
-                STR_BANSTATUT: "delete",
+                mode: deleteMode,
                 STR_UTITOKEN: user.STR_UTITOKEN,
                 [idField]: item[idField],
               });
-              
+
               if (userData?.code_statut === "1") {
-                // Mise à jour locale des données
-                const updatedItems = items.filter(currentItem => currentItem[idField] !== item[idField]);
-                setItems(updatedItems);
+                // Rafraîchir les données plutôt que modifier localement
+                setItems();
                 
                 notification.success({
                   message: "Succès",

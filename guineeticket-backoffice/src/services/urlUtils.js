@@ -13,5 +13,4 @@ export const baseUrl = getFullUrl() ;
 export const urlBaseImage = getFullUrl() + "eticketbackend/backoffice/";
 // export const urlBaseImage = getFullUrl() + "eticketbackend/backoffice/images/product/"; // PARAMETRE DOCKER
 
-
 export default getFullUrl;

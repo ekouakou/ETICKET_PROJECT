@@ -1,21 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Table,
-  Pagination,
   Button,
   Space,
-  Modal,
-  Form,
-  DatePicker,
   Spin,
   Switch,
   Image,
   notification,
   Breadcrumb,
   Typography,
-  Tag,
   Input,
-  Select,
   Row,
   Col,
   Card
@@ -28,87 +22,102 @@ import {
   CloseOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import eventService from "../../services/EventService";
 import { authService } from "../../services/AuthService";
-import useFetchData from "../../services/useFetchData";
-import { createStatusManager } from '../../services/statusUtils';
 import usePostData from "../../services/usePostData";
 import useDataTable from '../../services/useDataTable';
 
-
-
-
 const { Title } = Typography;
 const { Search } = Input;
-const { Option } = Select;
-
-const paths = JSON.parse(localStorage.getItem("appPaths"));
-
 
 const EventsDataTable = () => {
   const navigate = useNavigate();
-
-
-  // États pour gérer les données et l'interface
-  const [events, setEvents] = useState([]);
-  const [allEvents, setAllEvents] = useState([]);  // Tous les événements non filtrés
-  // const [loading, setLoading] = useState(true);
-  // const [pagination, setPagination] = useState({
-  //   current: 1,
-  //   pageSize: 10,
-  //   total: 0,
-  //   pageSizeOptions: [10, 20, 50, 100],
-  //   showSizeChanger: true
-  // });
-  const [currentEvent, setCurrentEvent] = useState(null);
   const [dateRange, setDateRange] = useState({
     start: "2020-01-01",
     end: "2025-08-31",
   });
-  const [searchText, setSearchText] = useState('');
 
   const user = authService.checkAuth(navigate);
-  const { postData, loading: postLoading, error: postError } = usePostData(process.env.REACT_APP_TICKET_MANAGER_API_URL);
-  const { toggleStatus, deleteItem } = createStatusManager({
-    setItems: setEvents,
-    items: events,
-    user,
-    idField: 'LG_EVEID',  // Changez pour correspondre au champ réel
-    statusField: 'STR_EVESTATUT',  // Changez pour correspondre au champ réel
-    mode: 'updateEventStatus',
-    entityName: 'Événement',
-    postData
-  });
+  const { postData, loading: postLoading } = usePostData(process.env.REACT_APP_TICKET_MANAGER_API_URL);
 
+  const {
+    data: allEventsData,
+    loading: fetchLoading,
+    pagination,
+    handleTableChange,
+    handleSearch,
+    refreshData
+  } = useDataTable(
+    process.env.REACT_APP_TICKET_MANAGER_API_URL,
+    {
+      mode: process.env.REACT_APP_LISTE_EVENT_MODE,
+      STR_UTITOKEN: user.STR_UTITOKEN,
+      DT_BEGIN: dateRange.start,
+      DT_END: dateRange.end,
+    },
+    "data",
+    {
+      fields: ["STR_EVENAME", "LG_LSTPLACEID", "DT_EVEBEGIN", "DT_EVEEND"]
+    },
+    10
+  );
+  
 
   // Fonction pour éditer un événement
   const handleEdit = (event) => {
-    navigate(paths.saveEventData, {
+    navigate(process.env.REACT_APP_SAVE_EVENT_DATA, {
       state: { LG_EVEID: event.LG_EVEID },
     });
   };
 
-const {
-  data: allEventsData,
-  loading: fetchLoading,
-  pagination,
-  handleTableChange,
-  handleSearch
-} = useDataTable(
-  process.env.REACT_APP_TICKET_MANAGER_API_URL,
-  {
-    mode: process.env.REACT_APP_LISTE_EVENT_MODE,
-    STR_UTITOKEN: user.STR_UTITOKEN,
-    DT_BEGIN: dateRange.start,
-    DT_END: dateRange.end,
-  },
-  "data",
-  {
-    fields: ["STR_EVENAME", "LG_LSTPLACEID", "DT_EVEBEGIN", "DT_EVEEND"]
-  },
-  10 // pageSize par défaut
-);
+  // Fonction pour supprimer un événement
+  const handleDeleteItem = async (record) => {
+    try {
+      await postData({
+        mode: "deleteEvenement",
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_EVEID: record.LG_EVEID
+      });
 
+      notification.success({
+        message: "Succès",
+        description: `L'événement a été supprimé avec succès.`
+      });
+
+      // Rafraîchir les données après la suppression
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de supprimer l'événement.`
+      });
+    }
+  };
+
+  // Fonction pour changer le statut d'un événement
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "enable" ? "disable" : "enable";
+      await postData({
+        mode: "deleteEvenement", // Mode utilisé pour le changement de statut
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_EVEID: id,
+        STR_EVESTATUT: newStatus
+      });
+
+      notification.success({
+        message: "Succès",
+        description: `Le statut de l'événement a été ${newStatus === "enable" ? "activé" : "désactivé"} avec succès.`
+      });
+
+      // Rafraîchir les données après la modification
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de modifier le statut de l'événement.`
+      });
+    }
+  };
 
   // Configuration des colonnes
   const columns = [
@@ -178,7 +187,7 @@ const {
       render: (status, record) => (
         <Switch
           checked={status === "enable"}
-          onChange={() => toggleStatus(record.LG_EVEID, status)}
+          onChange={() => handleToggleStatus(record.LG_EVEID, status)}
           checkedChildren={<CheckOutlined />}
           unCheckedChildren={<CloseOutlined />}
         />
@@ -187,7 +196,7 @@ const {
     {
       title: "Actions",
       key: "actions",
-      width: 150,
+      width: 100,
       fixed: "right",
       render: (_, record) => (
         <Space>
@@ -200,24 +209,22 @@ const {
           <Button
             type="danger"
             icon={<DeleteOutlined />}
-            onClick={() => deleteItem(record)}
+            onClick={() => handleDeleteItem(record)}
             size="small"
           />
           <Button
             type={record.STR_EVESTATUT === "enable" ? "text" : "primary"}
             danger={record.STR_EVESTATUT === "enable"}
             icon={record.STR_EVESTATUT === "enable" ? <CloseOutlined /> : <CheckOutlined />}
-            onClick={() => toggleStatus(record.LG_EVEID, record.STR_EVESTATUT)}
+            onClick={() => handleToggleStatus(record.LG_EVEID, record.STR_EVESTATUT)}
             size="small"
           />
         </Space>
       )
     }
-
   ];
 
   if (!user) {
-    // Pour React Router v6
     return navigate("/login");
   }
 
