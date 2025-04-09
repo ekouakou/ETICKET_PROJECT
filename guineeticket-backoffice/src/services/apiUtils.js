@@ -70,3 +70,32 @@ export const crudData = (params, apiUrl) => {
     }
   });
 };
+
+
+const doConnexion = (params) => {
+  return axios.post(`${rootUrl}Authentification.php`, params, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+};
+
+export const handleLogin = async (e, params, setError, navigate, redirectPath) => {
+  e.preventDefault(); // Empêche le comportement par défaut du formulaire (rechargement de la page)
+  try {
+    const response = await doConnexion(params); // Envoi des paramètres de connexion à l'API
+    const userData = response.data; // Extraction des données utilisateur de la réponse de l'API
+
+    if (userData.code_statut === "1") { // Vérification si la connexion a réussi
+      localStorage.setItem('userConnectedData', JSON.stringify(userData)); // Stockage des données utilisateur dans le localStorage
+      
+      console.log( JSON.stringify(userData));
+
+      navigate(redirectPath); // Redirection vers le chemin spécifié
+    } else {
+      setError(userData.desc_statut); // Affichage du message d'erreur
+    }
+  } catch (error) {
+    setError('Erreur de connexion. Veuillez réessayer.'); // Affichage d'un message d'erreur en cas d'exception
+  }
+};
