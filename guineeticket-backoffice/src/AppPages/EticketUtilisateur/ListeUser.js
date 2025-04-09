@@ -1,95 +1,276 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from "react-toastify";
-import GenericDataTable from "../GenericDataTable";
-import eventService from "../../services/UserService";
-import PageTitle from '../PageTitle';
-import ActionButton from '../ActionButton';
-import useLoader from '../../utils/useLoader'
-import SkeletonTable from "../Skeleton/SkeletonTable";
+import React, { useState } from "react";
+import {
+  Table,
+  Button,
+  Space,
+  Spin,
+  Switch,
+  Image,
+  notification,
+  Breadcrumb,
+  Typography,
+  Input,
+  Row,
+  Col,
+  Card,
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  CheckOutlined,
+  CloseOutlined,
+} from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
+import { authService } from "../../services/AuthService";
+import usePostData from "../../services/usePostData";
+import useDataTable from "../../services/useDataTable";
 
-const ListeUser = () => {
-  const paths = JSON.parse(localStorage.getItem("appPaths"));
+const { Title } = Typography;
+const { Search } = Input;
+
+const ListeClient = () => {
   const navigate = useNavigate();
-  const [eventData, setEventData] = useState([]);
-  const isLoading = useLoader(eventData);
+  const [dateRange, setDateRange] = useState({
+    start: "2020-01-01",
+    end: "2025-08-31",
+  });
 
-  const fetchEvents = async () => {
-    const events = await eventService.getEvents(navigate);
-    setEventData(events);
+  const user = authService.checkAuth(navigate);
+  const { postData, loading: postLoading } = usePostData(
+    process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL
+  );
+
+  const {
+    data: allEventsData,
+    loading: fetchLoading,
+    pagination,
+    handleTableChange,
+    handleSearch,
+    refreshData,
+  } = useDataTable(
+    process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL,
+    {
+      mode: "listUtilisateur",
+      STR_UTITOKEN: user.STR_UTITOKEN,
+      LG_PROID: user.LG_PROID,
+    },
+
+    "data",
+    {
+      fields: ["STR_UTISTATUT", "STR_UTIFIRSTLASTNAME",],
+    },
+    5
+  );
+
+  // Fonction pour éditer un événement
+  const handleEdit = (event) => {
+    navigate(process.env.REACT_APP_SAVE_UTILISATEURS, {
+      state: { LG_UTIID: event.LG_UTIID },
+    });
   };
 
-  const handleApiCall = async ({ mode, id, status }) => {
-    let success = false;
-
-    if (mode === "delete") {
-      success = await eventService.deleteEvent(navigate, id);
-    } else if (mode === "updateStatus") {
-      success = await eventService.updateEventStatus(navigate, id, status);
-    }
-
-    if (success) {
-      toast.success("Opération réussie", {
-        position: "top-center",
-        autoClose: 3000,
+  // Fonction pour supprimer un événement
+  const handleDeleteItem = async (record) => {
+    try {
+      await postData({
+        mode: "deleteUtilisateur",
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_UTIID: record.LG_UTIID,
       });
-      fetchEvents();
+
+      notification.success({
+        message: "Succès",
+        description: `L'utilisateur a été supprimé avec succès.`,
+      });
+
+      // Rafraîchir les données après la suppression
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de supprimer l'événement.`,
+      });
     }
   };
 
-  useEffect(() => {
-    fetchEvents();
-  }, [navigate]);
+  // Fonction pour changer le statut d'un événement
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "enable" ? "disable" : "enable";
+      await postData({
+        mode: "deleteUtilisateur", // Mode utilisé pour le changement de statut
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_UTIID: id,
+        STR_UTISTATUT: newStatus,
+      });
 
-  const breadcrumbs = [
-    { text: 'Utilisateur', link: '/' },
-    { isBullet: true },
-    { text: 'Liste des utilisateurs' },
+      notification.success({
+        message: "Succès",
+        description: `Le statut de l'événement a été ${
+          newStatus === "enable" ? "activé" : "désactivé"
+        } avec succès.`,
+      });
+
+      // Rafraîchir les données après la modification
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de modifier le statut de l'événement.`,
+      });
+    }
+  };
+
+  // Configuration des colonnes
+  const columns = [
+    {
+      title: "Image",
+      dataIndex: "STR_UTIPIC",
+      key: "image",
+      width: 90,
+      render: (text) =>
+        text && (
+          <Image
+            src={`${process.env.REACT_APP_BASE_IMAGE_URL}${text}`}
+            alt="Bannière"
+            width={50}
+            height={50}
+            style={{ objectFit: "cover" }}
+            preview={false}
+          />
+        ),
+    },
+
+    { dataIndex: "STR_UTIFIRSTLASTNAME", title: "Nom et prénom" },
+    { dataIndex: "LG_PROID", width: 150, title: "Rôle" },
+    { dataIndex: "STR_UTILOGIN",  width: 150, title: "Login" },
+    { dataIndex: "STR_UTIMAIL", title: "Email" },
+    { dataIndex: "STR_UTIPHONE", width: 150, title: "Téléphone" },
+    // {
+    //   title: "Statut",
+    //   dataIndex: "STR_UTISTATUT",
+    //   key: "status",
+    //   width: 100,
+    //   render: (status, record) => (
+    //     <Switch
+    //       checked={status === "enable"}
+    //       onChange={() => handleToggleStatus(record.LG_UTIID, status)}
+    //       checkedChildren={<CheckOutlined />}
+    //       unCheckedChildren={<CloseOutlined />}
+    //     />
+    //   ),
+    // },
+    {
+      title: "Actions",
+      key: "actions",
+      width: 100,
+      fixed: "right",
+      render: (_, record) => (
+        <Space>
+          <Button
+            type="primary"
+            icon={<EditOutlined />}
+            onClick={() => handleEdit(record)}
+            size="small"
+          />
+          <Button
+            type="danger"
+            icon={<DeleteOutlined />}
+            onClick={() => handleDeleteItem(record)}
+            size="small"
+          />
+          {/* <Button
+            type={record.STR_UTISTATUT === "enable" ? "text" : "primary"}
+            danger={record.STR_UTISTATUT === "enable"}
+            icon={
+              record.STR_UTISTATUT === "enable" ? (
+                <CloseOutlined />
+              ) : (
+                <CheckOutlined />
+              )
+            }
+            onClick={() =>
+              handleToggleStatus(record.LG_UTIID, record.STR_UTISTATUT)
+            }
+            size="small"
+          /> */}
+        </Space>
+      ),
+    },
   ];
 
+  if (!user) {
+    return navigate("/login");
+  }
+
   return (
-    <div className="d-flex flex-column flex-column-fluid">
-      <div id="kt_app_toolbar" className="app-toolbar py-3 py-lg-6">
-        <div id="kt_app_toolbar_container" className="app-container container-xxl d-flex flex-stack">
-          <PageTitle heading="Liste des utilisateurs" breadcrumbs={breadcrumbs} />
-          <ActionButton text="Ajouter utilisateurs" link={process.env.REACT_APP_SAVE_UTILISATEURS} className="btn-primary" />
-        </div>
-      </div>
-      <div id="kt_app_content" className="app-content flex-column-fluid">
-        <div id="kt_app_content_container" className="app-container container-xxl">
-        {isLoading ? (
-            <>
-              <SkeletonTable rows={6} columns={4} />
-            </>
-          ) : (
-            <div className="row gx-5 gx-xl-10">
-              <div className="col-xxl-12 mb-5 mb-xl-10">
-                <div className="card card-flush h-xl-100">
-                  <div className="card-body pt-6">
-                    <>
-                    <GenericDataTable
-                    data={eventData}
-                    columns={eventService.getColumns()}
-                    tableId="eventTable"
-                    onEdit={(id) => navigate(process.env.REACT_APP_SAVE_UTILISATEURS, { state: { LG_UTIID: id } })}
-                    onDelete={true}
-                    onToggleStatus={true}
-                    deleteConfirmMessage={(id) => `Êtes-vous sûr de vouloir supprimer cet utilisateur? (${id}) ?`}
-                    toggleStatusConfirmMessage={(id, newStatus) =>
-                      `Êtes-vous sûr de vouloir ${newStatus === "enable" ? "activer" : "désactiver"} cet utilisateur (${id}) ?`
-                    }
-                    handleApiCall={handleApiCall}
-                  />
-                    </>
-                  </div>
-                </div>
-              </div>
+    <div className="app-main flex-column flex-row-fluid" id="kt_app_main">
+      <div className="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" className="app-toolbar py-3 py-lg-6">
+          <div
+            id="kt_app_toolbar_container"
+            className="app-container container-xxl d-flex flex-stack"
+          >
+            {/* Titre et fil d'Ariane */}
+            <div>
+              <Title level={3}>Liste des utilisateurs</Title>
+              <Breadcrumb
+                items={[{ title: "Utilisateurs" }, { title: "Liste des utilisateurs" }]}
+              />
             </div>
-          )}
+
+            {/* Bouton d'ajout */}
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate(process.env.REACT_APP_SAVE_UTILISATEURS)}
+            >
+              Ajouter un utilisateur
+            </Button>
+          </div>
+        </div>
+
+        <div id="kt_app_content" className="app-content flex-column-fluid">
+          <div
+            id="kt_app_content_container"
+            className="app-container container-xxl"
+          >
+            <Card>
+              <Row gutter={[16, 16]} className="mb-4">
+                <Col xs={24} md={12}>
+                  <Search
+                    placeholder="Rechercher par nom, lieu ou date..."
+                    allowClear
+                    enterButton="Rechercher"
+                    size="middle"
+                    onSearch={handleSearch}
+                    onChange={(e) => handleSearch(e.target.value)}
+                  />
+                </Col>
+              </Row>
+
+              <Spin
+                spinning={fetchLoading || postLoading}
+                tip="Chargement des données..."
+              >
+                <Table
+                  columns={columns}
+                  dataSource={allEventsData}
+                  rowKey="LG_UTIID"
+                  pagination={pagination}
+                  onChange={handleTableChange}
+                  bordered
+                  size="middle"
+                  scroll={{ x: 1300 }}
+                />
+              </Spin>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ListeUser;
+export default ListeClient;

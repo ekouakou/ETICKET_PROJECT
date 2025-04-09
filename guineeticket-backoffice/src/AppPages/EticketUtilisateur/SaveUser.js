@@ -257,7 +257,7 @@ const SaveUser = () => {
               className="app-container container-xxl d-flex flex-stack"
             >
               <PageTitle
-                heading="Création des utilisateur"
+                heading="Création des utilisateurs"
                 breadcrumbs={breadcrumbs}
               />
               {/* <ActionButton text="Liste bannière" link={process.env.REACT_APP_SAVE_BANNER} className="btn-primary" /> */}
