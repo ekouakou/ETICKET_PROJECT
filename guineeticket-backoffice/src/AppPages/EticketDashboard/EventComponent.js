@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { crudData } from '../../services/apiService';
+import { crudData } from "../../services/apiUtils";
 import { useNavigate } from 'react-router-dom';
 import format from 'date-fns/format';
-import { loadStores, fetchCategorieData, useLoadStores } from "../../utils/apiUtils";
+import { loadStores, fetchCategorieData, useLoadStores } from "../../services/apiUtils";
 
 
 const EventComponent = () => {

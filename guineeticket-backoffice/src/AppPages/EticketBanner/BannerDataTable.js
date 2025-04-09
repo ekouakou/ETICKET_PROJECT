@@ -157,6 +157,12 @@ const EventsDataTable = () => {
       width: 100,
     },
     {
+      title: "Ordre d'affiche",
+      dataIndex: "STR_BANORDER",
+      key: "startTime",
+      width: 100,
+    },
+    {
       title: "Statut",
       dataIndex: "STR_BANSTATUT",
       key: "status",
@@ -202,7 +208,7 @@ const EventsDataTable = () => {
   ];
 
   if (!user) {
-    return navigate("/login");
+    return navigate(process.env.REACT_APP_SIGN_IN);
   }
 
   return (

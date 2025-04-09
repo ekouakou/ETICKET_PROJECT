@@ -1,7 +1,7 @@
 // eventService.js
 import axios from "axios";
 import { authService } from "./AuthService";
-import { crudData } from "./apiService";
+import { crudData } from "./apiUtils";
 import Swal from "sweetalert2";
 import { toast } from 'react-toastify';
 

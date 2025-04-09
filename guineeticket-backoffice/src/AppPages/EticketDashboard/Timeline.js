@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import axios from 'axios';
-import { crudData } from '../../services/apiService';
+import { crudData } from "../../services/apiUtils";
 import { useNavigate } from 'react-router-dom';
 
 

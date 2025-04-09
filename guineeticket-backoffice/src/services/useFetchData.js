@@ -1,35 +1,8 @@
 import { useState, useEffect } from "react";
-import { urlBaseImage,rootUrl } from './urlUtils';
+import { urlBaseImage, rootUrl } from './urlUtils';
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-// const useFetchData = (apiEndPoint, params, dataKey) => {
-//   const [data, setData] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         const response = await axios.post(
-//             rootUrl + apiEndPoint, params, {headers: { 'Content-Type': 'application/x-www-form-urlencoded'}}
-//         );
-//         // Vérifie si la réponse contient un tableau de données
-//         const responseData = dataKey ? response.data[dataKey] : response.data;
-//         setData(responseData);
-//       } catch (err) {
-//         setError("Erreur lors de la récupération des données");
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     // Appeler fetchData uniquement une fois, lors du montage du composant
-//     fetchData();
-//   }, []); // Les crochets vides assurent que l'effet se déclenche uniquement au montage
-
-//   return { data, loading, error };
-// };
-
-// export default useFetchData;
 
 /**
  * Hook pour récupérer des données d'API avec capacité de refetch
@@ -39,10 +12,11 @@ import axios from "axios";
  * @param {number} refreshTrigger - Déclencheur pour rafraîchir les données
  * @returns {Object} Les données récupérées, l'état du chargement, les erreurs et la fonction refetch
  */
-const useFetchData = (apiEndPoint, params, dataKey = 'data', refreshTrigger = 0) => {
+const useFetchData = (apiEndPoint, params, dataKey, refreshTrigger = 0) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fonction pour récupérer les données
   const fetchData = async () => {
@@ -50,10 +24,13 @@ const useFetchData = (apiEndPoint, params, dataKey = 'data', refreshTrigger = 0)
       setLoading(true);
 
       const response = await axios.post(
-        rootUrl + apiEndPoint, params, {headers: { 'Content-Type': 'application/x-www-form-urlencoded'}}
-    );
+        rootUrl + apiEndPoint, params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
 
       // const response = await axios.post(url, params);
+      if(response.data.code_statut == 2){
+        return navigate(process.env.REACT_APP_SIGN_IN);
+      }
       const fetchedData = dataKey ? response.data[dataKey] : response.data;
       setData(fetchedData);
       setError(null);

@@ -22,6 +22,19 @@ const SignIn = () => {
     params.append('STR_UTILOGIN', email);
     params.append('STR_UTIPASSWORD', password);
 
+    // crudData(params, 'Authentification.php').then(response => {
+    //   if (response.code_statut === "1") { // Vérification si la connexion a réussi
+    //     localStorage.setItem('userConnectedData', JSON.stringify(response)); // Stockage des données utilisateur dans le localStorage
+    //     console.log(JSON.stringify(response));
+    //     navigate("/tableau-bord"); // Redirection vers le chemin spécifié
+    //   } else {
+    //     setError(response.desc_statut); // Affichage du message d'erreur
+    //   }
+    // })
+    //   .catch(error => {
+    //     console.error('Erreur lors de la récupération des données:', error);
+    //   });
+
     try {
       const userData = await postData(params);
       if (userData?.code_statut === "1") {

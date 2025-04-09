@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Splide from '@splidejs/splide';
 import '@splidejs/splide/dist/css/splide.min.css';
-import { crudData } from '../../services/apiService';
+import { crudData } from '../../services/apiUtils';
 
 const SliderComponent = ({ numberSlidesToShow, slideMargin,ImagelBaseUrl }) => {
   const date = JSON.parse(localStorage.getItem("appDate"));

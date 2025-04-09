@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Dropdown, Button, Form, Spinner } from 'react-bootstrap';
 import { FaChartBar, FaArrowUp, FaArrowDown } from 'react-icons/fa';
 import axios from 'axios';
-import { crudData } from '../../services/apiService';
+import { crudData } from "../../services/apiUtils";
 import { useNavigate } from 'react-router-dom';
 import moment from 'moment';
 

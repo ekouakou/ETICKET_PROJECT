@@ -64,12 +64,6 @@ const useDataTable = (
       ...prev,
       current: 1
     }));
-
-    // notification.info({
-    //   message: "Rafraîchissement",
-    //   description: "Les données sont en cours de rafraîchissement...",
-    //   duration: 2
-    // });
   }, []);
 
   // Effet pour mettre à jour les données quand elles sont récupérées

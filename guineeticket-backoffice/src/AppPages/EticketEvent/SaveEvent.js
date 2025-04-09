@@ -12,7 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { EventContext } from "../../contexts/EventProvider";
 import { useNavigate } from "react-router-dom";
-import { crudData } from "../../services/apiService";
+import { crudData } from "../../services/apiUtils";
 import { Modal, Button, Form } from "react-bootstrap";
 import FileUploader from "../FileUploader/FileUploader";
 import EventSummary from "./EventSummary";
@@ -23,18 +23,11 @@ import makeAnimated from "react-select/animated";
 import { useLocation } from "react-router-dom";
 import { Calendar } from "primereact/calendar";
 
-// Ancien import qui cause l'erreur
-
-// Remplacer par
-import format from "date-fns/format";
-
-//
-
 import {
   loadStores,
   fetchCategorieData,
   useLoadStores,
-} from "../../utils/apiUtils";
+} from "../../services/apiUtils";
 import { urlToFile, processFile } from "../../utils/fileUtils";
 import { confirmAction } from "../../utils/notificationUtils";
 import { authService } from "../../services/AuthService";

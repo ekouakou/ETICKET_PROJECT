@@ -5,6 +5,7 @@ import { handleLogin } from '../../utils/formHandlers';
 
 const SignIn = () => {
   // const { theme } = useTheme();
+  alert("sdwfsdfsd");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,7 +19,13 @@ const SignIn = () => {
     params.append('STR_UTILOGIN', email);
     params.append('STR_UTIPASSWORD', password);
 
-    handleLogin(e, params, setError, navigate, "/tableau-bord");
+    const response = crudData(params, 'Authentification.php');
+
+    console.log(response);
+
+    alert("sdwfsdfsd");
+
+    //handleLogin(e, params, setError, navigate, "/tableau-bord");
   };
 
   return (

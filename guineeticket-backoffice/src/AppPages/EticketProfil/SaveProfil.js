@@ -3,7 +3,7 @@ import Switch from "react-switch";
 import { toast, ToastContainer } from "react-toastify";
 import { EventContext } from "../../contexts/EventProvider";
 import { useNavigate } from "react-router-dom";
-import { crudData } from "../../services/apiService";
+import { crudData } from "../../services/apiUtils";
 import { Modal, Button, Form } from "react-bootstrap";
 import FileUploader from "../FileUploader/FileUploader";
 // import EventSummary from './EventSummary'
@@ -28,7 +28,7 @@ import { Calendar } from "primereact/calendar";
 
 //
 
-import { loadStores, useLoadStores } from "../../utils/apiUtils";
+import { loadStores, useLoadStores } from "../../services/apiUtils";
 import { urlToFile, processFile } from "../../utils/fileUtils";
 import { confirmAction } from "../../utils/notificationUtils";
 import { authService } from "../../services/AuthService";

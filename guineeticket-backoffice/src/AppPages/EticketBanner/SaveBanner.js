@@ -14,18 +14,16 @@ import {
   faEllipsisV,
 } from "@fortawesome/free-solid-svg-icons";
 import { EventContext } from "../../contexts/EventProvider";
-import { crudData } from "../../services/apiService";
 import { Modal, Button, Form } from "react-bootstrap";
 import FileUploader from "../FileUploader/FileUploader";
 
 // import EventSummary from './EventSummary'
 import Swal from "sweetalert2"; // Importation de la bibliothèque pour afficher des boîtes de dialogue
 import { useLocation } from "react-router-dom";
-import { Calendar } from "primereact/calendar";
 
 //
 
-import { loadStores, fetchData } from "../../utils/apiUtils";
+import { loadStores, fetchData } from "../../services/apiUtils";
 import { urlToFile, processFile } from "../../utils/fileUtils";
 import { confirmAction } from "../../utils/notificationUtils";
 import { authService } from "../../services/AuthService";
@@ -37,21 +35,22 @@ import {
   handleFormChange,
   formatDate,
 } from "../../utils/formUtils";
-
-import format from "date-fns/format";
-
 import PageTitle from "../PageTitle";
 import ActionButton from "../ActionButton";
 import { DatePicker, TimePicker } from "rsuite";
 import { SelectPicker, VStack } from "rsuite";
 import CardHeader from "../CardHeader";
 import { Loader, Placeholder } from "rsuite";
+import { Spin } from 'antd';
+import 'antd/dist/reset.css';
+import LoadingOverlay from '../../AppComponents/LoadingOverlay'
 
 const SaveBanner = () => {
   const navigate = useNavigate();
   const [eventData, setEventData] = useState([]);
   const location = useLocation();
   const [banniereId, setbanniereId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const fetchEvents = async () =>
     setEventData(await eventService.getEvents(navigate));
@@ -65,8 +64,6 @@ const SaveBanner = () => {
   const [eventDetails, setEventDetails] = useState(null);
   const [previewPic, setPreviewPic] = useState(null);
   const [userData, setUserData] = useState(null);
-    const [loading, setLoading] = useState(false);
-  
 
   useEffect(() => {
     const data = authService.checkAuth(navigate);
@@ -84,6 +81,7 @@ const SaveBanner = () => {
     LG_AGEREQUESTID: userData?.LG_AGEID || "",
     BOOL_BANEVENT: 1,
     DT_BANEND: "",
+    STR_BANORDER: "",
     LG_AGEID: userData?.LG_AGEID || "",
     STR_EVESTATUTFREE: 1,
     STR_UTITOKEN: userData?.STR_UTITOKEN || "",
@@ -109,14 +107,7 @@ const SaveBanner = () => {
     setFormData({ ...formData, [fieldName]: e.value });
   };
   const handleChange = handleSelectChange(setFormData, formData);
-    const handleInputTextChange = (e) => handleFormChange(e, formData, setFormData);
-
-//   const handleChange = (e) => {
-//     setFormData({
-//       ...formData,
-//       [e.target.name]: e.target.value,
-//     });
-//   };
+  const handleInputTextChange = (e) => handleFormChange(e, formData, setFormData);
 
   //++++++++++++++++++++++++++++++++++++++++++ GESTION D4AJOUT DES CATEGORIE DE PLACE DANS LE FORMULAIRE ++++++++++++++++++++++++++++++++++++++++++
 
@@ -148,7 +139,6 @@ const SaveBanner = () => {
 
   // ++++++++++++++++++++++++++++++++++++++++++ GESTION DES MODIFICATION D'UN EVENEMENT ++++++++++++++++++++++++++++++++++++++++++
 
-
   useEffect(() => {
     if (location.state && location.state.LG_BANID) {
       setbanniereId(location.state.LG_BANID);
@@ -163,7 +153,7 @@ const SaveBanner = () => {
       );
     }
   }, [location.state]);
-  
+
 
   // ++++++++++++++++++++++++++++++++++++++++++ GESTION DES COMBOBOX ++++++++++++++++++++++++++++++++++++++++++
 
@@ -174,6 +164,7 @@ const SaveBanner = () => {
         LG_LSTPLACEID = "",
         DT_BANBEGIN,
         DT_BANEND,
+        STR_BANORDER,
         LG_AGEID = 1,
         STR_BANDESCRIPTION = "",
         STR_BANPATH,
@@ -185,18 +176,18 @@ const SaveBanner = () => {
         DT_BANBEGIN: convertToFullDate(DT_BANBEGIN) || "",
         DT_BANEND: convertToFullDate(DT_BANEND) || "",
         LG_AGEID,
+        STR_BANORDER,
         LG_AGEREQUESTID: LG_AGEID,
         STR_BANDESCRIPTION,
         mode: "updateBanniere",
         STR_UTITOKEN: userData?.UTITOKEN || "",
       });
 
-      // processFile("STR_BANPATH", STR_BANPATH);
       processFile(
-        "STR_BANPATH", 
+        "STR_BANPATH",
         STR_BANPATH,
-        setFormData, // Ajout du 3ème paramètre manquant
-        setPreviewPic // Ajout du 4ème paramètre manquant
+        setFormData,
+        setPreviewPic
       );
     }
   }, [eventDetails, userData]);
@@ -230,33 +221,32 @@ const SaveBanner = () => {
     }
 
     if (banniereId) {
-        formDataToSend.append("mode", "updateBanniere");
-        formDataToSend.append("LG_BANID", banniereId);
-        confirmAction(
-          `Êtes-vous sûr de modifier l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
-          "update",
-          formDataToSend,
-          resetForm,
-          endPoint,
-          navigate,
-          process.env.REACT_APP_LISTE_EVENT_BANNER,
-          setLoading
-        );
-      } else {
-        formDataToSend.append("mode", "createBanniere");
-        confirmAction(
-          `Êtes-vous sûr de l'enregistrement de l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
-          "create",
-          formDataToSend,
-          resetForm,
-          endPoint,
-          navigate,
-          process.env.REACT_APP_LISTE_EVENT_BANNER,
-          setLoading
-        );
-      }
+      formDataToSend.append("mode", "updateBanniere");
+      formDataToSend.append("LG_BANID", banniereId);
+      confirmAction(
+        `Êtes-vous sûr de modifier l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
+        "update",
+        formDataToSend,
+        resetForm,
+        endPoint,
+        navigate,
+        process.env.REACT_APP_LISTE_EVENT_BANNER,
+        setLoading
+      );
+    } else {
+      formDataToSend.append("mode", "createBanniere");
+      confirmAction(
+        `Êtes-vous sûr de l'enregistrement de l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
+        "create",
+        formDataToSend,
+        resetForm,
+        endPoint,
+        navigate,
+        process.env.REACT_APP_LISTE_EVENT_BANNER,
+        setLoading
+      );
+    }
   };
-
 
   const breadcrumbs = [
     { text: "Bannières", link: "/" },
@@ -266,6 +256,9 @@ const SaveBanner = () => {
 
   return (
     <div className="app-main flex-column flex-row-fluid" id="kt_app_main">
+      {/* Ajout du loader overlay */}
+      <LoadingOverlay isLoading={loading} message="Traitement en cours..." />
+
       <div className="d-flex flex-column flex-column-fluid">
         <div id="kt_app_toolbar" className="app-toolbar py-3 py-lg-6">
           <div
@@ -305,7 +298,7 @@ const SaveBanner = () => {
                             <Form onSubmit={handleSubmit}>
                               {/* FORMULMAIRE GENERAL */}
                               <div className="row mt-5">
-                                <div className="col-lg-12">
+                                <div className="col-lg-6">
                                   <div className="form-group">
                                     <label className="required fs-6 form-label fw-bold text-gray-900">
                                       Titre de la bannère
@@ -323,6 +316,24 @@ const SaveBanner = () => {
                                     </div>
                                   </div>
                                 </div>
+                                <div className="col-lg-6">
+                                  <div className="form-group">
+                                    <label className="required fs-6 form-label fw-bold text-gray-900">
+                                      Ordre d'affichage
+                                    </label>
+                                    <div className="input-group ">
+                                      <input
+                                        type="text"
+                                        id="STR_BANORDER"
+                                        name="STR_BANORDER"
+                                        className="form-control form-control-solid"
+                                        placeholder="Saisir l'ordre d'affichage"
+                                        value={formData.STR_BANORDER}
+                                        onChange={handleInputTextChange}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
                               </div>
 
                               <div className="row mt-5">
@@ -332,21 +343,6 @@ const SaveBanner = () => {
                                       <label className="required fs-6 form-label fw-bold text-gray-900">
                                         Date de début d'affichage
                                       </label>
-
-                                      {/* <Form.Group
-                                            controlId="formDate"
-                                            className="w-100"
-                                        >
-                                            <Calendar
-                                                value={formData.DT_BANBEGIN}
-                                                onChange={(e) =>
-                                                    handleDateChange(e, "DT_BANBEGIN")
-                                                }
-                                                dateFormat="dd/mm/yy"
-                                                placeholder="Date de début de l'événement"
-                                                showButtonBar
-                                            />
-                                        </Form.Group> */}
 
                                       <Form.Group
                                         controlId="formDate"
@@ -375,22 +371,22 @@ const SaveBanner = () => {
                                     </label>
 
                                     <Form.Group
-                                        controlId="formDate"
-                                        className="w-100"
-                                      >
-                                        <DatePicker
-                                          oneTap
-                                          size="lg"
-                                          format="yyyy-MM-dd"
-                                          style={{ width: "100%" }}
-                                          value={formData.DT_BANEND} // Permet de gérer la valeur null
-                                          onChange={(e) =>
-                                            handleChange(e, "DT_BANEND")
-                                          }
-                                          placeholder="Date de début de l'événement"
-                                          cleanable // Assurez-vous que le champ est nettoyable
-                                        />
-                                      </Form.Group>
+                                      controlId="formDate"
+                                      className="w-100"
+                                    >
+                                      <DatePicker
+                                        oneTap
+                                        size="lg"
+                                        format="yyyy-MM-dd"
+                                        style={{ width: "100%" }}
+                                        value={formData.DT_BANEND} // Permet de gérer la valeur null
+                                        onChange={(e) =>
+                                          handleChange(e, "DT_BANEND")
+                                        }
+                                        placeholder="Date de début de l'événement"
+                                        cleanable // Assurez-vous que le champ est nettoyable
+                                      />
+                                    </Form.Group>
                                   </div>
                                 </div>
                               </div>
@@ -412,7 +408,6 @@ const SaveBanner = () => {
                                       onChange={handleInputTextChange}
                                     ></textarea>
                                   </div>
-                                  {/* <div className="text-muted fs-7"> A product name is required and recommended to be unique. </div> */}
                                   <div className="fv-plugins-message-container fv-plugins-message-container--enabled invalid-feedback" />
                                 </div>
                               </div>

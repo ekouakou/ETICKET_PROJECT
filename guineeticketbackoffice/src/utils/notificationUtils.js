@@ -1,8 +1,9 @@
 import { toast } from 'react-toastify';
-import { crudData } from '../services/apiService';
+import { crudData } from './apiUtils';
 import Swal from 'sweetalert2';
 
 export const confirmAction = (title, actionType, formDataToSend, resetForm, endPoint, navigate, redirectRoot, setLoading) => {
+    alert('xjv;')
     return Swal.fire({
         title: title,
         text: actionType === 'update' ? "Vous ne pourrez pas revenir en arrière!" : '',
@@ -14,7 +15,7 @@ export const confirmAction = (title, actionType, formDataToSend, resetForm, endP
         confirmButtonText: actionType === 'update' ? 'Oui, Modifier!' : 'Oui, Enregistrer!',
     }).then((result) => {
         if (result.isConfirmed) {
-            setLoading(true); // Affiche le loader
+            setLoading(true);
             return crudData(formDataToSend, endPoint)
                 .then(response => {
                     const { desc_statut, code_statut } = response.data;

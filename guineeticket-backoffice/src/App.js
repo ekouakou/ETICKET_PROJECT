@@ -2,23 +2,10 @@ import React, { useEffect, useState } from "react";
 
 import Menu from "./AppPages/Home/Menu";
 import HeaderWrapper from "./AppPages/Home/HeaderWrappers.js";
-import Main from "./AppPages/Home/Main";
-import Aside from "./AppPages/Home/Aside";
-import Builder from "./AppPages/Home/Builder";
-// import Form from './AppPages/Home/Form';
-// import HomePage from './AppPages/Home/HomePage';
-// import DetailPage from './AppPages/Detail/DetailPage';
-// import SignIn from './AppPages/Home/SignIn';
-// import Contact from './AppPages/Home/Contact';
-import NotFound from "./AppPages/Home/NotFound";
-// import AboutUs from './AppPages/Home/AboutUs';
-// import MyAcount from './AppPages/Home/MyAcount';
-// import DetailEventRedirect from './AppPages/Home/DetailEventRedirect';
 
-import ListeEvent from "./AppPages/EticketEvent/ListeEvent";
+import NotFound from "./AppPages/Home/NotFound";
 import EventsDataTable from "./AppPages/EticketEvent/EventsDataTable";
-import ListeEventBanner from "./AppPages/EticketBanner/ListeEventBanner";
-import BannerDataTable from "./AppPages/EticketBanner/BannerDataTable";
+import BannerDataTable from "./AppPages/EticketBanner/BannerDataTable.js";
 
 
 import SaveBanner from "./AppPages/EticketBanner/SaveBanner";
@@ -31,6 +18,8 @@ import {
 } from "react-router-dom";
 import SignIn from "./AppPages/login/SignIn";
 import SaveEvent from "./AppPages/EticketEvent/SaveEvent";
+import SaveTypeActivite from "./AppPages/EticketEvent/SaveTypeActivite";
+import SaveCategoriePlace from "./AppPages/EticketEvent/SaveCategoriePlace";
 // import EventListPage from './AppPages/EticketEvent/ListeEventData.js';
 import SaveBannerPage from "./AppPages/EticketBanner/SaveBanner.js";
 import ListeClient from './AppPages/EticketClient/ListeClient';
@@ -70,6 +59,8 @@ const AppContent = () => {
   const paths = {
     signIn: process.env.REACT_APP_SIGN_IN,
     saveEvent: process.env.REACT_APP_SAVE_EVENT,
+    saveTypeActivite: process.env.REACT_APP_SAVE_TYPE_ACTIVITE,
+    saveCategoriePlace: process.env.REACT_APP_SAVE_CATEGORIE_PLACE,
     eventDetails: process.env.REACT_APP_EVENT_DETAILS,
     eventList: process.env.REACT_APP_EVENT_LIST,
     saveBanner: process.env.REACT_APP_SAVE_BANNER,
@@ -290,11 +281,13 @@ const AppContent = () => {
                 <Route path="/" element={<SignIn />} />
                 <Route path="*" element={<NotFound />} />
                 <Route path={paths.saveBanner} element={<SaveBannerPage />} />
-                <Route path={paths.clientListe} element={<ListeClient />} /> 
-                <Route path={paths.detailClient} element={<DetailClient />} /> 
+                <Route path={paths.clientListe} element={<ListeClient />} />
+                <Route path={paths.detailClient} element={<DetailClient />} />
 
                 {/* <Route path={paths.dashboard} element={<DashboardAnnonceur />} /> */}
                 <Route path={paths.saveEventData} element={<SaveEvent />} />
+                <Route path={paths.saveTypeActivite} element={<SaveTypeActivite />} />
+                <Route path={paths.saveCategoriePlace} element={<SaveCategoriePlace />} />
                 {/* <Route path={paths.listeEventData} element={<ListeEvent />} /> */}
                 <Route path={paths.listeEventData} element={<EventsDataTable />} />
                 <Route path={paths.ticketList} element={<ListeTicket />} />
@@ -308,30 +301,29 @@ const AppContent = () => {
 
                 <Route path={paths.listeProfil} element={<ListeProfil />} />
                 <Route path={paths.saveProfil} element={<SaveProfil />} />
-                
+
                 <Route path={paths.notFound} element={<NotFound />} />
                 <Route
                   path={paths.dashboard}
                   element={<DashboardAnnonceur />}
                 />
               </Routes>
-              {/*end:::Main*/}
-              <div id="kt_app_footer" className="app-footer">
+              <div id="kt_app_footer" className="app-footer fixed-bottom">
                 <div className="app-container container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3">
                   <div className="text-gray-900 order-2 order-md-1">
-                    <span className="text-muted fw-semibold me-1">2024©</span>
+                    <span className="text-muted fw-semibold me-1">2025©</span>
                     <a
-                      href="https://keenthemes.com/"
+                      href="#"
                       target="_blank"
                       className="text-gray-800 text-hover-primary"
                     >
-                      Keenthemes
+                      Guinéé Ticket
                     </a>
                   </div>
                   <ul className="menu menu-gray-600 menu-hover-primary fw-semibold order-1">
                     <li className="menu-item">
                       <a
-                        href="https://keenthemes.com/"
+                        href="#"
                         target="_blank"
                         className="menu-link px-2"
                       >
@@ -340,7 +332,7 @@ const AppContent = () => {
                     </li>
                     <li className="menu-item">
                       <a
-                        href="https://devs.keenthemes.com/"
+                        href="#"
                         target="_blank"
                         className="menu-link px-2"
                       >
@@ -360,9 +352,7 @@ const AppContent = () => {
                 </div>
               </div>
             </div>
-            {/*end::Wrapper*/}
           </div>
-          {/*end::Page*/}
         </div>
       )}
 

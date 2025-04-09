@@ -1,7 +1,7 @@
 // eventService.js
 import axios from "axios";
 import { authService } from "./AuthService";
-import { crudData } from "./apiService";
+import { crudData } from "./apiUtils";
 
 
 class ClientService {

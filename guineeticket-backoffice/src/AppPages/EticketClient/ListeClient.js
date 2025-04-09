@@ -159,13 +159,13 @@ const ListeClient = () => {
 // STR_CLIMAIL
 // STR_CLIPHONE
 
-    { data: "STR_CLIFIRSTNAME", title: "Nom" },
-    { data: "STR_CLILASTNAME", title: "Prenom" },
-    { data: "STR_CLIPHONE", title: "Téléphone" },
-    { data: "STR_CLIMAIL", title: "Email" },
+    { dataIndex: "STR_CLIFIRSTNAME", title: "Nom" },
+    { dataIndex: "STR_CLILASTNAME", title: "Prenom" },
+    { dataIndex: "STR_CLIPHONE", title: "Téléphone" },
+    { dataIndex: "STR_CLIMAIL", title: "Email" },
 
-    { data: "STR_CLILOGIN", title: "Login" },
-    { data: "NOMBRE", title: "Nombre" },
+    { dataIndex: "STR_CLILOGIN", title: "Login" },
+    { dataIndex: "NOMBRE", title: "Nombre" },
     {
       title: "Statut",
       dataIndex: "STR_UTISTATUT",
@@ -220,7 +220,7 @@ const ListeClient = () => {
   ];
 
   if (!user) {
-    return navigate("/login");
+    return navigate(process.env.REACT_APP_SIGN_IN);
   }
 
   return (

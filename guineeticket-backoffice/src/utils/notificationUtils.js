@@ -1,5 +1,5 @@
 import { toast } from 'react-toastify';
-import { crudData } from '../services/apiService';
+import { crudData } from '../services/apiUtils';
 import Swal from 'sweetalert2';
 
 export const confirmAction = (title, actionType, formDataToSend, resetForm, endPoint, navigate, redirectRoot, setLoading) => {
