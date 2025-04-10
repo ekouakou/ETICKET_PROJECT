@@ -14,10 +14,11 @@ import useFetchData from './useFetchData';
 const useDataTable = (
   apiUrl,
   queryParams,
-  dataKey = "data",
+  dataKey,
   searchOptions = {
     fields: ["STR_EVENAME", "LG_LSTPLACEID", "DT_EVEBEGIN", "DT_EVEEND"]
   },
+  userParamsAreValid,
   defaultPageSize = 10
 ) => {
   // États

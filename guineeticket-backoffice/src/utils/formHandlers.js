@@ -1,9 +1,17 @@
 import { toast } from 'react-toastify'; // Importation de la bibliothèque pour afficher des notifications
 import Swal from 'sweetalert2'; // Importation de la bibliothèque pour afficher des boîtes de dialogue
-import { crudData, doConnexion } from '../services/apiService'; // Importation des fonctions pour effectuer des requêtes API
+import { getFullUrl, rootUrl } from "./urlUtils";
+import { crudData} from '../services/apiUtils'; // Importation des fonctions pour effectuer des requêtes API
+
 import { useNavigate } from 'react-router-dom';
 
-
+const doConnexion = (params) => {
+  return axios.post(`${rootUrl}Authentification.php`, params, {
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    }
+  });
+};
 
 // Fonction pour gérer la création d'une ressource
 // Paramètres:

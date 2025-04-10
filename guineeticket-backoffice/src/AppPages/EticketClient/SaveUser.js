@@ -3,7 +3,7 @@ import Switch from "react-switch";
 import { toast, ToastContainer } from "react-toastify";
 import { EventContext } from "../../contexts/EventProvider";
 import { useNavigate } from "react-router-dom";
-import { crudData } from "../../services/apiService";
+import { crudData } from "../../services/apiUtils";
 import { Modal, Button, Form } from "react-bootstrap";
 import FileUploader from "../FileUploader/FileUploader";
 // import EventSummary from './EventSummary'
@@ -14,7 +14,6 @@ import { HashLoader } from "react-spinners";
 
 import { useLocation } from "react-router-dom";
 
-import eventService from "../../services/BannerService";
 
 import "react-toastify/dist/ReactToastify.css";
 import Tippy from "@tippyjs/react";
@@ -105,8 +104,8 @@ const SaveUser = () => {
   //   );
   // }, [userData, endPoint]);
 
-  const profilUtilisateur = useLoadStores( { mode: "listProfile", STR_PROTYPE: "system" }, endPoint, { valueKey: "LG_PROID", labelKey: "STR_PRODESCRIPTION" });
-  const aganceData = useLoadStores( { mode: "listAgence"}, endPoint, { valueKey: "LG_AGEID", labelKey: "STR_AGEDESCRIPTION" });
+  const profilUtilisateur = useLoadStores({ mode: "listProfile", STR_PROTYPE: "system" }, endPoint, { valueKey: "LG_PROID", labelKey: "STR_PRODESCRIPTION" });
+  const aganceData = useLoadStores({ mode: "listAgence" }, endPoint, { valueKey: "LG_AGEID", labelKey: "STR_AGEDESCRIPTION" });
 
 
   const handleChange = handleSelectChange(setFormData, formData);
@@ -146,7 +145,7 @@ const SaveUser = () => {
   useEffect(() => {
     if (location.state && location.state.LG_UTIID) {
       setutilisateurId(location.state.LG_UTIID);
-  
+
       // LISTES DES CATEGORIE DE TICKET DE L'EVENEMENT
       crudData(
         { mode: "getUtilisateur", LG_UTIID: location.state.LG_UTIID },
@@ -154,7 +153,7 @@ const SaveUser = () => {
       )
         .then((response) => {
           setEventDetails(response.data);
-  
+
           const {
             STR_UTIPHONE = "",
             STR_UTIMAIL = "",
@@ -164,7 +163,7 @@ const SaveUser = () => {
             LG_PROID = 1,
             STR_UTIPIC,
           } = response.data;
-  
+
           setFormData({
             STR_UTIPHONE,
             STR_UTIMAIL,
@@ -176,7 +175,7 @@ const SaveUser = () => {
             mode: "updateUtilisateur",
             STR_UTITOKEN: userData?.UTITOKEN || "",
           });
-  
+
           processFile("STR_UTIPIC", STR_UTIPIC, setFormData, setPreviewPic);
         })
         .catch((error) => {
@@ -184,7 +183,7 @@ const SaveUser = () => {
         });
     }
   }, [location.state, userData]);
-  
+
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
@@ -297,7 +296,7 @@ const SaveUser = () => {
                               {/* <h1>{selectedEvent ? 'Modifier l\'événement' : 'Ajouter un nouvel événement'}</h1> */}
                               <Form onSubmit={handleSubmit}>
                                 {/* FORMULMAIRE GENERAL */}
-                                
+
                                 <CardHeader text="Information génerale sur l'utilisateur" />
 
                                 <div className="row">
@@ -378,57 +377,57 @@ const SaveUser = () => {
                                 </div>
                                 <div className="row">
 
-                                <div className="col-lg-6">
-                                  <div className="form-group mb-5">
-                                    <label className="required fs-6 form-label fw-bold text-gray-900">
-                                      Profil
-                                    </label>
-                                    <Form.Group
-                                      controlId="formDate"
-                                      className="w-100"
-                                    >
-                                      <SelectPicker
-                                        data={profilUtilisateur} // Liste des options
-                                        style={{ width: "100%" }}
-                                        size="lg"
-                                        onChange={(value) =>
-                                          handleChange(value, "LG_PROID")
-                                        } // Gestionnaire
-                                        value={formData.LG_PROID || null} // Valeur initiale
-                                        placeholder="Sélectionnez un profil" // Texte affiché par défaut
-                                        className="basic-multi-select"
-                                      />
-                                    </Form.Group>
+                                  <div className="col-lg-6">
+                                    <div className="form-group mb-5">
+                                      <label className="required fs-6 form-label fw-bold text-gray-900">
+                                        Profil
+                                      </label>
+                                      <Form.Group
+                                        controlId="formDate"
+                                        className="w-100"
+                                      >
+                                        <SelectPicker
+                                          data={profilUtilisateur} // Liste des options
+                                          style={{ width: "100%" }}
+                                          size="lg"
+                                          onChange={(value) =>
+                                            handleChange(value, "LG_PROID")
+                                          } // Gestionnaire
+                                          value={formData.LG_PROID || null} // Valeur initiale
+                                          placeholder="Sélectionnez un profil" // Texte affiché par défaut
+                                          className="basic-multi-select"
+                                        />
+                                      </Form.Group>
+                                    </div>
                                   </div>
-                                </div>
-                                <div className="col-lg-6">
-                                  <div className="form-group mb-5">
-                                    <label className="required fs-6 form-label fw-bold text-gray-900">
-                                      Agence
-                                    </label>
-                                    <Form.Group
-                                      controlId="formDate"
-                                      className="w-100"
-                                    >
-                                      <SelectPicker
-                                        data={aganceData} // Liste des options
-                                        style={{ width: "100%" }}
-                                        size="lg"
-                                        onChange={(value) =>
-                                          handleChange(value, "LG_AGEID")
-                                        } // Gestionnaire
-                                        value={formData.LG_AGEID || null} // Valeur initiale
-                                        placeholder="Sélectionnez un agence" // Texte affiché par défaut
-                                        className="basic-multi-select"
-                                      />
-                                    </Form.Group>
+                                  <div className="col-lg-6">
+                                    <div className="form-group mb-5">
+                                      <label className="required fs-6 form-label fw-bold text-gray-900">
+                                        Agence
+                                      </label>
+                                      <Form.Group
+                                        controlId="formDate"
+                                        className="w-100"
+                                      >
+                                        <SelectPicker
+                                          data={aganceData} // Liste des options
+                                          style={{ width: "100%" }}
+                                          size="lg"
+                                          onChange={(value) =>
+                                            handleChange(value, "LG_AGEID")
+                                          } // Gestionnaire
+                                          value={formData.LG_AGEID || null} // Valeur initiale
+                                          placeholder="Sélectionnez un agence" // Texte affiché par défaut
+                                          className="basic-multi-select"
+                                        />
+                                      </Form.Group>
+                                    </div>
                                   </div>
-                                </div>
                                 </div>
 
                                 {/* GESTION DES IMAGES */}
 
-                               
+
                                 <CardHeader text="Gestion des images" />
 
 

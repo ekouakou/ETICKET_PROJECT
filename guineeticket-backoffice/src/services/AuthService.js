@@ -2,9 +2,8 @@
 export class AuthService {
     checkAuth(navigate) {
       const storedUser = JSON.parse(localStorage.getItem("userConnectedData"));
-      if (!storedUser) {
-        const paths = JSON.parse(localStorage.getItem("appPaths"));
-        navigate(paths.signIn);
+      if (!storedUser || storedUser == null) {
+        navigate(process.env.REACT_APP_SIGN_IN);
         return null;
       }
       return storedUser;

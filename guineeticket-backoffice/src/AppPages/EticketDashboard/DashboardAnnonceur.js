@@ -228,12 +228,12 @@ const DashboardAnnonceur = () => {
                                     <div className="row  mt-5">
                                         <div className="col-md-6 col-lg-6 col-xl-6 col-xxl-6 mb-10">
 
-                                            <SalesStatisticsCard />
+                                            {/* <SalesStatisticsCard /> */}
                                         </div>
-                                        <EventComponent />
-                                        <SalesStatisticsCard2 />
+                                        {/* <EventComponent /> */}
+                                        {/* <SalesStatisticsCard2 /> */}
 
-                                        <div className="col-xxl-6 d-none">
+                                        {/* <div className="col-xxl-6 d-none">
                                             <div className="card card-flush h-md-100">
                                                 <div className="card-body py-9">
                                                     <h2 className="text-lg font-semibold mb-4">Comparaison des ventes et revenus</h2>
@@ -252,9 +252,9 @@ const DashboardAnnonceur = () => {
 
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
-                                        <div className="col-xxl-6">
+                                        {/* <div className="col-xxl-6">
                                             <div className="card card-flush h-md-100">
                                                 <div className="card-body py-9">
                                                     <h2 className="text-lg font-semibold mb-4">Évolution des ventes par type</h2>
@@ -275,9 +275,9 @@ const DashboardAnnonceur = () => {
 
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
-                                        <div className="col-xxl-6">
+                                        {/* <div className="col-xxl-6">
                                             <div className="card card-flush h-md-100">
                                                 <div className="card-body py-9">
                                                     <h2 className="text-lg font-semibold mb-4">Récapitulatif par type d'événement</h2>
@@ -291,8 +291,6 @@ const DashboardAnnonceur = () => {
                                                                         <th className="p-0 min-w-100px">Vues</th>
                                                                         <th className="p-0 min-w-100px">Revenu (€)</th>
                                                                         <th className="p-0 min-w-100px">Taux Conversion (%)</th>
-                                                                        {/* <th className="p-0 min-w-100px">Prix Moyen (€)</th>
-                                                                            <th className="p-0 min-w-100px">Satisfaction</th> */}
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -323,16 +321,6 @@ const DashboardAnnonceur = () => {
                                                                                     {performance.tauxConversion}%
                                                                                 </span>
                                                                             </td>
-                                                                            {/* <td>
-                                                                                    <span className="text-gray-900 fw-bold fs-6">
-                                                                                        {performance.prixMoyen.toFixed(2)} €
-                                                                                    </span>
-                                                                                </td>
-                                                                                <td>
-                                                                                    <span className="text-gray-900 fw-bold fs-6">
-                                                                                        {performance.satisfaction.toFixed(1)}
-                                                                                    </span>
-                                                                                </td> */}
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>
@@ -342,60 +330,11 @@ const DashboardAnnonceur = () => {
 
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> */}
 
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* footer */}
-                        <div id="kt_app_footer" className="app-footer ">
-                            <div className="app-container  container-fluid d-flex flex-column flex-md-row flex-center flex-md-stack py-3 ">
-                                <div className="text-gray-900 order-2 order-md-1">
-                                    <span className="text-muted fw-semibold me-1">2024©</span>
-                                    <a
-                                        href="../../../../keenthemes.com/index.html"
-                                        target="_blank"
-                                        className="text-gray-800 text-hover-primary"
-                                    >
-                                        Keenthemes
-                                    </a>
-                                </div>
-                                {/*end::Copyright*/}
-                                {/*begin::Menu*/}
-                                <ul className="menu menu-gray-600 menu-hover-primary fw-semibold order-1">
-                                    <li className="menu-item">
-                                        <a
-                                            href="../../../../keenthemes.com/index.html"
-                                            target="_blank"
-                                            className="menu-link px-2"
-                                        >
-                                            About
-                                        </a>
-                                    </li>
-                                    <li className="menu-item">
-                                        <a
-                                            href="../../../../devs.keenthemes.com/index.html"
-                                            target="_blank"
-                                            className="menu-link px-2"
-                                        >
-                                            Support
-                                        </a>
-                                    </li>
-                                    <li className="menu-item">
-                                        <a
-                                            href="../../../../themes.getbootstrap.com/product/keen-the-ultimate-bootstrap-admin-theme/index.html"
-                                            target="_blank"
-                                            className="menu-link px-2"
-                                        >
-                                            Purchase
-                                        </a>
-                                    </li>
-                                </ul>
-                                {/*end::Menu*/}{" "}
-                            </div>
-                            {/*end::Footer container*/}
                         </div>
                     </div>
 

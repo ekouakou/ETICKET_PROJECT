@@ -1,103 +1,214 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
-import Switch from "react-switch";
-import { toast, ToastContainer } from "react-toastify";
-import { crudData } from "../../services/apiService";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
-
-import "react-toastify/dist/ReactToastify.css";
-import { authService } from "../../services/AuthService";
-import PageTitle from "../PageTitle";
+  Table,
+  Button,
+  Space,
+  Spin,
+  Switch,
+  Image,
+  notification,
+  Breadcrumb,
+  Typography,
+  Input,
+  Row,
+  Col,
+  Card
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  SearchOutlined
+} from "@ant-design/icons";
+import { DatePicker } from 'rsuite';
 import { useNavigate } from "react-router-dom";
-import GenericDataTable from "../GenericDataTable";
-import ClientService from "../../services/ClientService";
-import useLoader from "../../utils/useLoader";
-import SkeletonTable from "../Skeleton/SkeletonTable";
+import { authService } from "../../services/AuthService";
+import { formatDate, getCurrentDate, getDateInPastMonths } from "../../utils/dateUtils";
+import usePostData from "../../services/usePostData";
+import useDataTable from '../../services/useDataTable';
+import { getTicketColumns } from '../../services/dataTableColumns';
+import 'rsuite/dist/rsuite.min.css';
+import PageTitle from "../PageTitle";
+import { useLocation } from "react-router-dom";
+
+
+
+const { Title } = Typography;
+const { Search } = Input;
 
 const DetailClient = () => {
-
-  const [clientDetails, setClientDetails] = useState(null);
-  const [previewPic, setPreviewPic] = useState(null);
-  const [userData, setUserData] = useState(null);
-  const location = useLocation();
-  const [utilisateurId, setutilisateurId] = useState(null);
-  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const endPoint = process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL;
-  const [ticketData, setTicketData] = useState([]);
-  const isLoading = useLoader(ticketData);
+  const location = useLocation();
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("userConnectedData");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
+  const [startDate, setStartDate] = useState(getDateInPastMonths(new Date(), 2));
+  const [endDate, setEndDate] = useState(getCurrentDate());
+  const [searchText, setSearchText] = useState("");
 
+  // Check authentication on component mount
   useEffect(() => {
-    const data = authService.checkAuth(navigate);
-    if (data) {
-      setUserData(data);
+    const currentUser = authService.checkAuth(navigate);
+    if (!currentUser) {
+      navigate(process.env.REACT_APP_SIGN_IN);
+      return;
     }
+    setUser(currentUser);
   }, [navigate]);
 
+  const { postData, loading: postLoading } = usePostData(process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL);
+
+  // Référence aux paramètres de recherche pour useDataTable
+  const [searchParams, setSearchParams] = useState({
+    mode: process.env.REACT_APP_LISTE_TICKET_CLIENT_MODE,
+    STR_UTITOKEN: user?.STR_UTITOKEN,
+    LG_AGEID: user?.LG_AGEID,
+    LG_CLIID: location.state.LG_CLIID,
+    DT_BEGIN: formatDate(startDate),
+    DT_END: formatDate(endDate),
+  });
+  const {
+    data: allEventsData,
+    loading: fetchLoading,
+    pagination,
+    handleTableChange,
+    handleSearch,
+    refreshData
+  } = useDataTable(
+    process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL,
+    searchParams,
+    "data",
+    {
+      fields: ["STR_EVENAME", "LG_LSTPLACEID", "DT_EVEBEGIN", "DT_EVEEND"]
+    },
+    10
+  );
+
+  // Mettre à jour les paramètres quand l'utilisateur est chargé
   useEffect(() => {
+    if (user) {
+      setSearchParams(prev => ({
+        ...prev,
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+      }));
+    }
+  }, [user]);
 
-    if (location.state && location.state.LG_CLIID) {
-      setutilisateurId(location.state.LG_CLIID);
+  // Fonction pour gérer le changement de la date de début
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+  };
 
-      crudData(
-        { mode: "getClient", LG_CLIID: location.state.LG_CLIID },
-        endPoint
-      )
-        .then((response) => {
-          setClientDetails(response.data);
-        })
-        .catch((error) => {
-          console.error("Erreur lors de la récupération des données:", error);
+  // Fonction pour gérer le changement de la date de fin
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+  };
+
+  // Fonction pour rechercher avec les paramètres actuels (texte et dates)
+  const handleSearchWithFilters = () => {
+    if (user) {
+      const newParams = {
+        mode: process.env.REACT_APP_LISTE_TICKET_MODE,
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+        DT_BEGIN: formatDate(startDate),
+        DT_END: formatDate(endDate),
+      };
+
+      if (searchText) {
+        newParams.search = searchText;
+      }
+
+      // Mettre à jour les paramètres de recherche
+      setSearchParams(newParams);
+
+      // Forcer le rechargement des données
+      setTimeout(() => {
+        refreshData();
+      }, 100);
+    }
+  };
+
+  // Fonction pour éditer un événement
+  const handleEdit = (event) => {
+    navigate(process.env.REACT_APP_SAVE_EVENT_DATA, {
+      state: { LG_EVEID: event.LG_EVEID },
+    });
+  };
+
+  // Fonction pour supprimer un événement
+  const handleDeleteItem = async (record) => {
+    try {
+      await postData({
+        mode: "deleteEvenement",
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+        LG_EVEID: record.LG_EVEID
+      });
+
+      notification.success({
+        message: "Succès",
+        description: `L'événement a été supprimé avec succès.`
+      });
+
+      // Rafraîchir les données après la suppression
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de supprimer l'événement.`
       });
     }
-  }, [location.state, userData]);
+  };
+
+  // Fonction pour changer le statut d'un événement
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "enable" ? "disable" : "enable";
+      await postData({
+        mode: "deleteEvenement", // Mode utilisé pour le changement de statut
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+        LG_EVEID: id,
+        STR_EVESTATUT: newStatus
+      });
+
+      notification.success({
+        message: "Succès",
+        description: `Le statut de l'événement a été ${newStatus === "enable" ? "activé" : "désactivé"} avec succès.`
+      });
+
+      // Rafraîchir les données après la modification
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de modifier le statut de l'événement.`
+      });
+    }
+  };
+
+  // Configuration des colonnes
+  const columns = getTicketColumns(
+    handleEdit,
+    handleDeleteItem,
+    handleToggleStatus,
+    process.env.REACT_APP_BASE_IMAGE_URL
+  );
+
+  if (!user) {
+    return navigate(process.env.REACT_APP_SIGN_IN);
+  }
 
   const breadcrumbs = [
     { text: "Client", link: "/" },
     { isBullet: true },
     { text: "Détail du client" },
   ];
-
-  const fetchEvents = async () => {
-    try {
-      const events = await ClientService.getClientTickets(navigate, location.state.LG_CLIID);
-      setTicketData(events);
-    } catch (error) {
-      console.error("Erreur lors du chargement des tickets:", error);
-      toast.error("Erreur lors du chargement des tickets");
-    }
-  };
-
-  // Nouvel effet pour charger les tickets
-  useEffect(() => {
-    if (utilisateurId) {
-      // On s'assure d'avoir l'ID de l'utilisateur
-      fetchEvents();
-    }
-  }, [utilisateurId]); // La fonction se déclenche quand l'ID change
-
-  const handleApiCall = async ({ mode, id, ticketName }) => {
-    let success = false;
-    if (mode === "sendTicket") {
-      success = await ClientService.sendTicket(navigate, id, ticketName);
-    }
-
-    if (success) {
-      toast.success("Opération réussie", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-      fetchEvents(); // Rechargement des tickets après une opération
-    }
-  };
 
   return (
     <>
@@ -265,7 +376,7 @@ const DetailClient = () => {
                             href="#"
                             className="text-gray-800 text-hover-primary fs-2 fw-bolder me-1"
                           >
-                            {clientDetails?.STR_CLIFIRSTNAME}
+                            {/* {clientDetails?.STR_CLIFIRSTNAME} */}
                           </a>
                           <a
                             href="#"
@@ -349,7 +460,7 @@ const DetailClient = () => {
               </div>
 
               <div className="row g-xxl-12 align-items-stretch mb-5">
-                <div className="col-xxl-6">
+                <div className="col-xxl-4">
                   <div className="card card-xxl-stretch mb-5 mb-xl-10 h-100">
                     <div className="card-header card-header-stretch">
                       <div className="card-title">
@@ -372,10 +483,10 @@ const DetailClient = () => {
                                 <span
                                   className="fs-2hx fw-bold text-gray-900 counted"
                                   data-kt-countup="true"
-                                  data-kt-countup-value={ticketData.length}
+                                  data-kt-countup-value={allEventsData.length}
                                   data-kt-initialized={1}
                                 >
-                                  {ticketData.length}
+                                  {allEventsData.length}
                                 </span>
                               </div>
                             </div>
@@ -415,7 +526,7 @@ const DetailClient = () => {
                     </div>
                   </div>
                 </div>
-                <div className="col-xxl-6">
+                <div className="col-xxl-8">
                   <div className="card card-xxl-stretch-50 mb-5 mb-xl-10 h-100">
                     <div className="card-body pt-5">
                       <div className="card-header">
@@ -423,34 +534,69 @@ const DetailClient = () => {
                           <h3 className="text-gray-800">Evolution</h3>
                         </div>
                       </div>
-                      <div className="row g-xxl-3">
-                        <GenericDataTable
-                          data={ticketData}
-                          columns={ClientService.getTicketsColumns()}
-                          tableId="eventTable"
-                          onSendTicket={true}
-                          deleteConfirmMessage={(id) =>
-                            `Êtes-vous sûr de vouloir envoyé lme ticket à cet utilisateur?`
-                          }
-                          toggleStatusConfirmMessage={(id, STR_TICNAME) =>
-                            `Êtes-vous sûr de vouloir 
-                            } cet utilisateur (${id}) ?`
-                          }
-                          handleApiCall={handleApiCall}
-                        />
+                      <div id="kt_app_content" className="app-content flex-column-fluid">
+                        <div id="kt_app_content_container" className="app-container container-xxl">
+                          <Card className="shadow-sm">
+                            <Row gutter={[16, 16]} className="mb-4">
+                              {/* Zone de filtres alignée à gauche */}
+                              <Col xs={24} md={12} lg={14}>
+                                <Space size="middle" style={{ width: '100%' }}>
+                                  <div style={{ display: 'flex', gap: '12px' }}>
+                                    <DatePicker
+                                      value={startDate}
+                                      onChange={handleStartDateChange}
+                                      format="dd/MM/yyyy"
+                                      style={{ minWidth: '160px' }}
+                                      placeholder="Date début"
+                                    />
+                                    <DatePicker
+                                      value={endDate}
+                                      onChange={handleEndDateChange}
+                                      format="dd/MM/yyyy"
+                                      style={{ minWidth: '160px' }}
+                                      placeholder="Date fin"
+                                    />
+                                    <Button
+                                      type="primary"
+                                      icon={<SearchOutlined />}
+                                      onClick={handleSearchWithFilters}
+                                    >
+                                      Filtrer
+                                    </Button>
+                                  </div>
+                                </Space>
+                              </Col>
+
+                              {/* Zone de recherche alignée à droite */}
+                              <Col xs={24} md={12} lg={10} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                <Search
+                                  placeholder="Rechercher par nom, lieu ou date..."
+                                  allowClear
+                                  enterButton="Rechercher"
+                                  size="middle"
+                                  onSearch={handleSearch}
+                                  onChange={(e) => handleSearch(e.target.value)}
+                                  style={{ width: '100%', maxWidth: '450px' }}
+                                />
+                              </Col>
+                            </Row>
+
+                            <Spin spinning={fetchLoading || postLoading} tip="Chargement des données...">
+                              <Table
+                                columns={columns}
+                                dataSource={allEventsData}
+                                rowKey="LG_CLIID"
+                                pagination={pagination}
+                                onChange={handleTableChange}
+                                bordered
+                                size="middle"
+                                scroll={{ x: 1300 }}
+                                className="custom-table"
+                              />
+                            </Spin>
+                          </Card>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="row gx-5 gx-xl-10">
-                <div className="col-xxl-12 mb-5 mb-xl-10">
-                  <div className="card card-flush h-xl-100">
-                    <div className="card-body pt-6">
-                      <>
-
-                      </>
                     </div>
                   </div>
                 </div>

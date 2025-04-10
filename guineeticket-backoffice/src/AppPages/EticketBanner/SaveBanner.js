@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import eventService from "../../services/BannerService";
 
 import Switch from "react-switch";
 import { toast, ToastContainer } from "react-toastify";
@@ -51,13 +50,6 @@ const SaveBanner = () => {
   const location = useLocation();
   const [banniereId, setbanniereId] = useState(null);
   const [loading, setLoading] = useState(false);
-
-  const fetchEvents = async () =>
-    setEventData(await eventService.getEvents(navigate));
-
-  useEffect(() => {
-    fetchEvents();
-  }, [navigate]);
 
   const endPoint = process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL;
   const TicketendPoint = process.env.REACT_APP_TICKET_MANAGER_API_URL;

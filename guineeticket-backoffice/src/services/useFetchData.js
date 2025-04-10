@@ -3,7 +3,6 @@ import { urlBaseImage, rootUrl } from './urlUtils';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-
 /**
  * Hook pour récupérer des données d'API avec capacité de refetch
  * @param {string} url - URL de l'API
@@ -18,19 +17,46 @@ const useFetchData = (apiEndPoint, params, dataKey, refreshTrigger = 0) => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Fonction pour vérifier si un objet contient des valeurs null ou undefined
+  const validateParams = (params) => {
+    if (!params) return false;
+    
+    // Créer une copie propre des paramètres en supprimant les valeurs null/undefined
+    const cleanParams = {};
+    let isValid = false;
+    
+    for (const key in params) {
+      if (params[key] !== null && params[key] !== undefined) {
+        cleanParams[key] = params[key];
+        isValid = true; // Au moins un paramètre valide
+      }
+    }
+    
+    return { isValid, cleanParams };
+  };
+
   // Fonction pour récupérer les données
   const fetchData = async () => {
     try {
       setLoading(true);
-
+      
+      // Valider les paramètres avant d'envoyer la requête
+      const { isValid, cleanParams } = validateParams(params);
+      
+      if (!isValid) {
+        throw new Error("Paramètres invalides: tous les paramètres sont null ou undefined");
+      }
+      
       const response = await axios.post(
-        rootUrl + apiEndPoint, params, { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+        rootUrl + apiEndPoint, 
+        cleanParams, 
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
-
-      // const response = await axios.post(url, params);
-      if(response.data.code_statut == 2){
+      
+      if (response.data.code_statut == 2) {
         return navigate(process.env.REACT_APP_SIGN_IN);
       }
+      
       const fetchedData = dataKey ? response.data[dataKey] : response.data;
       setData(fetchedData);
       setError(null);

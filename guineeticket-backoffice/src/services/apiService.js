@@ -17,9 +17,9 @@ const getRootUrl = (port) => {
 const getFullUrl = () => {
   const { protocol, hostname, port } = window.location;
   const portPart = port ? `:${port}` : '';
-  // return `https://www.guineeticket.com/`;
+  return `https://www.guineeticket.com/`;
   // return `http://192.168.1.5/`;
-  return `${protocol}//${hostname}/`;
+  // return `${protocol}//${hostname}/`;
 };
 
 
@@ -32,21 +32,7 @@ const fullUrl = getFullUrl();
 
 //const urlBaseImage = "eticketbackend/backoffice/"//alert(fullUrl+urlBaseImage); backoffice
 const rootUrl = fullUrl + "eticketbackend/backoffice/webservices/"; //Production //eticketbackend/
-// localStorage.setItem("urlBaseImage", fullUrl + urlBaseImage);
 
-
-
-
-
-//const urlBaseImage = "http://192.168.5.17/eticketbackend/";
-//alert(fullUrl+urlBaseImage);
-//localStorage.setItem("urlBaseImage", fullUrl + urlBaseImage);
-//localStorage.setItem("fullUrl", urlBaseImage)
-
-
-
-//const port = "80"; // Vous pouvez changer cela selon votre besoin
-//const rootUrl = getRootUrl(port);
 
 const fetchEvenements = (params) => {
   return axios.post(`${rootUrl}TicketManager.php`, params, {
@@ -175,7 +161,7 @@ const fetchCatalogue = (params) => {
 
 // GLOBAL CRUD
 
-const crudData = (params,apiUrl) => {
+const crudData = (params, apiUrl) => {
   return axios.post(`${rootUrl}${apiUrl}`, params, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -207,7 +193,7 @@ const paths = {
   listeUtilisateurs: "/liste-utilisateurs",
   saveUtilisateurs: "/save-utilisateurs",
   notFound: "*",
-  
+
 };
 
 localStorage.setItem("appPaths", JSON.stringify(paths));
@@ -216,9 +202,9 @@ localStorage.setItem("appPaths", JSON.stringify(paths));
 
 
 
-export { fetchSlider,fetchFamille,fetchMarque, fetchSuccursale, fetchHomesectionProduct, fetchCatalogue, 
-  deleteMarque, updateMarque, createMarque ,
-
+export {
+  fetchSlider, fetchFamille, fetchMarque, fetchSuccursale, fetchHomesectionProduct, fetchCatalogue,
+  deleteMarque, updateMarque, createMarque,
   crudData,
-  
-  fetchEvenements, fetchEvenementDetails, doConnexion, doDisConnexion };
+  fetchEvenements, doConnexion, 
+};

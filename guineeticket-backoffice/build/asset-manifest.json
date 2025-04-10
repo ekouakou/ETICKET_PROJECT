@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/eticketAdmin/static/css/main.95f8aae6.css",
-    "main.js": "/eticketAdmin/static/js/main.bb5231e5.js",
+    "main.css": "/eticketAdmin/static/css/main.b1026099.css",
+    "main.js": "/eticketAdmin/static/js/main.10f4ea0d.js",
     "static/js/453.b9375fe4.chunk.js": "/eticketAdmin/static/js/453.b9375fe4.chunk.js",
     "index.html": "/eticketAdmin/index.html",
-    "main.95f8aae6.css.map": "/eticketAdmin/static/css/main.95f8aae6.css.map",
-    "main.bb5231e5.js.map": "/eticketAdmin/static/js/main.bb5231e5.js.map",
+    "main.b1026099.css.map": "/eticketAdmin/static/css/main.b1026099.css.map",
+    "main.10f4ea0d.js.map": "/eticketAdmin/static/js/main.10f4ea0d.js.map",
     "453.b9375fe4.chunk.js.map": "/eticketAdmin/static/js/453.b9375fe4.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.95f8aae6.css",
-    "static/js/main.bb5231e5.js"
+    "static/css/main.b1026099.css",
+    "static/js/main.10f4ea0d.js"
   ]
 }

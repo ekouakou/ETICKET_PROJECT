@@ -14,7 +14,6 @@ import { HashLoader } from "react-spinners";
 
 import { useLocation } from "react-router-dom";
 
-import eventService from "../../services/BannerService";
 
 import "react-toastify/dist/ReactToastify.css";
 import Tippy from "@tippyjs/react";
