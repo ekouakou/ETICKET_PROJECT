@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import useFetchData from "../../services/useFetchData";
 import AppHeader from "../../AppComponents/Header/AppHeader";
 import SliderComponent from "../../AppComponents/Slider/SliderComponent";
-import { urlBaseImage, rootUrl , baseUrl} from "../../services/urlUtils";
+import { urlBaseImage, rootUrl, baseUrl } from "../../services/urlUtils";
 import ExpectedPremiere from "./ExpectedPremiere";
 import BannerSkeleton from "../../AppPages/Skeleton/BannerSkeleton";
 import SiteHeaderSkeleton from "../Skeleton/SiteHeaderSkeleton";
@@ -25,7 +25,7 @@ const EventList = () => {
     mode: process.env.REACT_APP_LIST_EVENEMENT_FRONT_MODE,
     DT_BEGIN: pastDate,
     DT_END: futureDate,
-  }, "data" );
+  }, "data");
 
   // Simulation d'un chargement de 2 secondes
   useEffect(() => {

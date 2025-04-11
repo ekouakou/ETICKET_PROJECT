@@ -226,7 +226,7 @@ const AppContent = () => {
                 {/*begin::Logo*/}
                 <div className="app-sidebar-logo px-6" id="kt_app_sidebar_logo">
                   {/*begin::Logo image*/}
-                  <a href="../../index.html">
+                  <a href="#/tableau-bord">
                     <img
                       alt="Logo"
                       src="assets/media/logos/logo_dark.svg"
@@ -253,7 +253,7 @@ const AppContent = () => {
                   </div>
                 </div>
                 <Menu />
-                <div
+                {/* <div
                   className="app-sidebar-footer flex-column-auto pt-2 pb-6 px-6"
                   id="kt_app_sidebar_footer"
                 >
@@ -272,7 +272,7 @@ const AppContent = () => {
                       <span className="path2" />
                     </i>{" "}
                   </a>
-                </div>
+                </div> */}
                 {/*end::Footer*/}{" "}
               </div>
               {/*end::Sidebar*/}

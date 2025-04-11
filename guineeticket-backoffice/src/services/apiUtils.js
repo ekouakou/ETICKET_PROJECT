@@ -88,8 +88,8 @@ export const handleLogin = async (e, params, setError, navigate, redirectPath) =
 
     if (userData.code_statut === "1") { // Vérification si la connexion a réussi
       localStorage.setItem('userConnectedData', JSON.stringify(userData)); // Stockage des données utilisateur dans le localStorage
-      
-      console.log( JSON.stringify(userData));
+
+      console.log(JSON.stringify(userData));
 
       navigate(redirectPath); // Redirection vers le chemin spécifié
     } else {
