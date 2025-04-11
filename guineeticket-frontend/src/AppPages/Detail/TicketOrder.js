@@ -8,7 +8,8 @@ import { CartContext } from '../../contexts/CartContext'; // Contexte du panier
 import { CounterContext } from '../../contexts/CounterContext'; // Contexte pour compter les items
 import { fetchEvenements } from '../../services/apiService'; // Fonction de récupération des événements depuis l'API
 import { Button, Card } from 'react-bootstrap'; // Composants Bootstrap
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
+
 
 
 const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
@@ -16,10 +17,11 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
   const mode = JSON.parse(localStorage.getItem("appMode"));
   const appDevise = localStorage.getItem("appDevise");
   const STR_EVESTATUTFREE = localStorage.getItem('STR_EVESTATUTFREE');
+  const { PARAM_LG_EVEID } = useParams();
 
   console.log("------------- eventDetails ---------");
   console.log(eventDetails.STR_EVESTATUTFREE);
-  
+
   // Récupération des valeurs à partir des contextes
   const { cartItems, updateCartItems } = useContext(CartContext); // Pour mettre à jour le panier
   const { updateCount } = useContext(CounterContext); // Pour mettre à jour le compteur
@@ -35,7 +37,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
   useEffect(() => {
     const params = {
       mode: mode.listCategorieplaceEvenementMode, // Mode défini dans le localStorage
-      LG_EVEID: localStorage.getItem('LG_EVEID') // Identifiant de l'événement
+      LG_EVEID: PARAM_LG_EVEID // Identifiant de l'événement
     };
 
     // Récupération des données depuis l'API
@@ -125,7 +127,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
     // Calculer le montant total
     const updatedTotalAmount = ticketCategories.reduce((total, category) => {
       return total + (quantities[category.id] * category.price);
-      
+
     }, 0);
 
     // Mettre à jour les items du panier et stocker les informations dans le localStorage
@@ -139,7 +141,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
       autoClose: 3000,
       className: "custom-toast",
     });
-    
+
     resetCategories(); // Réinitialiser les catégories
   };
 
@@ -172,21 +174,21 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
     const category = ticketCategories.find(cat => cat.id === id);
 
     if (category) {
-      
+
 
       if (eventDetails.STR_EVESTATUTFREE !== '0') {
         // Vérifier si l'utilisateur dépasse la quantité max d'achat ou la disponibilité des tickets
-          if (change > 0 && (newAvailableTickets[id] <= 0 || newQuantities[id] >= category.maxPurchase)) {
-            // toast.error(`Vous ne pouvez pas acheter plus de ${category.maxPurchase} tickets pour ${category.title}.`);
+        if (change > 0 && (newAvailableTickets[id] <= 0 || newQuantities[id] >= category.maxPurchase)) {
+          // toast.error(`Vous ne pouvez pas acheter plus de ${category.maxPurchase} tickets pour ${category.title}.`);
 
-            toast.error(`Vous ne pouvez pas acheter plus de ${category.maxPurchase} tickets pour ${category.title}.`, {
-              position: "bottom-center",
-              autoClose: 3000,
-              className: "custom-toast",
-            });
+          toast.error(`Vous ne pouvez pas acheter plus de ${category.maxPurchase} tickets pour ${category.title}.`, {
+            position: "bottom-center",
+            autoClose: 3000,
+            className: "custom-toast",
+          });
 
-            return;
-          }
+          return;
+        }
       }
 
       // Mise à jour des quantités
@@ -225,7 +227,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
   function updateEventDatesInCart(eventId, newStartDate, newEndDate, newStartTime, newEndTime) {
     // Récupérer les items du panier depuis le localStorage
     let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-  
+
     // Trouver l'élément correspondant à l'ID de l'événement
     const updatedCartItems = cartItems.map(item => {
       if (item.LG_EVEID === eventId) {
@@ -240,13 +242,13 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
       }
       return item; // retourner l'item tel quel si l'ID ne correspond pas
     });
-  
+
     // Mettre à jour le localStorage avec les nouveaux items
     localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
-  
+
     console.log("Panier mis à jour avec les nouvelles dates :", updatedCartItems);
   }
-  
+
   // Exemple d'utilisation
   updateEventDatesInCart(
     eventDetails.LG_EVEID,  // ID de l'événement
@@ -255,7 +257,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
     eventDetails.HR_EVEBEGIN,
     eventDetails.HR_EVEEND,                                    // Nouvelle heure de fin
   );
-  
+
 
 
 
@@ -281,7 +283,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
                         <span>{category.price} <sup>{category.currency}</sup></span>
                       </span>
                     </div>
-                    {quantities[category.id] > 0 &&  (
+                    {quantities[category.id] > 0 && (
                       <div className="card card-flush box-shadow-none d-xs-none">
                         <div className="card-body p-2 change-quantity">
                           <div className="d-flex align-items-center">
@@ -295,17 +297,17 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
                     <div className="card card-flush box-shadow-none">
                       <div className="card-body p-2 change-quantity">
                         <div className="d-flex align-items-center">
-                            <a className="me-2 btn btn-lg rounded fs-14 pull-right btn-secondary" onClick={() => handleQuantityChange(category.id, -1)}>-</a>
+                          <a className="me-2 btn btn-lg rounded fs-14 pull-right btn-secondary" onClick={() => handleQuantityChange(category.id, -1)}>-</a>
                           <span id='quantiteTicket' className='fs-3 text-theme fw-bold mx-3'>{quantities[category.id]}</span>
-                            <a className="ms-2 btn btn-lg rounded fs-14 pull-right btn-secondary" onClick={() => handleQuantityChange(category.id, 1)}>+</a>
+                          <a className="ms-2 btn btn-lg rounded fs-14 pull-right btn-secondary" onClick={() => handleQuantityChange(category.id, 1)}>+</a>
                         </div>
                       </div>
                     </div>
                   </div>
-                  
-                  
+
+
                   <div className="d-flex justify-content-between align-items-center d-xs-block d-lg-none d-sm-none">
-                    {quantities[category.id] > 0 &&  (
+                    {quantities[category.id] > 0 && (
                       <div className="card card-flush box-shadow-none">
                         <div className="card-body p-2 change-quantity">
                           <div className="d-flex align-items-center">
@@ -327,16 +329,16 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
               </Button>
             )}
           </div>
-        ):(
+        ) : (
           <div className="card-px text-center pt-15 pb-15">
             {/*begin::Title*/}
             <h2 className="fs-2x fw-bold mb-0 text-theme">Evenement terminé !</h2>
             {/*end::Title*/}
             {/*begin::Description*/}
-            <img src="assets/images/event_end.png" height={200} className='my-10'/>
+            <img src="assets/images/event_end.png" height={200} className='my-10' />
             <p className="text-gray-500 fs-4 fw-semibold py-7">
-            Vous avez manqué cet événement ? Pas de panique ! <br />
-            Trouvez votre prochain coup de cœur parmi nos autres événements à l’accueil.
+              Vous avez manqué cet événement ? Pas de panique ! <br />
+              Trouvez votre prochain coup de cœur parmi nos autres événements à l’accueil.
 
             </p>
             {/*end::Description*/}

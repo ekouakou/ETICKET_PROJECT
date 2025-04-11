@@ -30,4 +30,53 @@ const usePostData = (apiEndPoint) => {
 export default usePostData;
 
 
+$param =[
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf","nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  "nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf","nom" = "edmond",
+  "prenom" = "kouakou",
+  "fonction" = "dev",
+  "entreprise" = "dgbf",
+  
+]
+
+$table = "personne";
+
+
 

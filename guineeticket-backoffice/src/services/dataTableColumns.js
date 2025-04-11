@@ -66,7 +66,7 @@ export const getEventColumns = (
                 categories && categories.map((cat, index) => (
                     <div key={index}>
                         <small>
-                            {cat.STR_LSTDESCRPTION}: {cat.DBL_ELIAMOUNT} GNF
+                            {cat.STR_LSTDESCRPTION}: {cat.DBL_ELIAMOUNT} {process.env.REACT_APP_DEVISE}
                         </small>
                         {index < categories.length - 1 && <br />}
                     </div>

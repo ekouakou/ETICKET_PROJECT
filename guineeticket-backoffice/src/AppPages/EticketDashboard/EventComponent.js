@@ -9,7 +9,6 @@ const EventComponent = () => {
   const [eventData, setEventData] = useState([]);
   const [user, setUser] = useState(null); // Add state for user
   const urlBaseImage = localStorage.getItem("urlBaseImage");
-  const paths = JSON.parse(localStorage.getItem("appPaths"));
   const apiUrl = "TicketManager.php";
   const navigate = useNavigate();
 
@@ -42,7 +41,7 @@ const EventComponent = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('userConnectedData'));
     if (!storedUser) {
-      navigate(paths.signIn); // Redirige vers la page d'accueil si l'utilisateur est vide
+      navigate(process.env.REACT_APP_SIGN_IN); // Redirige vers la page d'accueil si l'utilisateur est vide
     } else {
       setUser(storedUser); // Set user in state
       fetchData({
@@ -187,7 +186,7 @@ const EventComponent = () => {
                                 href="../apps/ecommerce/sales/details.html"
                                 className="text-gray-800 text-hover-primary fw-bold"
                               >
-                                 {cat.DBL_ELIAMOUNT} GNF
+                                 {cat.DBL_ELIAMOUNT} {process.env.REACT_APP_DEVISE}
                               </a>
                             </span>
                             {/* <span className="badge badge-light-success">Delivered</span> */}

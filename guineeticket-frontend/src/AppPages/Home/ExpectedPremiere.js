@@ -287,8 +287,8 @@ const EventCarousel = ({ data, ImagelBaseUrl, fullUrl, searchTerm, baseUrl }) =>
                                           <div className="event-date">
                                             <span
                                               className={`badge ${event.STR_EVESTATUTFREE === "1"
-                                                  ? "badge-danger"
-                                                  : "badge-success"
+                                                ? "badge-danger"
+                                                : "badge-success"
                                                 }`}
                                             >
                                               {event.STR_EVESTATUTFREE === "1" ? "Payant" : "Gratuit"}

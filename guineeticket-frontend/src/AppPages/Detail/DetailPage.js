@@ -550,8 +550,8 @@ function Detail() {
                                               className={`btn btn-outline btn-outline-dashed d-flex text-start p-6 ${selectedGetitcketOption.includes(
                                                 option.value
                                               )
-                                                  ? "btn-active-light-primary active"
-                                                  : ""
+                                                ? "btn-active-light-primary active"
+                                                : ""
                                                 } ${option.value === 1
                                                   ? "disabled"
                                                   : ""
@@ -703,9 +703,9 @@ function Detail() {
                                                           <li
                                                             key={option.id}
                                                             className={`pb-0 ${selectedOption ===
-                                                                option.id
-                                                                ? "active"
-                                                                : ""
+                                                              option.id
+                                                              ? "active"
+                                                              : ""
                                                               }`}
                                                             onClick={() =>
                                                               handleOptionClick(
@@ -953,8 +953,8 @@ function Detail() {
                                           {/*end::Title*/}
                                           <button
                                             className={`btn btn-lg rounded fs-14 pull-center ${conditionsAccepted
-                                                ? "btn-success"
-                                                : "btn-secondary"
+                                              ? "btn-success"
+                                              : "btn-secondary"
                                               }`}
                                             disabled={!conditionsAccepted}
                                             onClick={handlePayment}

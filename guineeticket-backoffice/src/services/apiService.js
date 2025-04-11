@@ -17,14 +17,10 @@ const getRootUrl = (port) => {
 const getFullUrl = () => {
   const { protocol, hostname, port } = window.location;
   const portPart = port ? `:${port}` : '';
-  return `https://www.guineeticket.com/`;
+  // return `https://www.guineeticket.com/`;
   // return `http://192.168.1.5/`;
-  // return `${protocol}//${hostname}/`;
+  return `${protocol}//${hostname}/`;
 };
-
-
-
-
 
 const fullUrl = getFullUrl();
 
@@ -44,20 +40,6 @@ const fetchEvenements = (params) => {
 
 // Vous pouvez ajouter d'autres fonctions pour d'autres appels API ici
 // Par exemple, une fonction pour obtenir les détails d'un événement
-const fetchEvenementDetails = (eventId) => {
-  const params = {
-    mode: 'getEvenementDetails',
-    STR_UTITOKEN: 'wzpjku2dvokriz3phgop',
-    LG_EVENID: eventId
-  };
-
-  return axios.post(`${rootUrl}TicketManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
 
 const doConnexion = (params) => {
   return axios.post(`${rootUrl}Authentification.php`, params, {
@@ -67,91 +49,9 @@ const doConnexion = (params) => {
   });
 };
 
-const doDisConnexion = (params) => {
-  return axios.post(`${rootUrl}Authentification.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-
-
-// SODISMADCI
-
-const fetchSlider = (params) => {
-  return axios.post(`${rootUrl}SliderManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-const fetchFamille = (params) => {
-  return axios.post(`${rootUrl}FamilleManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-
-const fetchMarque = (params) => {
-  return axios.post(`${rootUrl}MarquesManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-
-const createMarque = (params) => {
-  return axios.post(`${rootUrl}MarquesManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-
-const updateMarque = (params) => {
-  return axios.post(`${rootUrl}MarquesManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-
-const deleteMarque = (params) => {
-  return axios.post(`${rootUrl}MarquesManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-// ----
-
-const fetchSuccursale = (params) => {
-  return axios.post(`${rootUrl}SuccursaleManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
 
 const fetchHomesectionProduct = (params) => {
   return axios.post(`${rootUrl}SectionProductManager.php`, params, {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    }
-  });
-};
-
-
-const fetchCatalogue = (params) => {
-  return axios.post(`${rootUrl}CatalogueManager.php`, params, {
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded'
     }
@@ -174,37 +74,28 @@ const crudData = (params, apiUrl) => {
 
 
 // paths.js (si vous voulez un fichier séparé)
-const paths = {
-  signIn: "/",
-  saveEvent: "/save-event",
-  eventDetails: "/event-details",
-  eventList: "/liste-evenement",
-  saveBanner: "/save-banner",
-  clientList: "/liste-client",
-  ticketList: "/liste-ticket",
-  detailClient: "/detail-client",
+// const paths = {
+//   signIn: "/",
+//   saveEvent: "/save-event",
+//   eventDetails: "/event-details",
+//   eventList: "/liste-evenement",
+//   saveBanner: "/save-banner",
+//   clientList: "/liste-client",
+//   ticketList: "/liste-ticket",
+//   detailClient: "/detail-client",
 
 
-  dashboard: "/tableau-bord",
-  saveEventData: "/save-event-data",
-  listeEventData: "/liste-event-data",
-  saveEventBanner: "/save-event-banner",
-  listeEventBanner: "/liste-event-banniere",
-  listeUtilisateurs: "/liste-utilisateurs",
-  saveUtilisateurs: "/save-utilisateurs",
-  notFound: "*",
+//   dashboard: "/tableau-bord",
+//   saveEventData: "/save-event-data",
+//   listeEventData: "/liste-event-data",
+//   saveEventBanner: "/save-event-banner",
+//   listeEventBanner: "/liste-event-banniere",
+//   listeUtilisateurs: "/liste-utilisateurs",
+//   saveUtilisateurs: "/save-utilisateurs",
+//   notFound: "*",
 
-};
+// };
 
-localStorage.setItem("appPaths", JSON.stringify(paths));
+// localStorage.setItem("appPaths", JSON.stringify(paths));
 
-
-
-
-
-export {
-  fetchSlider, fetchFamille, fetchMarque, fetchSuccursale, fetchHomesectionProduct, fetchCatalogue,
-  deleteMarque, updateMarque, createMarque,
-  crudData,
-  fetchEvenements, doConnexion, 
-};
+export { fetchHomesectionProduct, crudData, fetchEvenements, doConnexion };

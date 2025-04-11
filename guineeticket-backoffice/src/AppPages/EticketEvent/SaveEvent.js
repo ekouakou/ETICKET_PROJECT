@@ -73,7 +73,6 @@ const SaveEvent = () => {
   const navigate = useNavigate();
   const [categorieData, setcategorieData] = useState([]);
   // const [lieuActiviteData, setlieuActiviteData] = useState([]);
-  const paths = JSON.parse(localStorage.getItem("appPaths"));
   const [showModal, setShowModal] = useState(false);
   const animatedComponents = makeAnimated();
   const location = useLocation();
@@ -493,7 +492,7 @@ const SaveEvent = () => {
         resetForm,
         TicketendPoint,
         navigate,
-        paths.listeEventData,
+        process.env.REACT_APP_LISTE_EVENT_DATA,
         setLoading
       );
     } else {
@@ -505,7 +504,7 @@ const SaveEvent = () => {
         resetForm,
         TicketendPoint,
         navigate,
-        paths.listeEventData,
+        process.env.REACT_APP_LISTE_EVENT_DATA,
         setLoading
       );
     }

@@ -9,7 +9,6 @@ import useLoader from '../../utils/useLoader'
 import SkeletonTable from "../Skeleton/SkeletonTable";
 
 const ListeUser = () => {
-  const paths = JSON.parse(localStorage.getItem("appPaths"));
   const navigate = useNavigate();
   const [eventData, setEventData] = useState([]);
   const isLoading = useLoader(eventData);

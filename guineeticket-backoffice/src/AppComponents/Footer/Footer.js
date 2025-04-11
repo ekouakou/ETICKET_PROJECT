@@ -92,7 +92,7 @@ function Footer() {
 
             <h4>5.4 Prix des Billets</h4>
             <p className="text-theme">
-                Les prix des Billets sont indiqués en Francs Guinéens (GNF) et sont toutes taxes comprises (TTC). Les frais de service et de livraison éventuels sont indiqués à l'Utilisateur avant la validation de la commande.
+                Les prix des Billets sont indiqués en Francs Guinéens ({process.env.REACT_APP_DEVISE}) et sont toutes taxes comprises (TTC). Les frais de service et de livraison éventuels sont indiqués à l'Utilisateur avant la validation de la commande.
             </p>
 
             <h4>5.5 Disponibilité des Billets</h4>

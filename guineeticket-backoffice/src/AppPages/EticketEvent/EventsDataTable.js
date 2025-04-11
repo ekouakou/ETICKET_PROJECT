@@ -40,6 +40,7 @@ const EventsDataTable = () => {
     const storedUser = localStorage.getItem("userConnectedData");
     return storedUser ? JSON.parse(storedUser) : null;
   });
+
   const [startDate, setStartDate] = useState(getDateInPastMonths(new Date(), 2));
   const [endDate, setEndDate] = useState(getCurrentDate());
   const [searchText, setSearchText] = useState("");

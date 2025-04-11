@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react'; 
+import React, { useState, useEffect } from 'react';
 import AppHeader from '../../AppComponents/Header/AppHeader';
 import Footer from '../../AppComponents/Footer/Footer';
-import { useTheme } from '../../contexts/ThemeProvider'; 
+import { useTheme } from '../../contexts/ThemeProvider';
 import { useNavigate } from 'react-router-dom';
 import { doConnexion } from '../../services/apiService';
 import { FaHandshake, FaShieldAlt, FaGlobe, FaHeadset } from 'react-icons/fa'; // Import des icônes
@@ -88,7 +88,7 @@ const AboutUs = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="col-12 col-md-6 col-lg-4">
                 <div className="feature">
                   <FaShieldAlt className="feature__icon text-danger" size={30} />
@@ -98,7 +98,7 @@ const AboutUs = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="col-12 col-md-6 col-lg-4">
                 <div className="feature">
                   <FaGlobe className="feature__icon text-danger" size={30} />
@@ -108,7 +108,7 @@ const AboutUs = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="col-12 col-md-6 col-lg-4">
                 <div className="feature">
                   <FaHeadset className="feature__icon text-danger" size={30} />

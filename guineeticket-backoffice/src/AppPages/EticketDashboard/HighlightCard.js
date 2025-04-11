@@ -8,7 +8,6 @@ import moment from 'moment';
 
 const HighlightCard = () => {
   const apiUrl = "TicketManager.php";
-  const paths = JSON.parse(localStorage.getItem("appPaths"));
 
   const today = moment();
   const [selectedDate, setSelectedDate] = useState(today.format('YYYY-MM-DD'));
@@ -54,7 +53,7 @@ const HighlightCard = () => {
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('userConnectedData'));
     if (!storedUser) {
-      navigate(paths.signIn);
+      navigate(process.env.REACT_APP_SIGN_IN);
     } else {
       fetchData({
         mode: 'totalVenteTicket',
@@ -66,7 +65,7 @@ const HighlightCard = () => {
         LG_AGEREQUESTID: ''
       });
     }
-  }, [navigate, paths.signIn]); // Enlever `today` pour éviter les appels répétitifs
+  }, [navigate, process.env.REACT_APP_SIGN_IN]); // Enlever `today` pour éviter les appels répétitifs
 
   // Timeout pour éviter un chargement infini
   useEffect(() => {

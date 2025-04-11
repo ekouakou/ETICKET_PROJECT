@@ -4,47 +4,44 @@ import { useNavigate } from 'react-router-dom';
 import { Loader } from 'rsuite'; // Importer le Loader de React Suite
 import usePostData from "../../services/usePostData";
 
-
-
 const SignIn = () => {
   const { theme } = useTheme();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  // const [loading, setLoading] = useState(false); // État pour suivre le chargement
+  const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
-  const { postData, loading, error: apiError } = usePostData(process.env.REACT_APP_TICKET_STATISTIQUE_API_URL);
+  const { postData, loading, error: apiError, response } = usePostData(process.env.REACT_APP_TICKET_STATISTIQUE_API_URL);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Réinitialiser les messages d'erreur précédents
+    setSuccessMessage(''); // Réinitialiser les messages de succès précédents
+    
     const params = new URLSearchParams();
     params.append('mode', 'doConnexion');
     params.append('STR_UTILOGIN', email);
     params.append('STR_UTIPASSWORD', password);
 
-    // crudData(params, 'Authentification.php').then(response => {
-    //   if (response.code_statut === "1") { // Vérification si la connexion a réussi
-    //     localStorage.setItem('userConnectedData', JSON.stringify(response)); // Stockage des données utilisateur dans le localStorage
-    //     console.log(JSON.stringify(response));
-    //     navigate("/tableau-bord"); // Redirection vers le chemin spécifié
-    //   } else {
-    //     setError(response.desc_statut); // Affichage du message d'erreur
-    //   }
-    // })
-    //   .catch(error => {
-    //     console.error('Erreur lors de la récupération des données:', error);
-    //   });
-
     try {
       const userData = await postData(params);
       if (userData?.code_statut === "1") {
+        // Stocker les données utilisateur
         localStorage.setItem('userConnectedData', JSON.stringify(userData));
-        navigate("/tableau-bord");
+        
+        // Afficher le message de succès
+        setSuccessMessage('Connexion réussie ! Redirection en cours...');
+        
+        // Attendre 3 secondes avant de rediriger
+        setTimeout(() => {
+          navigate(process.env.REACT_APP_DASHBOARD);
+        }, 1000);
       } else {
         setError(userData?.desc_statut || "Erreur de connexion.");
       }
     } catch (error) {
       console.error("Erreur de connexion:", error);
+      setError("Une erreur s'est produite lors de la tentative de connexion.");
     }
   };
 
@@ -60,14 +57,11 @@ const SignIn = () => {
             id="kt_sign_in_form"
             onSubmit={handleSubmit}
           >
-            <div className="text-center mb-11">
+            <div className="text-center mb-7">
               <a className="mb-0 mb-lg-20">
-                <img alt="Logo" src="assets/media/logos/logo_light.svg" className="h-60px h-lg-90px" />
+                <img alt="Logo" src="assets/media/logos/logo_light.svg" className="h-60px h-lg-50px" />
               </a>
-              <h1 className="text-gray-900 fw-bolder mb-3">Sign In</h1>
-              <div className="text-gray-500 fw-semibold fs-6">
-                Your Social Campaigns
-              </div>
+              <h1 className="text-gray-900 fw-bolder mb-3 fs-4">Connexion</h1>
             </div>
             <div className="row g-3 mb-9 d-none">
               <div className="col-md-6">
@@ -107,6 +101,21 @@ const SignIn = () => {
                 Or with email
               </span>
             </div>
+            
+            {/* Message de succès */}
+            {successMessage && (
+              <div className="alert alert-success mb-8" role="alert">
+                {successMessage}
+              </div>
+            )}
+            
+            {/* Message d'erreur */}
+            {error && (
+              <div className="alert alert-danger mb-8" role="alert">
+                {error}
+              </div>
+            )}
+            
             <div className="fv-row mb-8 fv-plugins-icon-container">
               <input
                 type="text"
@@ -149,17 +158,12 @@ const SignIn = () => {
                 )}
               </button>
             </div>
-            {error && (
-              <div className="alert alert-danger mt-3" role="alert">
-                {error}
-              </div>
-            )}
-            <div className="text-gray-500 text-center fw-semibold fs-6">
+            {/* <div className="text-gray-500 text-center fw-semibold fs-6">
               Se souvenir de moi ?
               <a href="sign-up.html" className="link-primary">
                 Sign up
               </a>
-            </div>
+            </div> */}
           </form>
         </div>
       </div>
