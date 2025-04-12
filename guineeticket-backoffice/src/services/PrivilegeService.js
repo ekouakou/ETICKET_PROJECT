@@ -63,10 +63,10 @@ class PrivilegeService {
       {
         data: "checked", // Remplacez par le champ qui contient le statut
         title: "Etat",
-        width: "10%", 
+        width: "10%",
         render: (data, type, row) => {
-        //   const isChecked = data === "enable" ? "checked" : "";
-            const isChecked = data === true || data === 1 ? "checked" : "";
+          //   const isChecked = data === "enable" ? "checked" : "";
+          const isChecked = data === true || data === 1 ? "checked" : "";
           return `
                 <input 
                   type="checkbox" 
@@ -77,7 +77,7 @@ class PrivilegeService {
               `;
         },
       },
-      { data: "STR_PRIDESCRIPTION", title: "Description", width: "80%",  },
+      { data: "STR_PRIDESCRIPTION", title: "Description", width: "80%" },
     ];
   }
 }

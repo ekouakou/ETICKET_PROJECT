@@ -3,7 +3,7 @@ const getFullUrl = () => {
   const portPart = port ? `:${port}` : '';
   return `${protocol}//${hostname}/`;
   // return `https://guineeticket.com/`;
-  // return `http://192.168.1.4/`;
+  // return `http://192.168.1.10/`;
   // return process.env.REACT_APP_API_URL || "http://localhost:8080/"; // PARAMETRE DOCKER
 };
 

@@ -185,6 +185,38 @@ export const getDateInPastMonths = (date = new Date(), months = 1, formatResult 
 };
 
 
+export const convertDateFormat_YMDHM = (dateString) => {
+  // Extraire la partie principale de la date (avant GMT)
+  const mainPart = dateString.split('GMT')[0].trim();
+  
+  // Extraire le temps à la fin (après Greenwich)
+  const timePart = dateString.includes(')') ? 
+    dateString.split(')')[1].trim() : 
+    '';
+  
+  // Créer un objet Date à partir de la chaîne principale
+  const date = new Date(mainPart);
+  
+  // Si nous avons un temps spécifique après la partie GMT, l'utiliser
+  if (timePart) {
+    const [hours, minutes] = timePart.split(':').map(num => parseInt(num, 10));
+    date.setHours(hours);
+    date.setMinutes(minutes);
+    date.setSeconds(0);
+  }
+  
+  // Formatter la date au format YYYY-MM-DD HH:MM:SS
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+}
+
+
 
 
 

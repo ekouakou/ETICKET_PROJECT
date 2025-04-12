@@ -1,94 +1,296 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from "react-toastify";
-import GenericDataTable from "../GenericDataTable";
-import eventService from "../../services/UserService";
-import PageTitle from '../PageTitle';
-import ActionButton from '../ActionButton';
-import useLoader from '../../utils/useLoader'
-import SkeletonTable from "../Skeleton/SkeletonTable";
+import React, { useState, useEffect } from "react";
+import {
+  Table,
+  Button,
+  Space,
+  Spin,
+  Switch,
+  Image,
+  notification,
+  Breadcrumb,
+  Typography,
+  Input,
+  Row,
+  Col,
+  Card
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  CheckOutlined,
+  CloseOutlined,
+  SearchOutlined
+} from "@ant-design/icons";
+import { DatePicker } from 'rsuite';
+import { useNavigate } from "react-router-dom";
+import { authService } from "../../services/AuthService";
+import { formatDate, getCurrentDate, getDateInPastMonths } from "../../utils/dateUtils";
+import usePostData from "../../services/usePostData";
+import useDataTable from '../../services/useDataTable';
+import { getProfilColumns } from '../../services/dataTableColumns';
+import 'rsuite/dist/rsuite.min.css';
 
-const ListeUser = () => {
+const { Title } = Typography;
+const { Search } = Input;
+
+const EventsDataTable = () => {
   const navigate = useNavigate();
-  const [eventData, setEventData] = useState([]);
-  const isLoading = useLoader(eventData);
+  const [user, setUser] = useState(() => {
+    const storedUser = localStorage.getItem("userConnectedData");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-  const fetchEvents = async () => {
-    const events = await eventService.getEvents(navigate);
-    setEventData(events);
-  };
+  const [startDate, setStartDate] = useState(getDateInPastMonths(new Date(), 2));
+  const [endDate, setEndDate] = useState(getCurrentDate());
+  const [searchText, setSearchText] = useState("");
 
-  const handleApiCall = async ({ mode, id, status }) => {
-    let success = false;
-
-    if (mode === "delete") {
-      success = await eventService.deleteEvent(navigate, id);
-    } else if (mode === "updateStatus") {
-      success = await eventService.updateEventStatus(navigate, id, status);
-    }
-
-    if (success) {
-      toast.success("Opération réussie", {
-        position: "top-center",
-        autoClose: 3000,
-      });
-      fetchEvents();
-    }
-  };
-
+  // Check authentication on component mount
   useEffect(() => {
-    fetchEvents();
+    const currentUser = authService.checkAuth(navigate);
+    if (!currentUser) {
+      navigate(process.env.REACT_APP_SIGN_IN);
+      return;
+    }
+    setUser(currentUser);
   }, [navigate]);
 
-  const breadcrumbs = [
-    { text: 'Utilisateur', link: '/' },
-    { isBullet: true },
-    { text: 'Liste des utilisateurs' },
-  ];
+  const { postData, loading: postLoading } = usePostData(process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL);
+
+  // Référence aux paramètres de recherche pour useDataTable
+  const [searchParams, setSearchParams] = useState({
+    mode: process.env.REACT_APP_LISTE_PROFILE_MODE,
+    STR_UTITOKEN: user?.STR_UTITOKEN,
+    LG_AGEID: user?.LG_AGEID,
+    DT_BEGIN: formatDate(startDate),
+    DT_END: formatDate(endDate),
+  });
+
+  const {
+    data: allEventsData,
+    loading: fetchLoading,
+    pagination,
+    handleTableChange,
+    handleSearch,
+    refreshData
+  } = useDataTable(
+    process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL,
+    searchParams,
+    "data",
+    {
+      fields: ["STR_EVENAME", "LG_LSTPLACEID", "DT_EVEBEGIN", "DT_EVEEND"]
+    },
+    10
+  );
+
+  // Mettre à jour les paramètres quand l'utilisateur est chargé
+  useEffect(() => {
+    if (user) {
+      setSearchParams(prev => ({
+        ...prev,
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+      }));
+    }
+  }, [user]);
+
+  // Fonction pour gérer le changement de la date de début
+  const handleStartDateChange = (date) => {
+    setStartDate(date);
+  };
+
+  // Fonction pour gérer le changement de la date de fin
+  const handleEndDateChange = (date) => {
+    setEndDate(date);
+  };
+
+  // Fonction pour rechercher avec les paramètres actuels (texte et dates)
+  const handleSearchWithFilters = () => {
+    if (user) {
+      const newParams = {
+        mode: process.env.REACT_APP_LISTE_EVENT_MODE,
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+        DT_BEGIN: formatDate(startDate),
+        DT_END: formatDate(endDate),
+      };
+
+      if (searchText) {
+        newParams.search = searchText;
+      }
+
+      // Mettre à jour les paramètres de recherche
+      setSearchParams(newParams);
+
+      // Forcer le rechargement des données
+      setTimeout(() => {
+        refreshData();
+      }, 100);
+    }
+  };
+
+  // Fonction pour éditer un événement
+  const handleEdit = (event) => {
+    navigate(process.env.REACT_APP_SAVE_PROFIL, {
+      state: { LG_PROID: event.LG_PROID },
+    });
+  };
+
+  // Fonction pour supprimer un événement
+  const handleDeleteItem = async (record) => {
+    try {
+      await postData({
+        mode: "deleteEvenement",
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+        LG_EVEID: record.LG_EVEID
+      });
+
+      notification.success({
+        message: "Succès",
+        description: `L'événement a été supprimé avec succès.`
+      });
+
+      // Rafraîchir les données après la suppression
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de supprimer l'événement.`
+      });
+    }
+  };
+
+  // Fonction pour changer le statut d'un événement
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === "enable" ? "disable" : "enable";
+      await postData({
+        mode: "deleteEvenement", // Mode utilisé pour le changement de statut
+        STR_UTITOKEN: user.STR_UTITOKEN,
+        LG_AGEID: user.LG_AGEID,
+        LG_EVEID: id,
+        STR_EVESTATUT: newStatus
+      });
+
+      notification.success({
+        message: "Succès",
+        description: `Le statut de l'événement a été ${newStatus === "enable" ? "activé" : "désactivé"} avec succès.`
+      });
+
+      // Rafraîchir les données après la modification
+      refreshData();
+    } catch (error) {
+      notification.error({
+        message: "Erreur",
+        description: `Impossible de modifier le statut de l'événement.`
+      });
+    }
+  };
+
+  // Configuration des colonnes
+  const columns = getProfilColumns(
+    handleEdit,
+    handleDeleteItem,
+    handleToggleStatus,
+    process.env.REACT_APP_BASE_IMAGE_URL
+  );
+
+  if (!user) {
+    return navigate(process.env.REACT_APP_SIGN_IN);
+  }
 
   return (
-    <div className="d-flex flex-column flex-column-fluid">
-      <div id="kt_app_toolbar" className="app-toolbar py-3 py-lg-6">
-        <div id="kt_app_toolbar_container" className="app-container container-xxl d-flex flex-stack">
-          <PageTitle heading="Liste des utilisateurs" breadcrumbs={breadcrumbs} />
-          <ActionButton text="Ajouter utilisateurs" link={process.env.REACT_APP_SAVE_UTILISATEURS} className="btn-primary" />
-        </div>
-      </div>
-      <div id="kt_app_content" className="app-content flex-column-fluid">
-        <div id="kt_app_content_container" className="app-container container-xxl">
-        {isLoading ? (
-            <>
-              <SkeletonTable rows={6} columns={4} />
-            </>
-          ) : (
-            <div className="row gx-5 gx-xl-10">
-              <div className="col-xxl-12 mb-5 mb-xl-10">
-                <div className="card card-flush h-xl-100">
-                  <div className="card-body pt-6">
-                    <>
-                    <GenericDataTable
-                    data={eventData}
-                    columns={eventService.getColumns()}
-                    tableId="eventTable"
-                    onEdit={(id) => navigate(process.env.REACT_APP_SAVE_UTILISATEURS, { state: { LG_UTIID: id } })}
-                    onDelete={true}
-                    onToggleStatus={true}
-                    deleteConfirmMessage={(id) => `Êtes-vous sûr de vouloir supprimer cet utilisateur? (${id}) ?`}
-                    toggleStatusConfirmMessage={(id, newStatus) =>
-                      `Êtes-vous sûr de vouloir ${newStatus === "enable" ? "activer" : "désactiver"} cet utilisateur (${id}) ?`
-                    }
-                    handleApiCall={handleApiCall}
-                  />
-                    </>
-                  </div>
-                </div>
-              </div>
+    <div className="app-main flex-column flex-row-fluid" id="kt_app_main">
+      <div className="d-flex flex-column flex-column-fluid">
+        <div id="kt_app_toolbar" className="app-toolbar py-3 py-lg-6">
+          <div id="kt_app_toolbar_container" className="app-container container-xxl d-flex flex-stack">
+            {/* Titre et fil d'Ariane */}
+            <div>
+              <Title level={3}>Liste des évenements</Title>
+              <Breadcrumb items={[
+                { title: "Evenement" },
+                { title: "Liste des évènements" }
+              ]} />
             </div>
-          )}
+
+            {/* Bouton d'ajout */}
+            <Button
+              type="primary"
+              icon={<PlusOutlined />}
+              onClick={() => navigate(process.env.REACT_APP_SAVE_EVENT_DATA)}
+            >
+              Ajouter un évenement
+            </Button>
+          </div>
+        </div>
+
+        <div id="kt_app_content" className="app-content flex-column-fluid">
+          <div id="kt_app_content_container" className="app-container container-xxl">
+            <Card className="shadow-sm">
+              <Row gutter={[16, 16]} className="mb-4">
+                {/* Zone de filtres alignée à gauche */}
+                <Col xs={24} md={12} lg={14}>
+                  <Space size="middle" style={{ width: '100%' }}>
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      <DatePicker
+                        value={startDate}
+                        onChange={handleStartDateChange}
+                        format="dd/MM/yyyy"
+                        style={{ minWidth: '160px' }}
+                        placeholder="Date début"
+                      />
+                      <DatePicker
+                        value={endDate}
+                        onChange={handleEndDateChange}
+                        format="dd/MM/yyyy"
+                        style={{ minWidth: '160px' }}
+                        placeholder="Date fin"
+                      />
+                      <Button
+                        type="primary"
+                        icon={<SearchOutlined />}
+                        onClick={handleSearchWithFilters}
+                      >
+                        Filtrer
+                      </Button>
+                    </div>
+                  </Space>
+                </Col>
+
+                {/* Zone de recherche alignée à droite */}
+                <Col xs={24} md={12} lg={10} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  <Search
+                    placeholder="Rechercher par nom, lieu ou date..."
+                    allowClear
+                    enterButton="Rechercher"
+                    size="middle"
+                    onSearch={handleSearch}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    style={{ width: '100%', maxWidth: '450px' }}
+                  />
+                </Col>
+              </Row>
+
+              <Spin spinning={fetchLoading || postLoading} tip="Chargement des données...">
+                <Table
+                  columns={columns}
+                  dataSource={allEventsData}
+                  rowKey="LG_PROID"
+                  pagination={pagination}
+                  onChange={handleTableChange}
+                  bordered
+                  size="middle"
+                  // scroll={{ x: 1300 }}
+                  className="custom-table"
+                />
+              </Spin>
+            </Card>
+          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ListeUser;
+export default EventsDataTable;

@@ -260,7 +260,7 @@ const SaveProfil = () => {
                 heading="Création des profils"
                 breadcrumbs={breadcrumbs}
               />
-              {/* <ActionButton text="Liste bannière" link={process.env.REACT_APP_SAVE_BANNER} className="btn-primary" /> */}
+              <ActionButton text="Liste des profiles" link={process.env.REACT_APP_LISTE_PROFIL} className="btn-primary" />
             </div>
           </div>
           <div id="kt_app_content" className="app-content flex-column-fluid">

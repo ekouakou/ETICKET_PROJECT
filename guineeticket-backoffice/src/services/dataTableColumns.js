@@ -119,6 +119,85 @@ export const getEventColumns = (
     ];
 };
 
+
+export const getProfilColumns = (
+    handleEdit,
+    handleDeleteItem,
+    handleToggleStatus,
+    baseImageUrl
+) => {
+    return [
+        {
+            title: "Description",
+            dataIndex: "STR_PRODESCRIPTION",
+            key: "name",
+            // width: 200,
+        },
+        {
+            title: "Profil",
+            dataIndex: "STR_PRONAME",
+            key: "place",
+            // width: 150,
+        },
+        {
+            title: "Type profil",
+            dataIndex: "STR_PROTYPE",
+            key: "startDate",
+            // width: 100,
+        },
+        
+        // {
+        //     title: "Statut",
+        //     dataIndex: "STR_EVESTATUT",
+        //     key: "status",
+        //     width: 100,
+        //     render: (status, record) => (
+        //         <Switch
+        //             checked={status === "enable"}
+        //             onChange={() => handleToggleStatus(record.LG_PROID, status)}
+        //             checkedChildren={<CheckOutlined />}
+        //             unCheckedChildren={<CloseOutlined />}
+        //         />
+        //     )
+        // },
+        {
+            title: "Actions",
+            key: "actions",
+            width: 100,
+            fixed: "right",
+            render: (_, record) => (
+                <Space>
+                    <Button
+                        type="primary"
+                        icon={<EditOutlined />}
+                        onClick={() => handleEdit(record)}
+                        size="small"
+                    />
+                    <Button
+                        type="danger"
+                        icon={<DeleteOutlined />}
+                        onClick={() => handleDeleteItem(record)}
+                        size="small"
+                    />
+                    <Button
+                        type={record.STR_EVESTATUT === "enable" ? "text" : "primary"}
+                        danger={record.STR_EVESTATUT === "enable"}
+                        icon={record.STR_EVESTATUT === "enable" ? <CloseOutlined /> : <CheckOutlined />}
+                        onClick={() => handleToggleStatus(record.LG_PROID, record.STR_EVESTATUT)}
+                        size="small"
+                    />
+                </Space>
+            )
+        }
+    ];
+};
+
+
+
+
+
+
+
 export const getClientColumns = (
     handleEdit,
     handleDeleteItem,
