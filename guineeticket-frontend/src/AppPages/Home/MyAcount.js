@@ -22,6 +22,8 @@ import html2pdf from "html2pdf.js";
 import SkeletonGenericCardView from "../Skeleton/SkeletonGenericCardView";
 import GenericCardView from "../../AppComponents/GenericCardView";
 import useLoader from "../../utils/useLoader";
+import { urlBaseImage, rootUrl, baseUrl } from "../../services/urlUtils";
+
 
 const MyAcount = () => {
   const { theme, toggleTheme } = useTheme(); // Hook pour le thème
@@ -31,7 +33,6 @@ const MyAcount = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const urlBaseImage = localStorage.getItem("urlBaseImage");
   const [currentPage, setCurrentPage] = useState(1);
   const ticketsPerPage = 3;
   const [userData, setUserData] = useState(null);

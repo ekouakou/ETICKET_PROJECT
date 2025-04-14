@@ -9,6 +9,8 @@ import {
   ButtonToolbar,
   Divider,
 } from "rsuite";
+import { urlBaseImage, rootUrl, baseUrl } from "../services/urlUtils";
+
 
 const GenericCardView = ({
   data,
@@ -31,7 +33,6 @@ const GenericCardView = ({
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
   const handleEntered = () => setRows(3);
-  const urlBaseImage = localStorage.getItem("urlBaseImage");
 
   const itemsPerPageOptions = [
     { label: '4 par page', value: 4 },

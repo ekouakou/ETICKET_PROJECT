@@ -6,8 +6,13 @@ import { urlBaseImage, rootUrl, baseUrl } from "../../services/urlUtils";
 import ExpectedPremiere from "./ExpectedPremiere";
 import BannerSkeleton from "../../AppPages/Skeleton/BannerSkeleton";
 import SiteHeaderSkeleton from "../Skeleton/SiteHeaderSkeleton";
-import { getWeekRange } from "../../utils/dateUtils"; // Ajuste le chemin selon ton projet
 import EventCardSkeleton from "../../AppPages/Skeleton/EventCardSkeleton";
+import {
+  formatDate,
+  getCurrentDate,
+  getDateInPastMonths,
+  getDateInFutureMonths,
+} from "../../utils/dateUtils";
 
 const EventList = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,15 +21,14 @@ const EventList = () => {
   const handleSearch = (searchTerm) => {
     setSearchTerm(searchTerm);
   };
-  const { pastDate, futureDate } = getWeekRange(4, 6);
   const {
     data: activitesData,
     loading,
     error,
   } = useFetchData(process.env.REACT_APP_TICKET_MANAGER_API_URL, {
     mode: process.env.REACT_APP_LIST_EVENEMENT_FRONT_MODE,
-    DT_BEGIN: pastDate,
-    DT_END: futureDate,
+    DT_BEGIN: formatDate(getDateInPastMonths(new Date(), 2)),
+    DT_END: formatDate(getDateInFutureMonths(new Date(), 12)),
   }, "data");
 
   // Simulation d'un chargement de 2 secondes

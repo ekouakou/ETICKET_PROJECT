@@ -1,5 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { CartContext } from "../contexts/CartContext";
+import { urlBaseImage, rootUrl, baseUrl } from "../../services/urlUtils";
+
 
 const PanierItem = ({ pannierData, index, onRemove }) => {
   const [quantity, setQuantity] = useState(pannierData.quantity);
@@ -13,7 +15,6 @@ const PanierItem = ({ pannierData, index, onRemove }) => {
     "border-info bg-light-info",
     "border-success bg-light-success",
   ];
-  const urlBaseImage = localStorage.getItem("urlBaseImage");
 
   useEffect(() => {
     const cartItem = cartItems.find(

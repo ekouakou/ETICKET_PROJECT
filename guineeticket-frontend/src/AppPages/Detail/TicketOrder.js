@@ -1,26 +1,20 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { ToastContainer, toast } from 'react-toastify'; // Gestion des notifications
-import 'react-toastify/dist/ReactToastify.css'; // Import du style pour les notifications
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'; // Import des icônes
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import Tippy from '@tippyjs/react'; // Utilisation des tooltips
-import { CartContext } from '../../contexts/CartContext'; // Contexte du panier
-import { CounterContext } from '../../contexts/CounterContext'; // Contexte pour compter les items
-import { fetchEvenements } from '../../services/apiService'; // Fonction de récupération des événements depuis l'API
-import { Button, Card } from 'react-bootstrap'; // Composants Bootstrap
-import { NavLink, useParams } from 'react-router-dom';
-
+import React, { useState, useEffect, useContext } from "react";
+import { ToastContainer, toast } from "react-toastify"; // Gestion des notifications
+import "react-toastify/dist/ReactToastify.css"; // Import du style pour les notifications
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; // Import des icônes
+import { faExclamationTriangle } from "@fortawesome/free-solid-svg-icons";
+import Tippy from "@tippyjs/react"; // Utilisation des tooltips
+import { CartContext } from "../../contexts/CartContext"; // Contexte du panier
+import { CounterContext } from "../../contexts/CounterContext"; // Contexte pour compter les items
+import { Button, Card } from "react-bootstrap"; // Composants Bootstrap
+import { NavLink, useParams } from "react-router-dom";
+import useFetchData from '../../services/useFetchData';
 
 
 const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
   // Récupération de certaines données dans le localStorage
-  const mode = JSON.parse(localStorage.getItem("appMode"));
-  const appDevise = localStorage.getItem("appDevise");
-  const STR_EVESTATUTFREE = localStorage.getItem('STR_EVESTATUTFREE');
+  const STR_EVESTATUTFREE = localStorage.getItem("STR_EVESTATUTFREE");
   const { PARAM_LG_EVEID } = useParams();
-
-  console.log("------------- eventDetails ---------");
-  console.log(eventDetails.STR_EVESTATUTFREE);
 
   // Récupération des valeurs à partir des contextes
   const { cartItems, updateCartItems } = useContext(CartContext); // Pour mettre à jour le panier
@@ -33,51 +27,50 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
   const [availableTickets, setAvailableTickets] = useState({});
   const [isButtonDisabled, setIsButtonDisabled] = useState(true); // Gérer l'état du bouton
 
-  // Utilisation de useEffect pour charger les catégories de tickets
+
+  const params = {
+    mode: process.env.REACT_APP_LIST_CATEGORIE_PLACE_EVENEMENT_MODE, // Mode défini dans le localStorage
+    LG_EVEID: PARAM_LG_EVEID, // Identifiant de l'événement
+  };
+
+  const {
+    data: fetchedData,
+    error: fetchError,
+    loading: fetchLoading,
+    refetch
+  } = useFetchData(process.env.REACT_APP_TICKET_MANAGER_API_URL, params, "data");
+
   useEffect(() => {
-    const params = {
-      mode: mode.listCategorieplaceEvenementMode, // Mode défini dans le localStorage
-      LG_EVEID: PARAM_LG_EVEID // Identifiant de l'événement
-    };
+    if (!fetchedData || fetchLoading || fetchError) return;
+  
+    const transformedData = fetchedData.map((item) => ({
+      id: item.LG_ELIID,
+      title: item.STR_LSTDESCRPTION,
+      lg_lstid: item.LG_LSTID,
+      price: parseFloat(item.DBL_ELIAMOUNT),
+      image: "assets/images/billet.png",
+      available: parseInt(item.INT_ELINUMBER, 10),
+      maxseat: parseInt(item.INT_ELINUMBERMAX, 10),
+      maxPurchase: parseInt(item.INT_ELINUMBERMAX, 10),
+      currency: process.env.REACT_APP_DEVISE,
+    }));
+  
+    setTicketCategories(transformedData);
+  
+    const initialQuantities = transformedData.reduce((acc, category) => {
+      acc[category.id] = 0;
+      return acc;
+    }, {});
+  
+    const initialAvailableTickets = transformedData.reduce((acc, category) => {
+      acc[category.id] = category.maxseat;
+      return acc;
+    }, {});
+  
+    setQuantities(initialQuantities);
+    setAvailableTickets(initialAvailableTickets);
+  }, [fetchedData, fetchLoading, fetchError]);
 
-    // Récupération des données depuis l'API
-    fetchEvenements(params)
-      .then(response => {
-        const apiData = response.data.data;
-
-        // Transformation des données de l'API pour correspondre au format requis
-        const transformedData = apiData.map(item => ({
-          id: item.LG_ELIID,
-          title: item.STR_LSTDESCRPTION,
-          lg_lstid: item.LG_LSTID,
-          price: parseFloat(item.DBL_ELIAMOUNT),
-          image: 'assets/images/billet.png', // Image associée à chaque catégorie
-          available: parseInt(item.INT_ELINUMBER, 10),
-          maxseat: parseInt(item.INT_ELINUMBERMAX, 10),
-          maxPurchase: parseInt(item.INT_ELINUMBERMAX, 10), // Nombre maximum d'achats
-          currency: appDevise // Devise récupérée du localStorage
-        }));
-
-        setTicketCategories(transformedData); // Mise à jour des catégories de tickets
-
-        // Initialisation des états pour gérer les quantités et tickets disponibles
-        const initialQuantities = transformedData.reduce((acc, category) => {
-          acc[category.id] = 0;
-          return acc;
-        }, {});
-
-        const initialAvailableTickets = transformedData.reduce((acc, category) => {
-          acc[category.id] = category.maxseat;
-          return acc;
-        }, {});
-
-        setQuantities(initialQuantities);
-        setAvailableTickets(initialAvailableTickets);
-      })
-      .catch(error => {
-        console.error('Erreur lors de la récupération des données:', error);
-      });
-  }, []);
 
   // Fonction pour gérer le clic sur le bouton de paiement
   const handlePaymentClick = () => {
@@ -85,10 +78,12 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
 
     // Filtrer et ajouter les catégories avec des quantités > 0
     ticketCategories
-      .filter(category => quantities[category.id] > 0)
-      .forEach(category => {
-        const existingItemIndex = existingCartItems.findIndex(item =>
-          item.category === category.title && item.LG_EVEID === eventDetails.LG_EVEID
+      .filter((category) => quantities[category.id] > 0)
+      .forEach((category) => {
+        const existingItemIndex = existingCartItems.findIndex(
+          (item) =>
+            item.category === category.title &&
+            item.LG_EVEID === eventDetails.LG_EVEID
         );
 
         if (existingItemIndex !== -1) {
@@ -97,7 +92,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
             ...existingCartItems[existingItemIndex],
             quantity: quantities[category.id],
             INT_ELINUMBER: quantities[category.id],
-            totalPrice: quantities[category.id] * category.price
+            totalPrice: quantities[category.id] * category.price,
           };
         } else {
           // Sinon, on l'ajoute comme nouvel élément
@@ -119,21 +114,20 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
             STR_DEVISE: category.currency,
             STR_EVEPIC: eventDetails.STR_EVEPIC,
             STR_MAX_PURCHASE: category.maxPurchase,
-            mode: mode.createTicketMode
+            mode: process.env.REACT_APP_CREATE_TICKET_MODE,
           });
         }
       });
 
     // Calculer le montant total
     const updatedTotalAmount = ticketCategories.reduce((total, category) => {
-      return total + (quantities[category.id] * category.price);
-
+      return total + quantities[category.id] * category.price;
     }, 0);
 
     // Mettre à jour les items du panier et stocker les informations dans le localStorage
     updateCartItems(existingCartItems);
-    localStorage.setItem('totalAmount', updatedTotalAmount.toFixed(2));
-    localStorage.setItem('quantities', JSON.stringify(quantities));
+    localStorage.setItem("totalAmount", updatedTotalAmount.toFixed(2));
+    localStorage.setItem("quantities", JSON.stringify(quantities));
 
     //toast.success("Vos choix ont été ajoutés au panier !");
     toast.success(process.env.REACT_APP_MSG_AJOUTER_PANNER, {
@@ -147,23 +141,27 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
 
   // Réinitialiser les quantités et les tickets disponibles
   const resetCategories = () => {
-    setQuantities(ticketCategories.reduce((acc, category) => {
-      acc[category.id] = 0;
-      return acc;
-    }, {}));
+    setQuantities(
+      ticketCategories.reduce((acc, category) => {
+        acc[category.id] = 0;
+        return acc;
+      }, {})
+    );
 
-    setAvailableTickets(ticketCategories.reduce((acc, category) => {
-      acc[category.id] = category.available;
-      return acc;
-    }, {}));
+    setAvailableTickets(
+      ticketCategories.reduce((acc, category) => {
+        acc[category.id] = category.available;
+        return acc;
+      }, {})
+    );
     setIsButtonDisabled(true); // Désactiver le bouton après réinitialisation
   };
 
   // Fonction pour vider le panier
   const clearCart = () => {
     updateCartItems([]); // Vider les items du panier
-    localStorage.removeItem('totalAmount');
-    localStorage.removeItem('quantities');
+    localStorage.removeItem("totalAmount");
+    localStorage.removeItem("quantities");
     updateCount(0); // Réinitialiser le compteur d'items
   };
 
@@ -171,21 +169,26 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
   const handleQuantityChange = (id, change) => {
     const newQuantities = { ...quantities };
     const newAvailableTickets = { ...availableTickets };
-    const category = ticketCategories.find(cat => cat.id === id);
+    const category = ticketCategories.find((cat) => cat.id === id);
 
     if (category) {
-
-
-      if (eventDetails.STR_EVESTATUTFREE !== '0') {
+      if (eventDetails.STR_EVESTATUTFREE !== "0") {
         // Vérifier si l'utilisateur dépasse la quantité max d'achat ou la disponibilité des tickets
-        if (change > 0 && (newAvailableTickets[id] <= 0 || newQuantities[id] >= category.maxPurchase)) {
+        if (
+          change > 0 &&
+          (newAvailableTickets[id] <= 0 ||
+            newQuantities[id] >= category.maxPurchase)
+        ) {
           // toast.error(`Vous ne pouvez pas acheter plus de ${category.maxPurchase} tickets pour ${category.title}.`);
 
-          toast.error(`Vous ne pouvez pas acheter plus de ${category.maxPurchase} tickets pour ${category.title}.`, {
-            position: "bottom-center",
-            autoClose: 3000,
-            className: "custom-toast",
-          });
+          toast.error(
+            `Vous ne pouvez pas acheter plus de ${category.maxPurchase} tickets pour ${category.title}.`,
+            {
+              position: "bottom-center",
+              autoClose: 3000,
+              className: "custom-toast",
+            }
+          );
 
           return;
         }
@@ -204,32 +207,41 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
 
       // Calculer le montant total
       const newTotalAmount = ticketCategories.reduce((total, category) => {
-        return total + (newQuantities[category.id] * category.price);
+        return total + newQuantities[category.id] * category.price;
       }, 0);
 
       setTotalAmount(newTotalAmount); // Mise à jour du montant total
 
       // Activer/désactiver le bouton de paiement en fonction de la quantité totale
-      const totalTickets = Object.values(newQuantities).reduce((acc, curr) => acc + curr, 0);
+      const totalTickets = Object.values(newQuantities).reduce(
+        (acc, curr) => acc + curr,
+        0
+      );
       setIsButtonDisabled(totalTickets === 0);
 
       // Si l'événement est gratuit (STR_EVESTATUTFREE = '0'), mettre à jour les quantités et appeler onQuantityUpdate
-      if (eventDetails.STR_EVESTATUTFREE === '0') {
-        const totalQuantities = Object.values(newQuantities).reduce((acc, curr) => acc + curr, 0);
+      if (eventDetails.STR_EVESTATUTFREE === "0") {
+        const totalQuantities = Object.values(newQuantities).reduce(
+          (acc, curr) => acc + curr,
+          0
+        );
         onQuantityUpdate(totalQuantities); // Appel de la fonction du parent
       }
     }
   };
 
-
-
-
-  function updateEventDatesInCart(eventId, newStartDate, newEndDate, newStartTime, newEndTime) {
+  function updateEventDatesInCart(
+    eventId,
+    newStartDate,
+    newEndDate,
+    newStartTime,
+    newEndTime
+  ) {
     // Récupérer les items du panier depuis le localStorage
-    let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    let cartItems = JSON.parse(localStorage.getItem("cartItems")) || [];
 
     // Trouver l'élément correspondant à l'ID de l'événement
-    const updatedCartItems = cartItems.map(item => {
+    const updatedCartItems = cartItems.map((item) => {
       if (item.LG_EVEID === eventId) {
         // Mettre à jour les dates et heures de l'événement
         return {
@@ -237,29 +249,29 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
           DT_EVEBEGIN: newStartDate,
           DT_EVEEND: newEndDate,
           HR_EVEBEGIN: newStartTime,
-          HR_EVEEND: newEndTime
+          HR_EVEEND: newEndTime,
         };
       }
       return item; // retourner l'item tel quel si l'ID ne correspond pas
     });
 
     // Mettre à jour le localStorage avec les nouveaux items
-    localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+    localStorage.setItem("cartItems", JSON.stringify(updatedCartItems));
 
-    console.log("Panier mis à jour avec les nouvelles dates :", updatedCartItems);
+    console.log(
+      "Panier mis à jour avec les nouvelles dates :",
+      updatedCartItems
+    );
   }
 
   // Exemple d'utilisation
   updateEventDatesInCart(
-    eventDetails.LG_EVEID,  // ID de l'événement
+    eventDetails.LG_EVEID, // ID de l'événement
     eventDetails.DT_EVEBEGIN,
     eventDetails.DT_EVEEND,
     eventDetails.HR_EVEBEGIN,
-    eventDetails.HR_EVEEND,                                    // Nouvelle heure de fin
+    eventDetails.HR_EVEEND // Nouvelle heure de fin
   );
-
-
-
 
   return (
     <>
@@ -268,86 +280,132 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
         {!datePassed ? (
           <div className="card-body pt-0 bgi-no-repeat bgi-position-center bgi-size-cover card-rounded min-h-250px">
             <div className="pb-7">
-              <h1 className="fw-bold text-gray-900 text-theme">Choisir mon ticket</h1>
+              <h1 className="fw-bold text-gray-900 text-theme">
+                Choisir mon ticket
+              </h1>
               <div className="text-muted fw-semibold fs-4 text-theme">
                 Indiquez le nombre de ticket pour continuer
               </div>
             </div>
-            <div id='ticketCategories' className="row justify-content-center mb-0">
-              {!datePassed && ticketCategories.map(category => (
-                <div key={category.id} className="card card-flush box-shadow-none p-5 mb-5">
-                  <div className="d-flex justify-content-between align-items-center">
-                    <div>
-                      <h3 className='text-theme'> Billet {category.title}</h3>
-                      <span className="badge bg-light text-danger fw-bold">
-                        <span>{category.price} <sup>{category.currency}</sup></span>
-                      </span>
-                    </div>
-                    {quantities[category.id] > 0 && (
-                      <div className="card card-flush box-shadow-none d-xs-none">
-                        <div className="card-body p-2 change-quantity">
-                          <div className="d-flex align-items-center">
-                            <span className="text-success mx-3 fs-1 fw-bold">
-                              {(quantities[category.id] * category.price).toFixed(2)} <sup className='fs-7'>{category.currency}</sup>
-                            </span>
+            <div
+              id="ticketCategories"
+              className="row justify-content-center mb-0"
+            >
+              {!datePassed &&
+                ticketCategories.map((category) => (
+                  <div
+                    key={category.id}
+                    className="card card-flush box-shadow-none p-5 mb-5"
+                  >
+                    <div className="d-flex justify-content-between align-items-center">
+                      <div>
+                        <h3 className="text-theme"> Billet {category.title}</h3>
+                        <span className="badge bg-light text-danger fw-bold">
+                          <span>
+                            {category.price} <sup>{category.currency}</sup>
+                          </span>
+                        </span>
+                      </div>
+                      {quantities[category.id] > 0 && (
+                        <div className="card card-flush box-shadow-none d-xs-none">
+                          <div className="card-body p-2 change-quantity">
+                            <div className="d-flex align-items-center">
+                              <span className="text-success mx-3 fs-1 fw-bold">
+                                {(
+                                  quantities[category.id] * category.price
+                                ).toFixed(2)}{" "}
+                                <sup className="fs-7">{category.currency}</sup>
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                    <div className="card card-flush box-shadow-none">
-                      <div className="card-body p-2 change-quantity">
-                        <div className="d-flex align-items-center">
-                          <a className="me-2 btn btn-lg rounded fs-14 pull-right btn-secondary" onClick={() => handleQuantityChange(category.id, -1)}>-</a>
-                          <span id='quantiteTicket' className='fs-3 text-theme fw-bold mx-3'>{quantities[category.id]}</span>
-                          <a className="ms-2 btn btn-lg rounded fs-14 pull-right btn-secondary" onClick={() => handleQuantityChange(category.id, 1)}>+</a>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-
-                  <div className="d-flex justify-content-between align-items-center d-xs-block d-lg-none d-sm-none">
-                    {quantities[category.id] > 0 && (
+                      )}
                       <div className="card card-flush box-shadow-none">
                         <div className="card-body p-2 change-quantity">
                           <div className="d-flex align-items-center">
-                            <span className="text-success mx-3 fs-1">
-                              {(quantities[category.id] * category.price).toFixed(2)} <sup className='fs-7'>{category.currency}</sup>
+                            <a
+                              className="me-2 btn btn-lg rounded fs-14 pull-right btn-secondary"
+                              onClick={() =>
+                                handleQuantityChange(category.id, -1)
+                              }
+                            >
+                              -
+                            </a>
+                            <span
+                              id="quantiteTicket"
+                              className="fs-3 text-theme fw-bold mx-3"
+                            >
+                              {quantities[category.id]}
                             </span>
+                            <a
+                              className="ms-2 btn btn-lg rounded fs-14 pull-right btn-secondary"
+                              onClick={() =>
+                                handleQuantityChange(category.id, 1)
+                              }
+                            >
+                              +
+                            </a>
                           </div>
                         </div>
                       </div>
-                    )}
+                    </div>
+
+                    <div className="d-flex justify-content-between align-items-center d-xs-block d-lg-none d-sm-none">
+                      {quantities[category.id] > 0 && (
+                        <div className="card card-flush box-shadow-none">
+                          <div className="card-body p-2 change-quantity">
+                            <div className="d-flex align-items-center">
+                              <span className="text-success mx-3 fs-1">
+                                {(
+                                  quantities[category.id] * category.price
+                                ).toFixed(2)}{" "}
+                                <sup className="fs-7">{category.currency}</sup>
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
-            {eventDetails.STR_EVESTATUTFREE && eventDetails.STR_EVESTATUTFREE != "0" && (
-              <Button variant="primary" className='mt-5' onClick={handlePaymentClick}//{STR_EVESTATUTFREE > 0 ?  : handleGetTicketGratuit}
-                disabled={isButtonDisabled} >
-                Valider
-              </Button>
-            )}
+            {eventDetails.STR_EVESTATUTFREE &&
+              eventDetails.STR_EVESTATUTFREE != "0" && (
+                <Button
+                  variant="primary"
+                  className="mt-5"
+                  onClick={handlePaymentClick} //{STR_EVESTATUTFREE > 0 ?  : handleGetTicketGratuit}
+                  disabled={isButtonDisabled}
+                >
+                  Valider
+                </Button>
+              )}
           </div>
         ) : (
           <div className="card-px text-center pt-15 pb-15">
             {/*begin::Title*/}
-            <h2 className="fs-2x fw-bold mb-0 text-theme">Evenement terminé !</h2>
+            <h2 className="fs-2x fw-bold mb-0 text-theme">
+              Evenement terminé !
+            </h2>
             {/*end::Title*/}
             {/*begin::Description*/}
-            <img src="assets/images/event_end.png" height={200} className='my-10' />
+            <img
+              src="assets/images/event_end.png"
+              height={200}
+              className="my-10"
+            />
             <p className="text-gray-500 fs-4 fw-semibold py-7">
               Vous avez manqué cet événement ? Pas de panique ! <br />
-              Trouvez votre prochain coup de cœur parmi nos autres événements à l’accueil.
-
+              Trouvez votre prochain coup de cœur parmi nos autres événements à
+              l’accueil.
             </p>
             {/*end::Description*/}
             {/*begin::Action*/}
-            <NavLink to="/" className="btn btn-primary er fs-6 px-8 py-4"
-            >Retour à l'accueil</NavLink>
+            <NavLink to="/" className="btn btn-primary er fs-6 px-8 py-4">
+              Retour à l'accueil
+            </NavLink>
             {/*end::Action*/}
           </div>
-
         )}
       </div>
     </>

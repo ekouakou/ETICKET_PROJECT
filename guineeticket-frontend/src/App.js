@@ -1,7 +1,6 @@
 import './App.css';
 import React from 'react';
 import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import RegisterForm from './AppPages/Home/RegisterForm';
 import LoadExternalScripts from './AppComponents/LoadExternalScripts';
 import HomePage from './AppPages/Home/HomePage';
 import DetailPage from './AppPages/Detail/DetailPage';
@@ -13,8 +12,6 @@ import MyAcount from './AppPages/Home/MyAcount';
 import Footer from './AppComponents/Footer/Footer';
 import ScrollToTop from './AppComponents/ScrollToTop';
 
-import PhotoFrameApp from './AppPages/Home/PhotoFrameApp.js';
-
 
 function App() {
   return (
@@ -24,10 +21,8 @@ function App() {
         <div className="content">
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/PhotoFrameApp" element={<PhotoFrameApp />} />
-            <Route path="/form" element={<RegisterForm />} />
-            <Route path="/detail-event/:PARAM_LG_EVEID" element={<DetailPage />} /> 
-            <Route path="/signIn" element={<SignIn />} />
+            <Route path={`${process.env.REACT_APP_EVENT_DETAILS}/:PARAM_LG_EVEID`}element={<DetailPage />}/> 
+            <Route path={process.env.REACT_APP_SIGN_IN} element={<SignIn />} />
             <Route path="/contactUs" element={<Contact />} />
             <Route path="/aboutUs" element={<AboutUs />} />
             <Route path="/profile" element={<MyAcount />} />

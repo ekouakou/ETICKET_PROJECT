@@ -3,7 +3,6 @@ import AppHeader from '../../AppComponents/Header/AppHeader';
 import Footer from '../../AppComponents/Footer/Footer';
 import { useTheme } from '../../contexts/ThemeProvider'; 
 import { useNavigate } from 'react-router-dom';
-import { doConnexion } from '../../services/apiService';
 import { NavLink } from 'react-router-dom';
 
 

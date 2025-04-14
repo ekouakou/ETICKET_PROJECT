@@ -1,8 +1,8 @@
 import React from 'react';
+import { urlBaseImage, rootUrl, baseUrl } from "../services/urlUtils";
+
 
 const EventTicket = ({ ticketSelected }) => {
-
-    const urlBaseImage = localStorage.getItem("urlBaseImage");
 
     return (
         // <div className="w-full max-w-4xl bg-black p-6 text-white font-sans" >

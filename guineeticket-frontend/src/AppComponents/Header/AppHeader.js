@@ -130,6 +130,13 @@ function Header({ onSearch }) {
     setSearchActive((prev) => !prev);
   };
 
+  const getFirstEventId = () => {
+    if (cartItems && cartItems.length > 0 && cartItems[0].LG_EVEID) {
+      return cartItems[0].LG_EVEID;
+    }
+    return "";
+  };
+
   return (
     <>
       {/* Overlay qui apparaît lorsque le menu mobile est actif */}
@@ -372,17 +379,20 @@ function Header({ onSearch }) {
             </div>
           </Modal.Body>
           <Modal.Footer>
-            <Button
-              variant="success"
-              onClick={() => {
-                handleClose();
-                // La redirection est gérée par le NavLink
-              }}
-              as={NavLink}
-              to="/detail-event"
-            >
-              Passez à l'achat
-            </Button>
+            {cartItems.length > 0 && (
+              <Button
+                onClick={() => {
+                  handleClose();
+                  // La redirection est gérée par le NavLink
+                }}
+                as={NavLink}
+                to={`${
+                  process.env.REACT_APP_EVENT_DETAILS
+                }/${getFirstEventId()}`}
+              >
+                Passez à l'achat
+              </Button>
+            )}
             <Button onClick={handleClose} appearance="primary" className="ms-2">
               Fermer
             </Button>

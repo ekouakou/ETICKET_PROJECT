@@ -3,10 +3,14 @@ import { Carousel } from "rsuite";
 import "@splidejs/splide/dist/css/splide.min.css";
 import useFetchData from "../../services/useFetchData";
 import BannerSkeleton from "../../AppPages/Skeleton/BannerSkeleton";
-import { getWeekRange } from "../../utils/dateUtils"; // Ajuste le chemin selon ton projet
+import {
+  formatDate,
+  getCurrentDate,
+  getDateInPastMonths,
+  getDateInFutureMonths,
+} from "../../utils/dateUtils";
 
 const SliderComponent = ({ numberSlidesToShow = 1, ImagelBaseUrl }) => {
-  const { pastDate, futureDate } = getWeekRange(4, 6);
 
   const {
     data: sliderData,
@@ -14,8 +18,8 @@ const SliderComponent = ({ numberSlidesToShow = 1, ImagelBaseUrl }) => {
     error,
   } = useFetchData(process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL, {
     mode: process.env.REACT_APP_LIST_BANNIERE_MODE,
-    DT_BEGIN: pastDate,
-    DT_END: futureDate,
+    DT_BEGIN: formatDate(getDateInPastMonths(new Date(), 2)),
+    DT_END: formatDate(getDateInFutureMonths(new Date(), 12)),
   }, "data" );
 
   return (

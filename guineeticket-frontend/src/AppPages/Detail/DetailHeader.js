@@ -7,8 +7,7 @@ import {
   faMapMarkerAlt,
   faTags,
 } from "@fortawesome/free-solid-svg-icons";
-
-const urlBaseImage = localStorage.getItem("urlBaseImage");
+import { urlBaseImage, rootUrl, baseUrl } from "../../services/urlUtils";
 
 const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
   const [countdown, setCountdown] = useState("");
