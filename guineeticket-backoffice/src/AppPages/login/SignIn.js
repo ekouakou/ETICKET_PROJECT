@@ -11,7 +11,7 @@ const SignIn = () => {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const navigate = useNavigate();
-  const { postData, loading, error: apiError, response } = usePostData(process.env.REACT_APP_TICKET_STATISTIQUE_API_URL);
+  const { postData, loading, error: apiError, response } = usePostData(process.env.REACT_APP_AUTHENTIFICATION_API_URL);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

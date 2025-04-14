@@ -12,17 +12,20 @@ import {
   ButtonToolbar,
   Divider,
 } from "rsuite";
-import {
-  doConnexion,
-  doDisConnexion,
-  crudData,
-} from "../../services/apiService";
 import html2pdf from "html2pdf.js";
 
 import SkeletonGenericCardView from "../Skeleton/SkeletonGenericCardView";
 import GenericCardView from "../../AppComponents/GenericCardView";
 import useLoader from "../../utils/useLoader";
 import { urlBaseImage, rootUrl, baseUrl } from "../../services/urlUtils";
+import {
+  formatDate,
+  getCurrentDate,
+  getDateInPastMonths,
+  getDateInFutureMonths,
+} from "../../utils/dateUtils";
+import useFetchData from "../../services/useFetchData";
+
 
 
 const MyAcount = () => {
@@ -36,7 +39,6 @@ const MyAcount = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const ticketsPerPage = 3;
   const [userData, setUserData] = useState(null);
-  const [response, setResponse] = useState([]);
   const apiUrl = "TicketManager.php";
   const [showModal, setShowModal] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState(null); // Nouvel état pour l'élément sélectionné
@@ -44,7 +46,6 @@ const MyAcount = () => {
   const [rows, setRows] = useState(0);
   const [open, setOpen] = useState(false);
   // const [isLoading, setIsLoading] = useState(true);
-  const isLoading = useLoader(response);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -54,8 +55,6 @@ const MyAcount = () => {
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
-    console.log(user);
-
     if (!user) {
       navigate("/"); // Redirige vers la page d'accueil si l'utilisateur est vide
     } else {
@@ -63,31 +62,24 @@ const MyAcount = () => {
     }
   }, [navigate]);
 
-  useEffect(() => {
-    if (userData && userData.STR_CLILOGIN) {
-      // Vérifiez que userData et UTITOKEN sont définis
-      fetchData(
-        {
-          mode: "listTicket",
-          LG_CLIID: userData.LG_CLIID,
-          DT_BEGIN: localStorage.getItem("DT_BEGIN"),
-          DT_END: "2026-10-06",
-        },
-        apiUrl,
-        setResponse
-      );
-    }
-  }, [userData, apiUrl]);
+  // Move useFetchData here, after userData is set and check for userData
+  const {
+    data: response,
+    loading,
+  } = useFetchData(
+    process.env.REACT_APP_TICKET_MANAGER_API_URL,
+    userData ? {
+      mode: process.env.REACT_APP_LIST_TICKET_CLIENT_MODE,
+      LG_CLIID: userData.LG_CLIID,
+      DT_BEGIN: formatDate(getDateInPastMonths(new Date(), 2)),
+      DT_END: formatDate(getDateInFutureMonths(new Date(), 12)),
+    } : null,
+    "data"
+  );
 
-  const fetchData = (params, url, setData) => {
-    crudData(params, url)
-      .then((response) => {
-        setData(response.data.data);
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la récupération des données:", error);
-      });
-  };
+
+  // Now we can use response after it's been defined
+  const isLoading = useLoader(response);
 
   const handleEditClick = (ticket) => {
     setSelectedTicket(ticket); // Mettez à jour l'état avec l'élément cliqué
@@ -122,27 +114,8 @@ const MyAcount = () => {
     setBackground(newBackground);
   }, [theme]); // Exécuter à chaque changement de `theme`
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const params = new URLSearchParams();
-      params.append("mode", "doConnexion");
-      params.append("STR_UTILOGIN", email);
-      params.append("STR_UTIPASSWORD", password);
 
-      const response = await doConnexion(params);
-      const userData = response.data;
 
-      if (userData.code_statut === "1") {
-        localStorage.setItem("user", JSON.stringify(userData));
-        navigate("/mon-profile"); // Rediriger vers le tableau de bord
-      } else {
-        setError(userData.desc_statut);
-      }
-    } catch (error) {
-      setError("Erreur de connexion. Veuillez réessayer.");
-    }
-  };
 
   return (
     <>
@@ -236,7 +209,7 @@ const MyAcount = () => {
                   <div className="col-12 col-md-6 col-xl-3">
                     <div className="stats">
                       <span className="text-theme">Nombre d'ticket</span>
-                      <p className="text-theme">{response.length}</p>
+                      {/* <p className="text-theme">{response.length}</p> */}
                       <i className="ti ti-movie" />
                     </div>
                   </div>

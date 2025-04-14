@@ -15,7 +15,7 @@ const HeaderWrapper = () => {
   const handleMouseLeave = () => setShowDropdown(false);
   const handleToggle = (isOpen) => setShowDropdown(isOpen);
 
-  const { postData, loading, error: apiError } = usePostData(process.env.REACT_APP_TICKET_STATISTIQUE_API_URL);
+  const { postData, loading, error: apiError } = usePostData(process.env.REACT_APP_AUTHENTIFICATION_API_URL);
   const userConnectedObj = JSON.parse(localStorage.getItem('userConnectedData'));
 
   // Fonction de déconnexion

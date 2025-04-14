@@ -20,7 +20,7 @@ const SliderComponent = ({ numberSlidesToShow = 1, ImagelBaseUrl }) => {
     mode: process.env.REACT_APP_LIST_BANNIERE_MODE,
     DT_BEGIN: formatDate(getDateInPastMonths(new Date(), 2)),
     DT_END: formatDate(getDateInFutureMonths(new Date(), 12)),
-  }, "data" );
+  }, "data");
 
   return (
     <section className="home home--hero">

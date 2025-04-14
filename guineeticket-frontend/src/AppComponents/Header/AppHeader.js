@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { NavLink } from "react-router-dom";
 import LogoHeader from "./LogoHeader";
 import PanierItem from "./PanierItem";
-import DropdownMenu from "./DropdownMenu";
 import { HeaderContext } from "../../contexts/HeaderContext";
 import {
   Modal,
@@ -21,14 +20,22 @@ import {
   faUser,
   faShoppingCart,
 } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from 'react-toastify';
+import usePostData from "../../services/usePostData";
 
-function Header({ onSearch }) {
+
+function AppHeader({ onSearch }) {
   const { theme, toggleTheme } = useTheme();
 
   const [isSearchVisible, setIsSearchVisible] = useState(false);
   const [isCartVisible, setIsCartVisible] = useState(false);
   const [menuActive, setMenuActive] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
 
   const searchInputRef = useRef(null);
   const searchIconRef = useRef(null);
@@ -39,8 +46,8 @@ function Header({ onSearch }) {
     useContext(HeaderContext);
   const { cartItems, updateCartItems } = useContext(CartContext);
 
-  const user = JSON.parse(localStorage.getItem("user"));
-  console.log(user);
+  const { postData, loading, error: apiError } = usePostData(process.env.REACT_APP_CUSTOMER_MANAGER_API_URL);
+  const userConnectedObj = JSON.parse(localStorage.getItem('user'));
 
   const menus = [
     // Menus structure here
@@ -137,6 +144,61 @@ function Header({ onSearch }) {
     return "";
   };
 
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      const params = new URLSearchParams();
+      params.append('mode', 'doDisConnexion');
+      params.append('STR_CLITOKEN', userConnectedObj.STR_CLITOKEN);
+
+      const userData = await postData(params);
+
+      if (userData?.code_statut === "1") {
+        // Notification de succès
+        toast.success(userData.desc_statut, {
+          position: "top-right",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true
+        });
+
+        // Suppression des données utilisateur du localStorage
+        localStorage.removeItem("user");
+
+        // Redirection après 2 secondes
+        setTimeout(() => {
+          navigate(process.env.REACT_APP_SIGN_IN);
+        }, 2000);
+      } else {
+        // Notification d'erreur
+        toast.error(userData?.desc_statut || "Échec de la déconnexion. Veuillez réessayer.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true
+        });
+        setError(userData?.desc_statut || "Erreur lors de la déconnexion.");
+      }
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+      toast.error("Une erreur s'est produite lors de la déconne xion.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <>
       {/* Overlay qui apparaît lorsque le menu mobile est actif */}
@@ -155,9 +217,8 @@ function Header({ onSearch }) {
 
                 <ul
                   ref={headerNavRef}
-                  className={`header__nav ${
-                    menuActive ? "header__nav--active" : ""
-                  }`}
+                  className={`header__nav ${menuActive ? "header__nav--active" : ""
+                    }`}
                 >
                   {menus.map((menu, index) => (
                     <li className="header__nav-item" key={index}>
@@ -197,18 +258,39 @@ function Header({ onSearch }) {
                     </li>
                   ))}
 
-                  <li className="header__nav-item mobileMenu ">
+                  {/* <li className="header__nav-item mobileMenu ">
                     <NavLink exact to="/signIn" isActive={isActiveFunc}>
                       <a className="header__nav-link">
-                        <i className="ti ti-ghost me-5" /> Profile
+                        <i className="ti ti-ghost me-5" /> Mes tickets
                       </a>
                     </NavLink>
                   </li>
                   <li className="header__nav-item mobileMenu">
-                    <a className="header__nav-link" href="#">
+                    <a className="header__nav-link" onClick={handleLogout}>
                       <i className="ti ti-logout me-5" /> Déconnexion
                     </a>
-                  </li>
+                  </li> */}
+                  {userConnectedObj && userConnectedObj != null ? (
+                    <>
+                      <li className="header__nav-item mobileMenu">
+                        <NavLink to="/profile" className="header__nav-link">
+                          <i className="ti ti-ghost" />
+                          Mes tickets
+                        </NavLink>
+                      </li>
+                      <li className="header__nav-item mobileMenu">
+                        <a className="header__nav-link" onClick={handleLogout} >
+                          <i className="ti ti-logout" /> Deconnexion
+                        </a>
+                      </li>
+                    </>
+                  ) : (
+                    <li className="header__nav-item mobileMenu">
+                      <NavLink to="/signIn" isActive={isActiveFunc}>
+                        <i className="ti ti-ghost" /> Connexion
+                      </NavLink>
+                    </li>
+                  )}
                   <li className="header__nav-item mobileMenu">
                     <div className="header__sign-in">
                       <a id="themeToggle" onClick={toggleButton}>
@@ -229,9 +311,8 @@ function Header({ onSearch }) {
                 <div className="header__auth">
                   <form
                     action="#"
-                    className={`header__search ${
-                      searchActive ? "header__search--active" : ""
-                    }`}
+                    className={`header__search ${searchActive ? "header__search--active" : ""
+                      }`}
                   >
                     <input
                       className="header__search-input"
@@ -308,7 +389,7 @@ function Header({ onSearch }) {
                     </a>
 
                     <div className="dropdown-menu dropdown-menu-end header__dropdown-menu header__dropdown-menu--user">
-                      {user && user != null ? (
+                      {userConnectedObj && userConnectedObj != null ? (
                         <>
                           <li>
                             <NavLink to="/profile">
@@ -317,7 +398,7 @@ function Header({ onSearch }) {
                             </NavLink>
                           </li>
                           <li>
-                            <a href="#">
+                            <a onClick={handleLogout} >
                               <i className="ti ti-logout" /> Deconnexion
                             </a>
                           </li>
@@ -334,9 +415,8 @@ function Header({ onSearch }) {
                 </div>
 
                 <button
-                  className={`header__btn ${
-                    menuActive ? "header__btn--active" : ""
-                  }`}
+                  className={`header__btn ${menuActive ? "header__btn--active" : ""
+                    }`}
                   onClick={toggleHeaderMenu}
                   type="button"
                 >
@@ -386,9 +466,8 @@ function Header({ onSearch }) {
                   // La redirection est gérée par le NavLink
                 }}
                 as={NavLink}
-                to={`${
-                  process.env.REACT_APP_EVENT_DETAILS
-                }/${getFirstEventId()}`}
+                to={`${process.env.REACT_APP_EVENT_DETAILS
+                  }/${getFirstEventId()}`}
               >
                 Passez à l'achat
               </Button>
@@ -403,4 +482,4 @@ function Header({ onSearch }) {
   );
 }
 
-export default Header;
+export default AppHeader;

@@ -36,8 +36,7 @@ const fullUrl = getFullUrl();
 
 const urlBaseImage = "eticketbackend/backoffice/"//alert(fullUrl+urlBaseImage); backoffice
 const rootUrl = fullUrl + "eticketbackend/backoffice/webservices/"; //Production //eticketbackend/
-localStorage.setItem("urlBaseImage", fullUrl + urlBaseImage);
-localStorage.setItem("fullUrl", fullUrl);
+// localStorage.setItem("fullUrl", fullUrl);
 
 
 

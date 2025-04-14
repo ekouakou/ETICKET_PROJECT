@@ -3,7 +3,6 @@ import AppHeader from '../../AppComponents/Header/AppHeader';
 import Footer from '../../AppComponents/Footer/Footer';
 import { useTheme } from '../../contexts/ThemeProvider';
 import { useNavigate } from 'react-router-dom';
-import { doConnexion } from '../../services/apiService';
 import { FaHandshake, FaShieldAlt, FaGlobe, FaHeadset } from 'react-icons/fa'; // Import des icônes
 
 const AboutUs = () => {
@@ -23,27 +22,6 @@ const AboutUs = () => {
     setBackground(newBackground);
   }, [theme]); // Exécuter à chaque changement de `theme`
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const params = new URLSearchParams();
-      params.append('mode', 'doConnexion');
-      params.append('STR_UTILOGIN', email);
-      params.append('STR_UTIPASSWORD', password);
-
-      const response = await doConnexion(params);
-      const userData = response.data;
-
-      if (userData.code_statut === "1") {
-        localStorage.setItem('user', JSON.stringify(userData));
-        navigate('/mon-profile'); // Rediriger vers le tableau de bord
-      } else {
-        setError(userData.desc_statut);
-      }
-    } catch (error) {
-      setError('Erreur de connexion. Veuillez réessayer.');
-    }
-  };
 
   return (
     <>
