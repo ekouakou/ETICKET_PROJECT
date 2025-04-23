@@ -62,10 +62,15 @@ const ListeTicket = () => {
   );
   const [endDate, setEndDate] = useState(getCurrentDate());
   const [searchText, setSearchText] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // Nouveau filtre pour le statut
-  const [agencesList, setAgencesList] = useState([]); // Liste des agences disponibles
-  const [selectedAgence, setSelectedAgence] = useState(null); // Agence sélectionnée
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [agencesList, setAgencesList] = useState([]);
+  const [selectedAgence, setSelectedAgence] = useState(null);
   const [agence, setAgenceData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [ticketData, setTicketData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check authentication on component mount
   useEffect(() => {
@@ -81,76 +86,64 @@ const ListeTicket = () => {
     process.env.REACT_APP_TICKET_MANAGER_API_URL
   );
 
-  const statut = [
-    {
-      LG_AGEID: "1",
-      STR_AGENAME: "Guinée Ticket",
-      STR_AGEDESCRIPTION: "Guinée Ticket",
-      STR_AGEPHONE: "0141513892",
-      str_ACTION:
-        "<span class='text-warning' title='Mise à jour de Guinée Ticket'></span>",
-    },
-    {
-      LG_AGEID: "2",
-      STR_AGENAME: "Marange Boutik",
-      STR_AGEDESCRIPTION: "Marange Boutik",
-      STR_AGEPHONE: "0203040506",
-      str_ACTION:
-        "<span class='text-warning' title='Mise à jour de Marange Boutik'></span>",
-    },
-  ];
+  // Construit les paramètres de recherche
+  const buildSearchParams = () => {
+    const params = {
+      mode: process.env.REACT_APP_LISTE_TICKET_MODE,
+      STR_UTITOKEN: user?.STR_UTITOKEN,
+      LG_AGEID: selectedAgence || user?.LG_AGEID,
+      DT_BEGIN: formatDate(startDate),
+      DT_END: formatDate(endDate),
+      page: currentPage,
+      pageSize: pageSize,
+    };
 
-  // Charger la liste des agences au montage du composant
-  // useEffect(() => {
-  //   if (user?.STR_UTITOKEN) {
-  //     loadAgencesList();
-  //   }
-  // }, [user]);
+    if (searchText) {
+      params.search = searchText;
+    }
 
-  // // Fonction pour charger la liste des agences
-  // const loadAgencesList = async () => {
-  //   try {
-  //     const response = await postData({
-  //       mode: "getAgencesList", // Assurez-vous que ce mode existe dans votre API
-  //       STR_UTITOKEN: user.STR_UTITOKEN,
-  //     });
+    if (statusFilter !== "all") {
+      params.STR_EVESTATUT = statusFilter;
+    }
 
-  //     if (response && response.data) {
-  //       setAgencesList(response.data);
-  //     }
-  //   } catch (error) {
-  //     notification.error({
-  //       message: "Erreur",
-  //       description: "Impossible de charger la liste des agences.",
-  //     });
-  //   }
-  // };
+    return params;
+  };
 
-  // Référence aux paramètres de recherche pour useDataTable
-  const [searchParams, setSearchParams] = useState({
-    mode: process.env.REACT_APP_LISTE_TICKET_MODE,
-    STR_UTITOKEN: user?.STR_UTITOKEN,
-    LG_AGEID: user?.LG_AGEID,
-    DT_BEGIN: formatDate(startDate),
-    DT_END: formatDate(endDate),
-  });
+  // Fonction pour charger les données des tickets
+  const loadTicketData = async () => {
+    if (!user?.STR_UTITOKEN) return;
 
-  const {
-    data: allEventsData,
-    loading: fetchLoading,
-    pagination,
-    handleTableChange,
-    handleSearch,
-    refreshData,
-  } = useDataTable(
-    process.env.REACT_APP_TICKET_MANAGER_API_URL,
-    searchParams,
-    "data",
-    {
-      fields: ["STR_EVENAME", "LG_LSTPLACEID", "DT_EVEBEGIN", "DT_EVEEND"],
-    },
-    10
-  );
+    setIsLoading(true);
+    try {
+      const params = buildSearchParams();
+      const response = await postData(params);
+      
+      if (response && response.data) {
+        setTicketData(response.data);
+        setTotalRecords(response.recordsTotal || 0);
+      } else {
+        setTicketData([]);
+        setTotalRecords(0);
+      }
+    } catch (error) {
+      console.error("Error loading ticket data:", error);
+      notification.error({
+        message: "Erreur",
+        description: "Impossible de charger les tickets.",
+      });
+      setTicketData([]);
+      setTotalRecords(0);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Charger les données initiales et quand les paramètres changent
+  useEffect(() => {
+    if (user?.STR_UTITOKEN) {
+      loadTicketData();
+    }
+  }, [user, currentPage, pageSize]);
 
   //LISTE DES TYPE D'ACTIVITE
   useEffect(() => {
@@ -160,18 +153,7 @@ const ListeTicket = () => {
       setAgencesList,
       { valueKey: "LG_AGEID", labelKey: "STR_AGENAME" }
     );
-  }, [process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL]);
-
-  // Mettre à jour les paramètres quand l'utilisateur est chargé
-  useEffect(() => {
-    if (user) {
-      setSearchParams((prev) => ({
-        ...prev,
-        STR_UTITOKEN: user.STR_UTITOKEN,
-        LG_AGEID: user.LG_AGEID,
-      }));
-    }
-  }, [user]);
+  }, []);
 
   // Fonction pour gérer le changement de la date de début
   const handleStartDateChange = (date) => {
@@ -193,44 +175,20 @@ const ListeTicket = () => {
     setSelectedAgence(value);
   };
 
-  // Fonction pour rechercher avec les paramètres actuels (texte, dates, statut et agence)
+  // Gérer la recherche avec filtres
   const handleSearchWithFilters = () => {
-    if (user) {
-      const newParams = {
-        mode: process.env.REACT_APP_LISTE_TICKET_MODE,
-        STR_UTITOKEN: user.STR_UTITOKEN,
-        LG_AGEID: selectedAgence || user.LG_AGEID, // Utiliser l'agence sélectionnée ou celle de l'utilisateur
-        DT_BEGIN: formatDate(startDate),
-        DT_END: formatDate(endDate),
-      };
-
-      if (searchText) {
-        newParams.search = searchText;
-      }
-
-      // Ajouter le filtre de statut s'il n'est pas "all"
-      if (statusFilter !== "all") {
-        newParams.STR_EVESTATUT = statusFilter;
-      }
-
-      // Mettre à jour les paramètres de recherche
-      setSearchParams(newParams);
-
-      // Forcer le rechargement des données
-      setTimeout(() => {
-        refreshData();
-      }, 100);
-    }
+    setCurrentPage(1); // Réinitialise à la première page lors du filtrage
+    loadTicketData();
   };
 
-  // Fonction pour éditer un événement
-  const handleEdit = (event) => {
-    navigate(process.env.REACT_APP_SAVE_EVENT_DATA, {
-      state: { LG_EVEID: event.LG_EVEID },
-    });
+  // Gérer la recherche par texte
+  const handleSearch = (value) => {
+    setSearchText(value);
+    setCurrentPage(1); // Réinitialise à la première page lors de la recherche
+    loadTicketData();
   };
 
-  // Fonction pour supprimer un événement
+  // Fonction pour envoyer un ticket
   const handleSend = async (record) => {
     try {
       await postData({
@@ -246,91 +204,22 @@ const ListeTicket = () => {
         description: `Ticket envoyé avec succès.`,
       });
 
-      // Rafraîchir les données après la suppression
-      refreshData();
+      loadTicketData();
     } catch (error) {
       notification.error({
         message: "Erreur",
-        description: `Impossible de supprimer l'événement.`,
+        description: `Impossible d'envoyer le ticket.`,
       });
     }
   };
 
-  const handleDeleteItem = async (record) => {
-    try {
-      await postData({
-        mode: "deleteEvenement",
-        STR_UTITOKEN: user.STR_UTITOKEN,
-        LG_AGEID: user.LG_AGEID,
-        LG_EVEID: record.LG_EVEID,
-      });
-
-      notification.success({
-        message: "Succès",
-        description: `L'événement a été supprimé avec succès.`,
-      });
-
-      // Rafraîchir les données après la suppression
-      refreshData();
-    } catch (error) {
-      notification.error({
-        message: "Erreur",
-        description: `Impossible de supprimer l'événement.`,
-      });
+  // Gérer le changement de pagination
+  const handlePaginationChange = (page, pageSizeParam) => {
+    setCurrentPage(page);
+    if (pageSizeParam !== undefined && pageSizeParam !== pageSize) {
+      setPageSize(pageSizeParam);
     }
-  };
-
-  // Fonction pour changer le statut d'un événement
-  const handleToggleStatus = async (id, currentStatus) => {
-    try {
-      const newStatus = currentStatus === "enable" ? "disable" : "enable";
-      await postData({
-        mode: "deleteEvenement", // Mode utilisé pour le changement de statut
-        STR_UTITOKEN: user.STR_UTITOKEN,
-        LG_AGEID: user.LG_AGEID,
-        LG_EVEID: id,
-        STR_EVESTATUT: newStatus,
-      });
-
-      notification.success({
-        message: "Succès",
-        description: `Le statut de l'événement a été ${
-          newStatus === "enable" ? "activé" : "désactivé"
-        } avec succès.`,
-      });
-
-      // Rafraîchir les données après la modification
-      refreshData();
-    } catch (error) {
-      notification.error({
-        message: "Erreur",
-        description: `Impossible de modifier le statut de l'événement.`,
-      });
-    }
-  };
-
-  // Fonction pour gérer la pagination manuelle
-  const handlePaginationChange = (page, pageSize) => {
-    handleTableChange({ current: page, pageSize }, null);
-  };
-
-  // StatusTag pour remplacer la colonne de statut
-  const StatusTag = ({ status }) => {
-    const color = status === "enable" ? "#52c41a" : "#f5222d";
-    const text = status === "enable" ? "Actif" : "Inactif";
-    return (
-      <div
-        style={{
-          backgroundColor: color,
-          color: "white",
-          padding: "0 10px",
-          borderRadius: "4px",
-          display: "inline-block",
-        }}
-      >
-        {text}
-      </div>
-    );
+    // Les données seront rechargées via l'effet qui surveille currentPage et pageSize
   };
 
   if (!user) {
@@ -355,15 +244,6 @@ const ListeTicket = () => {
                 ]}
               />
             </div>
-
-            {/* Bouton d'ajout */}
-            {/* <Button
-              type="primary"
-              icon={<PlusOutlined />}
-              onClick={() => navigate(process.env.REACT_APP_SAVE_EVENT_DATA)}
-            >
-              Ajouter un évenement
-            </Button> */}
           </div>
         </div>
 
@@ -414,14 +294,12 @@ const ListeTicket = () => {
                   </label>
                   <Form.Group controlId="formDate" className="w-100">
                     <SelectPicker
-                      data={agencesList} // Liste des options
+                      data={agencesList}
                       style={{ width: "100%" }}
                       size="lg"
-                      onChange={(value) =>
-                        handleAgenceChange(value, "LG_AGEID")
-                      } // Gestionnaire
-                      value={selectedAgence || null} // Valeur initiale
-                      placeholder="Sélectionnez un type d'activité" // Texte affiché par défaut
+                      onChange={(value) => handleAgenceChange(value)}
+                      value={selectedAgence || null}
+                      placeholder="Sélectionnez un type d'activité"
                       className="basic-multi-select"
                     />
                   </Form.Group>
@@ -451,7 +329,7 @@ const ListeTicket = () => {
               <div className="col-lg-2">
                 <div className="form-group mb-5">
                   <label className=" fs-6 form-label fw-bold text-gray-900">
-                    Statut
+                    Rechercher
                   </label>
                   <Form.Group controlId="formDate" className="w-100">
                     <Button
@@ -467,38 +345,6 @@ const ListeTicket = () => {
             </div>
             <Card className="shadow-sm">
               <Row gutter={[16, 16]} className="mb-4">
-                {/* <Col xs={24} lg={16}>
-                  <Space size="middle" wrap style={{ width: "100%" }}>
-                    <div
-                      style={{ display: "flex", flexWrap: "wrap", gap: "12px" }}
-                    >
-                      <Select
-                        placeholder="Statut"
-                        value={statusFilter}
-                        onChange={handleStatusChange}
-                        style={{ minWidth: "120px" }}
-                      >
-                        <Option value="all">Tous</Option>
-                        <Option value="enable">Actif</Option>
-                        <Option value="disable">Inactif</Option>
-                      </Select>
-                      <Select
-                        placeholder="Agence"
-                        value={selectedAgence}
-                        onChange={handleAgenceChange}
-                        style={{ minWidth: "140px" }}
-                        allowClear
-                      >
-                        {agencesList.map((agence) => (
-                          <Option key={agence.LG_AGEID} value={agence.LG_AGEID}>
-                            {agence.STR_AGENAME}
-                          </Option>
-                        ))}
-                      </Select>
-                    </div>
-                  </Space>
-                </Col> */}
-
                 {/* Zone de recherche alignée à droite */}
                 <Col
                   xs={24}
@@ -519,19 +365,19 @@ const ListeTicket = () => {
               </Row>
 
               <Spin
-                spinning={fetchLoading || postLoading}
+                spinning={isLoading || postLoading}
                 tip="Chargement des données..."
               >
                 {/* Affichage en grille de cartes */}
                 <Row gutter={[16, 16]} className="mt-4">
-                  {allEventsData &&
-                    allEventsData.map((event) => (
+                  {ticketData &&
+                    ticketData.map((ticket) => (
                       <Col
                         xs={24}
                         sm={12}
                         md={8}
                         lg={6}
-                        key={event.LG_EVEID}
+                        key={ticket.LG_TICID}
                         className="mb-4"
                       >
                         <Card
@@ -546,8 +392,8 @@ const ListeTicket = () => {
                                 alignItems: "center",
                               }}
                             >
-                              {event.STR_EVEPIC ? (
-                                <TicketCard event={event} />
+                              {ticket.STR_EVEPIC ? (
+                                <TicketCard event={ticket} />
                               ) : (
                                 <div
                                   style={{
@@ -565,39 +411,26 @@ const ListeTicket = () => {
                             </div>
                           }
                           actions={[
-                            // <SendOutlined key="share" onClick={() => handleShare(event)} />,
-                            // <EyeOutlined key="view" onClick={() => navigate(`/view-ticket/${event.LG_EVEID}`)} />,
-                            <span key="send" onClick={() => handleSend(event)}>
+                            <span key="send" onClick={() => handleSend(ticket)}>
                               <SendOutlined style={{ marginRight: "5px" }} />
                               Envoyer
                             </span>,
-                            // <EyeOutlined key="view" onClick={() => navigate(`/view-ticket/${event.LG_EVEID}`)} />,
-                            // <EditOutlined key="edit" onClick={() => handleEdit(event)} />,
-                            // <DeleteOutlined key="delete" onClick={() => handleDeleteItem(event)} />,
-                            // <Switch
-                            //   key="status"
-                            //   checkedChildren={<CheckOutlined />}
-                            //   unCheckedChildren={<CloseOutlined />}
-                            //   checked={event.STR_EVESTATUT === "enable"}
-                            //   onChange={() => handleToggleStatus(event.LG_EVEID, event.STR_EVESTATUT)}
-                            //   size="small"
-                            // />
                           ]}
                         >
                           <Meta
-                            title={event.STR_EVENAME}
+                            title={ticket.STR_EVENAME}
                             description={
                               <div>
                                 <p className="mb-1 mt-0">
                                   <strong>Lieu:</strong>{" "}
-                                  {event.LG_LSTPLACEID || "Non défini"}
+                                  {ticket.LG_LSTPLACEID || "Non défini"}
                                 </p>
                                 <p className="mb-1 mt-0">
-                                  <strong>Date:</strong> {event.DT_TCIVALIDATED}{" "}
+                                  <strong>Date:</strong> {ticket.DT_TCIVALIDATED}{" "}
                                 </p>
                                 <p className="mb-1 mt-0">
                                   <strong>Téléphone:</strong>{" "}
-                                  {event.STR_TICPHONE}{" "}
+                                  {ticket.STR_TICPHONE}{" "}
                                 </p>
                               </div>
                             }
@@ -607,15 +440,17 @@ const ListeTicket = () => {
                     ))}
                 </Row>
 
-                {/* Pagination */}
-                {allEventsData && allEventsData.length > 0 && (
+                {/* Pagination améliorée */}
+                {ticketData && ticketData.length > 0 && (
                   <div style={{ marginTop: 20, textAlign: "center" }}>
                     <Pagination
-                      current={pagination.current}
-                      pageSize={pagination.pageSize}
-                      total={pagination.total}
+                      current={currentPage}
+                      pageSize={pageSize}
+                      total={totalRecords}
                       onChange={handlePaginationChange}
+                      onShowSizeChange={handlePaginationChange}
                       showSizeChanger
+                      pageSizeOptions={['10', '20', '50', '100']}
                       showTotal={(total, range) =>
                         `${range[0]}-${range[1]} sur ${total} éléments`
                       }
@@ -624,9 +459,9 @@ const ListeTicket = () => {
                 )}
 
                 {/* Message si aucune donnée */}
-                {allEventsData && allEventsData.length === 0 && (
+                {(!ticketData || ticketData.length === 0) && !isLoading && (
                   <div style={{ textAlign: "center", padding: "40px 0" }}>
-                    <p>Aucun événement trouvé</p>
+                    <p>Aucun ticket trouvé</p>
                   </div>
                 )}
               </Spin>
