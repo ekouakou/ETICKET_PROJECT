@@ -7,6 +7,7 @@ import ExpectedPremiere from "./ExpectedPremiere";
 import BannerSkeleton from "../../AppPages/Skeleton/BannerSkeleton";
 import SiteHeaderSkeleton from "../Skeleton/SiteHeaderSkeleton";
 import EventCardSkeleton from "../../AppPages/Skeleton/EventCardSkeleton";
+import ErrorMessage from "./ErrorMessage";
 import {
   formatDate,
   getCurrentDate,
@@ -21,6 +22,7 @@ const EventList = () => {
   const handleSearch = (searchTerm) => {
     setSearchTerm(searchTerm);
   };
+  
   const {
     data: activitesData,
     loading,
@@ -39,8 +41,17 @@ const EventList = () => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Helper function to extract error message
+  const getErrorMessage = (error) => {
+    if (!error) return "Une erreur inconnue est survenue";
+    if (typeof error === 'string') return error;
+    if (error.message) return error.message;
+    return "Une erreur est survenue lors du chargement des données";
+  };
+
   return (
     <div>
+      <AppHeader onSearch={handleSearch} />
       {isLoading || loading ? (
         <>
           <SiteHeaderSkeleton />
@@ -83,10 +94,10 @@ const EventList = () => {
           </section>
         </>
       ) : error ? (
-        <p>{error}</p>
+        <ErrorMessage error={error} />
       ) : (
         <>
-          <AppHeader onSearch={handleSearch} />
+          
           <SliderComponent ImagelBaseUrl={urlBaseImage} />
           {activitesData && activitesData.length > 0 ? (
             <ExpectedPremiere
@@ -97,7 +108,9 @@ const EventList = () => {
               searchTerm={searchTerm}
             />
           ) : (
-            <p>Aucun événement à afficher.</p>
+            <div className="container mt-5">
+              <p>Aucun événement à afficher.</p>
+            </div>
           )}
         </>
       )}

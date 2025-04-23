@@ -32,26 +32,26 @@ function Footer() {
           <h2 className="text-center mb-10">Conditions Générales d'Utilisation et de Vente de Guinée Ticket</h2>
           {/* <p className="text-center">Dernière mise à jour le : [Date de la dernière mise à jour]</p> */}
           <p>
-              Les présentes Conditions Générales d’Utilisation et de Vente (ci-après « CGU ») régissent l’utilisation du site internet www.guineeticket.com (ci-après le « Site ») et la vente de billets pour des événements (ci-après les « Billets ») par AFRIDIGICOM SARLU (ci-après « Guinée Ticket »), agence de marketing et de communication enregistrée en Guinée, pour le compte d’organisateurs d’événements (ci-après les « Organisateurs »).
+              Les présentes Conditions Générales d’Utilisation et de Vente (ci-après « CGU ») régissent l’utilisation du site internet www.guineeticket.com (ci-après le « Site ») et la vente de Tickets pour des événements (ci-après les « Tickets ») par AFRIDIGICOM SARLU (ci-après « Guinée Ticket »), agence de marketing et de communication enregistrée en Guinée, pour le compte d’organisateurs d’événements (ci-après les « Organisateurs »).
           </p>
           <p>
-              En accédant au Site et/ou en utilisant les services de Guinée Ticket, tout utilisateur (ci-après l’ « Utilisateur ») accepte sans réserve les présentes CGU. Il est donc conseillé de lire attentivement les présentes CGU avant toute utilisation du Site ou achat de Billets.
+              En accédant au Site et/ou en utilisant les services de Guinée Ticket, tout utilisateur (ci-après l’ « Utilisateur ») accepte sans réserve les présentes CGU. Il est donc conseillé de lire attentivement les présentes CGU avant toute utilisation du Site ou achat de Tickets.
           </p>
 
           <h3>Article 1 - Définitions</h3>
           <ul>
               <li><strong>Site :</strong> désigne le site internet accessible à l’adresse www.guineeticket.com.</li>
               <li><strong>Guinée Ticket :</strong> désigne la société AFRIDIGICOM SARLU, agence de marketing et de communication, propriétaire et gestionnaire du Site.</li>
-              <li><strong>Organisateur :</strong> désigne toute personne physique ou morale qui utilise les services de Guinée Ticket pour la vente de Billets pour un événement qu'elle organise.</li>
+              <li><strong>Organisateur :</strong> désigne toute personne physique ou morale qui utilise les services de Guinée Ticket pour la vente de Tickets pour un événement qu'elle organise.</li>
               <li><strong>Utilisateur :</strong> désigne toute personne physique ou morale qui accède au Site et/ou utilise les services de Guinée Ticket.</li>
-              <li><strong>Billet :</strong> désigne un titre d'accès à un événement vendu par Guinée Ticket pour le compte d'un Organisateur.</li>
-              <li><strong>Evénement :</strong> désigne tout spectacle, concert, festival, manifestation sportive ou culturelle, ou tout autre événement pour lequel Guinée Ticket propose la vente de Billets.</li>
-              <li><strong>Services :</strong> désigne l'ensemble des services proposés par Guinée Ticket via le Site, notamment la vente de Billets, la gestion des commandes et le service client.</li>
+              <li><strong>Ticket :</strong> désigne un titre d'accès à un événement vendu par Guinée Ticket pour le compte d'un Organisateur.</li>
+              <li><strong>Evénement :</strong> désigne tout spectacle, concert, festival, manifestation sportive ou culturelle, ou tout autre événement pour lequel Guinée Ticket propose la vente de Tickets.</li>
+              <li><strong>Services :</strong> désigne l'ensemble des services proposés par Guinée Ticket via le Site, notamment la vente de Tickets, la gestion des commandes et le service client.</li>
           </ul>
 
           <h3>Article 2 - Objet</h3>
           <p>
-              Les présentes CGU ont pour objet de définir les conditions dans lesquelles Guinée Ticket met à disposition des Utilisateurs son Site et ses Services pour l'achat de Billets pour des Evénements.
+              Les présentes CGU ont pour objet de définir les conditions dans lesquelles Guinée Ticket met à disposition des Utilisateurs son Site et ses Services pour l'achat de Tickets pour des Evénements.
               Guinée Ticket agit en qualité d'intermédiaire entre l'Organisateur et l'Utilisateur. La responsabilité de l'organisation de l'Evénement et de son bon déroulement incombe exclusivement à l'Organisateur.
           </p>
 
@@ -65,14 +65,14 @@ function Footer() {
 
           <h3>Article 4 - Création d'un compte</h3>
           <p>
-              L'achat de Billets sur le Site n'est pas nécessairement soumis à la création d'un compte utilisateur. Cependant, la création d'un compte permet à l'Utilisateur de bénéficier de fonctionnalités supplémentaires, telles que la sauvegarde de ses informations personnelles pour faciliter ses futurs achats.
+              L'achat de Tickets sur le Site n'est pas nécessairement soumis à la création d'un compte utilisateur. Cependant, la création d'un compte permet à l'Utilisateur de bénéficier de fonctionnalités supplémentaires, telles que la sauvegarde de ses informations personnelles pour faciliter ses futurs achats.
           </p>
 
-          <h3>Article 5 - Commande et achat de Billets</h3>
+          <h3>Article 5 - Commande et achat de Tickets</h3>
           <h4>5.1 Processus de commande</h4>
           <ul>
               <li>Sélectionner l'Evénement de son choix sur le Site.</li>
-              <li>Sélectionner le type de Billet souhaité et le nombre de Billets.</li>
+              <li>Sélectionner le type de Ticket souhaité et le nombre de Tickets.</li>
               <li>Remplir le formulaire de commande avec ses informations personnelles et ses coordonnées bancaires.</li>
               <li>Vérifier et valider sa commande.</li>
               <li>Procéder au paiement en ligne.</li>
@@ -83,30 +83,30 @@ function Footer() {
               Une fois le paiement validé, l'Utilisateur reçoit une confirmation de commande par email à l'adresse email indiquée lors de la commande.
           </p>
 
-          <h4>5.3 Obtention des Billets</h4>
+          <h4>5.3 Obtention des Tickets</h4>
           <p>
-              Les Billets sont envoyés à l'Utilisateur par email, sous format électronique (e-billet).
+              Les Tickets sont envoyés à l'Utilisateur par email, sous format électronique (e-Ticket).
           </p>
 
-          <h4>5.4 Prix des Billets</h4>
+          <h4>5.4 Prix des Tickets</h4>
           <p>
-              Les prix des Billets sont indiqués en Francs Guinéens (GNF) et sont toutes taxes comprises (TTC). Les frais de service et de livraison éventuels sont indiqués à l'Utilisateur avant la validation de la commande.
+              Les prix des Tickets sont indiqués en Francs Guinéens (GNF) et sont toutes taxes comprises (TTC). Les frais de service et de livraison éventuels sont indiqués à l'Utilisateur avant la validation de la commande.
           </p>
 
-          <h4>5.5 Disponibilité des Billets</h4>
+          <h4>5.5 Disponibilité des Tickets</h4>
           <p>
-              Les Billets sont proposés à la vente dans la limite des places disponibles. Guinée Ticket ne saurait être tenue responsable de l'indisponibilité de Billets pour un Evénement donné.
+              Les Tickets sont proposés à la vente dans la limite des places disponibles. Guinée Ticket ne saurait être tenue responsable de l'indisponibilité de Tickets pour un Evénement donné.
           </p>
 
           <h3>Article 6 - Paiement</h3>
           <p>
-              Le paiement des Billets s'effectue en ligne, par carte bancaire ou via un service de paiement mobile (Orange Money, MTN Mobile Money).
+              Le paiement des Tickets s'effectue en ligne, par carte bancaire ou via un service de paiement mobile (Orange Money, MTN Mobile Money).
           </p>
 
           <h3>Article 7 - Annulation, modification et remboursement</h3>
           <h4>7.1 Annulation et modification par l'Utilisateur</h4>
           <p>
-              Sauf mention contraire, les Billets ne sont ni échangeables ni remboursables.
+              Sauf mention contraire, les Tickets ne sont ni échangeables ni remboursables.
           </p>
 
           <h4>7.2 Annulation et modification par l'Organisateur</h4>
@@ -212,7 +212,7 @@ function Footer() {
                                 </NavLink>
                             </div>
                             <div class="footer-text">
-                                <p>Guinée Ticket est la solution de billetterie en ligne qui simplifie l'accès à vos événements préférés en Guinée ! Détenue par AFRIDIGICOM SARLU.</p>
+                                <p>Guinée Ticket est la solution de Ticketterie en ligne qui simplifie l'accès à vos événements préférés en Guinée ! Détenue par AFRIDIGICOM SARLU.</p>
                             </div>
                             <div class="footer-social-icon mt-10">
                                 <span>Suivez-nous</span>
@@ -246,8 +246,8 @@ function Footer() {
                             </div>
                             <ul >
                               <li class="d-flex">
-                                <img loading="lazy" src="https://www.ticketmaster.fr/img/footer/billets.svg"/>
-                                <div class="list-body">Billetterie 100% Officielle</div>
+                                <img loading="lazy" src="https://www.ticketmaster.fr/img/footer/Tickets.svg"/>
+                                <div class="list-body">Ticketterie 100% Officielle</div>
                               </li>
                               <li class="d-flex">
                                 <img loading="lazy" src="https://www.ticketmaster.fr/img/footer/lock.svg"/>
@@ -325,7 +325,7 @@ function Footer() {
                       <a className=' center-align-items' href="#" rel="noopener" target="_blank">
                         <img className='d-block mx-auto' loading="lazy" src="https://www.ticketmaster.fr/img/footer/Box-Office-Collection.svg" height={70}/>
                         <p className='text-center mt-3'>Retrait en magasin</p>
-                        <p class=" text-center">Retirez gratuitement vos billets partout en France dans plus de 1600 points de vente</p>
+                        <p class=" text-center">Retirez gratuitement vos Tickets partout en France dans plus de 1600 points de vente</p>
                       </a>
                     </div>
 
@@ -333,15 +333,15 @@ function Footer() {
                       <a className=' center-align-items' href="#" rel="noopener" target="_blank">
                         <img className='d-block mx-auto' loading="lazy" src="https://www.ticketmaster.fr/img/footer/umbrella.svg" height={70}/>
                         <p className='text-center mt-3'>RAssurance annulation</p>
-                        <p class=" text-center">Réservez vos billets en toute confiance et sérénité</p>
+                        <p class=" text-center">Réservez vos Tickets en toute confiance et sérénité</p>
                       </a>
                     </div>
 
                     <div className='col-lg-3'>
                       <a className=' center-align-items' href="#" rel="noopener" target="_blank">
                         <img className='d-block mx-auto' loading="lazy" src="https://www.ticketmaster.fr/img/footer/CollectorTicket-fr.svg" height={70}/>
-                        <p className='text-center mt-3'>Billetcollector™</p>
-                        <p class=" text-center">Le billet souvenir pour tous les fans. Un produit exclusif Ticketmaster®</p>
+                        <p className='text-center mt-3'>Ticketcollector™</p>
+                        <p class=" text-center">Le Ticket souvenir pour tous les fans. Un produit exclusif Ticketmaster®</p>
                       </a>
                     </div>
                   </div>

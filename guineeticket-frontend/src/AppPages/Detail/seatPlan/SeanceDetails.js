@@ -130,7 +130,7 @@ const SeanceDetails = ({ seanceData }) => {
               <h4 className="title">Résumé de l’achat </h4>
               <ul>
                 <li>
-                  <div className="info"><span>Nbre billet</span> <span>{Object.values(quantities).reduce((acc, curr) => acc + curr, 0)} Tickets</span></div>
+                  <div className="info"><span>Nbre Ticket</span> <span>{Object.values(quantities).reduce((acc, curr) => acc + curr, 0)} Tickets</span></div>
                 </li>
               </ul>
               <ul className="side-shape"></ul>

@@ -1099,7 +1099,7 @@ function Detail() {
                                   </span>
                                   <button class="btn btn-light-warning fs-3 fw-bolder w-100 py-5 mb-13">
                                     {totalAmount === 0
-                                      ? "Vos billet sont gratuits"
+                                      ? "Vos tickets sont gratuits"
                                       : ` ${totalAmount} GNF`}
                                   </button>
                                   <button

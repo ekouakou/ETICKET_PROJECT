@@ -299,7 +299,7 @@ const TicketOrder = ({ eventDetails, onQuantityUpdate, datePassed }) => {
                   >
                     <div className="d-flex justify-content-between align-items-center">
                       <div>
-                        <h3 className="text-theme"> Billet {category.title}</h3>
+                        <h3 className="text-theme"> Ticket {category.title}</h3>
                         <span className="badge bg-light text-danger fw-bold">
                           <span>
                             {category.price} <sup>{category.currency}</sup>

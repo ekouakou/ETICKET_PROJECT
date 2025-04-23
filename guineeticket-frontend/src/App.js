@@ -6,7 +6,6 @@ import HomePage from './AppPages/Home/HomePage';
 import DetailPage from './AppPages/Detail/DetailPage';
 import SignIn from './AppPages/Home/SignIn';
 import Contact from './AppPages/Home/Contact';
-import Wizard from './AppPages/Home/Wizard';
 import NotFound from './AppPages/Home/NotFound';
 import AboutUs from './AppPages/Home/AboutUs';
 import MyAcount from './AppPages/Home/MyAcount';
@@ -24,8 +23,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path={`${process.env.REACT_APP_EVENT_DETAILS}/:PARAM_LG_EVEID`}element={<DetailPage />}/> 
             <Route path={process.env.REACT_APP_SIGN_IN} element={<SignIn />} />
-            {/* <Route path="/contactUs" element={<Contact />} /> */}
-            <Route path="/contactUs" element={<Wizard />} />
+            <Route path="/contactUs" element={<Contact />} />
             <Route path="/aboutUs" element={<AboutUs />} />
             <Route path="/profile" element={<MyAcount />} />
             <Route path="*" element={<NotFound />} />

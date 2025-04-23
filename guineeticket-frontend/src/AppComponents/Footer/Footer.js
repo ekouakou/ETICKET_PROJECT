@@ -40,7 +40,7 @@ function Footer() {
                 <div class="footer-text">
                   <p>
                     Événements, spectacles, concerts, sports et transports en
-                    Guinée : Trouvez un billet facile en ligne sur Guinée Ticket
+                    Guinée : Trouvez un Billet facile en ligne sur Guinée Ticket
                     ! La solution simple et rapide pour assister à vos
                     événements préférés.
                   </p>
