@@ -206,7 +206,7 @@ const ListeTicket = () => {
 
       loadTicketData();
     } catch (error) {
-      notification.error({
+      notification.error({ 
         message: "Erreur",
         description: `Impossible d'envoyer le ticket.`,
       });
