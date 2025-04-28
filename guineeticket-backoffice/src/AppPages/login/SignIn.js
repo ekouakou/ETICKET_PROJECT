@@ -1,174 +1,232 @@
+// App.js - Composant principal
 import React, { useState } from 'react';
-import { useTheme } from '../../contexts/ThemeProvider';
-import { useNavigate } from 'react-router-dom';
-import { Loader } from 'rsuite'; // Importer le Loader de React Suite
-import usePostData from "../../services/usePostData";
+import { Button, Panel, Container, Content, Header, Footer, ButtonToolbar, ButtonGroup } from 'rsuite';
+import 'rsuite/dist/rsuite.min.css';
+import html2pdf from 'html2pdf.js';
+import QCMQuestions from './questions';
+import './styles.css';
 
-const SignIn = () => {
-  const { theme } = useTheme();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
-  const navigate = useNavigate();
-  const { postData, loading, error: apiError, response } = usePostData(process.env.REACT_APP_AUTHENTIFICATION_API_URL);
+const App = () => {
+  const [activeKey, setActiveKey] = useState(null);
+  const [showAnswers, setShowAnswers] = useState({});
+  const [showExplanation, setShowExplanation] = useState({});
+  const [expandAll, setExpandAll] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError(''); // Réinitialiser les messages d'erreur précédents
-    setSuccessMessage(''); // Réinitialiser les messages de succès précédents
-    
-    const params = new URLSearchParams();
-    params.append('mode', 'doConnexion');
-    params.append('STR_UTILOGIN', email);
-    params.append('STR_UTIPASSWORD', password);
+  // Lettres pour les options (de A à X)
+  const optionLetters = 'ABCDEFGHIJKLMNOPQRSTUVWX';
 
-    try {
-      const userData = await postData(params);
-      if (userData?.code_statut === "1") {
-        // Stocker les données utilisateur
-        localStorage.setItem('userConnectedData', JSON.stringify(userData));
-        
-        // Afficher le message de succès
-        setSuccessMessage('Connexion réussie ! Redirection en cours...');
-        
-        // Attendre 3 secondes avant de rediriger
-        setTimeout(() => {
-          navigate(process.env.REACT_APP_DASHBOARD);
-        }, 1000);
-      } else {
-        setError(userData?.desc_statut || "Erreur de connexion.");
-      }
-    } catch (error) {
-      console.error("Erreur de connexion:", error);
-      setError("Une erreur s'est produite lors de la tentative de connexion.");
+  const handleSelect = (eventKey) => {
+    setActiveKey(activeKey === eventKey ? null : eventKey);
+  };
+
+  const toggleAnswers = (id) => {
+    setShowAnswers(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  const toggleExplanation = (id) => {
+    setShowExplanation(prev => ({
+      ...prev,
+      [id]: !prev[id]
+    }));
+  };
+
+  // Afficher/masquer toutes les questions
+  const toggleExpandAll = () => {
+    if (expandAll) {
+      setActiveKey(null);
+    } else {
+      // Ouvrir toutes les questions
+      const questions = {};
+      QCMQuestions.forEach(q => {
+        questions[q.id] = true;
+      });
+      setActiveKey('all');
     }
+    setExpandAll(!expandAll);
+  };
+
+  // Afficher/masquer toutes les réponses
+  const toggleAllAnswers = (show) => {
+    const answers = {};
+    QCMQuestions.forEach(q => {
+      answers[q.id] = show;
+    });
+    setShowAnswers(answers);
+  };
+
+  // Afficher/masquer toutes les explications
+  const toggleAllExplanations = (show) => {
+    const explanations = {};
+    QCMQuestions.forEach(q => {
+      explanations[q.id] = show;
+    });
+    setShowExplanation(explanations);
+  };
+
+  // Mode PDF - Affiche tout le contenu
+  const prepareForPDF = () => {
+    toggleAllAnswers(true);
+    toggleAllExplanations(true);
+    if (!expandAll) {
+      toggleExpandAll();
+    }
+    
+    // Petit délai pour laisser le DOM se mettre à jour
+    setTimeout(() => {
+      generatePDF();
+    }, 500);
+  };
+
+  const generatePDF = () => {
+    const element = document.getElementById('qcm-content');
+    const opt = {
+      margin: 10,
+      filename: 'qcm-informatique-complet.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100" id="kt_app_root">
-      <style dangerouslySetInnerHTML={{ __html: "\n    body {\n        background-image: url('https://keenthemes.com/static/metronic/tailwind/dist/assets/media/images/2600x1200/bg-10.png');\n    }\n\n    [data-bs-theme=\"dark\"] body {\n        background-image: url('../../../assets/media/auth/bg4-dark.jpg');\n    }\n" }}
-      />
-      <div className="bg-body d-flex flex-column align-items-stretch flex-center rounded-4 w-md-400px p-14">
-        <div className="d-flex flex-center flex-column flex-column-fluid ">
-          <form
-            className="form w-100 fv-plugins-bootstrap5 fv-plugins-framework"
-            noValidate="novalidate"
-            id="kt_sign_in_form"
-            onSubmit={handleSubmit}
-          >
-            <div className="text-center mb-7">
-              <a className="mb-0 mb-lg-20">
-                <img alt="Logo" src="assets/media/logos/logo_light.svg" className="h-60px h-lg-50px" />
-              </a>
-              <h1 className="text-gray-900 fw-bolder mb-3 fs-4">Connexion</h1>
-            </div>
-            <div className="row g-3 mb-9 d-none">
-              <div className="col-md-6">
-                <a
-                  href="#"
-                  className="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100"
-                >
-                  <img
-                    alt="Logo"
-                    src="https://keenthemes.com/static/metronic/tailwind/dist/assets/media/brand-logos/google.svg"
-                    className="h-15px me-3"
-                  />
-                  Sign in with Google
-                </a>
-              </div>
-              <div className="col-md-6">
-                <a
-                  href="#"
-                  className="btn btn-flex btn-outline btn-text-gray-700 btn-active-color-primary bg-state-light flex-center text-nowrap w-100"
-                >
-                  <img
-                    alt="Logo"
-                    src="https://keenthemes.com/static/metronic/tailwind/dist/assets/media/brand-logos/apple-black.svg"
-                    className="theme-light-show h-15px me-3"
-                  />
-                  <img
-                    alt="Logo"
-                    src="../../../assets/media/svg/brand-logos/apple-black-dark.svg"
-                    className="theme-dark-show h-15px me-3"
-                  />
-                  Sign in with Apple
-                </a>
-              </div>
-            </div>
-            <div className="separator separator-content my-14 d-none">
-              <span className="w-125px text-gray-500 fw-semibold fs-7">
-                Or with email
-              </span>
-            </div>
-            
-            {/* Message de succès */}
-            {successMessage && (
-              <div className="alert alert-success mb-8" role="alert">
-                {successMessage}
-              </div>
-            )}
-            
-            {/* Message d'erreur */}
-            {error && (
-              <div className="alert alert-danger mb-8" role="alert">
-                {error}
-              </div>
-            )}
-            
-            <div className="fv-row mb-8 fv-plugins-icon-container">
-              <input
-                type="text"
-                placeholder="Email"
-                name="email"
-                autoComplete="off"
-                className="form-control bg-transparent"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div className="fv-row mb-3 fv-plugins-icon-container">
-              <input
-                type="password"
-                placeholder="Password"
-                name="password"
-                autoComplete="off"
-                className="form-control bg-transparent"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="d-flex flex-stack flex-wrap gap-3 fs-base fw-semibold mb-8">
-              <div />
-              <a href="reset-password.html" className="link-primary">
-                Forgot Password ?
-              </a>
-            </div>
-            <div className="d-grid mb-10">
-              <button
-                type="submit"
-                id="kt_sign_in_submit"
-                className="btn btn-primary"
-                disabled={loading}
-              >
-                {loading ? (
-                  <Loader content="Chargement..." />
-                ) : (
-                  <span className="indicator-label">Se connecter</span>
-                )}
-              </button>
-            </div>
-            {/* <div className="text-gray-500 text-center fw-semibold fs-6">
-              Se souvenir de moi ?
-              <a href="sign-up.html" className="link-primary">
-                Sign up
-              </a>
-            </div> */}
-          </form>
+    <Container className="qcm-container">
+      <Header className="qcm-header">
+        <h1>QCM d'Informatique</h1>
+        <div className="header-controls">
+          <Button appearance="primary" onClick={prepareForPDF} className="pdf-button">
+            Télécharger en PDF complet
+          </Button>
         </div>
+      </Header>
+      
+      <div className="global-controls">
+        <ButtonToolbar>
+          <ButtonGroup>
+            <Button 
+              appearance="ghost" 
+              onClick={toggleExpandAll}
+            >
+              {expandAll ? 'Masquer toutes les questions' : 'Afficher toutes les questions'}
+            </Button>
+          </ButtonGroup>
+          
+          <ButtonGroup>
+            <Button 
+              appearance="ghost" 
+              onClick={() => toggleAllAnswers(true)}
+            >
+              Afficher toutes les réponses
+            </Button>
+            <Button 
+              appearance="ghost" 
+              onClick={() => toggleAllAnswers(false)}
+            >
+              Masquer toutes les réponses
+            </Button>
+          </ButtonGroup>
+          
+          <ButtonGroup>
+            <Button 
+              appearance="ghost" 
+              onClick={() => toggleAllExplanations(true)}
+            >
+              Afficher toutes les explications
+            </Button>
+            <Button 
+              appearance="ghost" 
+              onClick={() => toggleAllExplanations(false)}
+            >
+              Masquer toutes les explications
+            </Button>
+          </ButtonGroup>
+        </ButtonToolbar>
       </div>
-    </div>
+      
+      <Content className="qcm-content" id="qcm-content">
+        <div className="qcm-intro">
+          <h2>Test de connaissances en informatique</h2>
+          <p>Ce QCM couvre divers sujets liés à l'informatique, du développement web aux concepts avancés.</p>
+        </div>
+        
+        {QCMQuestions.map((item) => (
+          <Panel
+            key={item.id}
+            className="question-panel"
+            header={`Question ${item.id}: ${item.question}`}
+            collapsible
+            expanded={expandAll || activeKey === item.id}
+            onSelect={() => !expandAll && handleSelect(item.id)}
+          >
+            <div className="options-container">
+              {item.options.map((option, index) => (
+                <div
+                  key={index}
+                  className={`option ${showAnswers[item.id] && item.correctAnswer === index ? 'correct-answer' : ''}`}
+                >
+                  <span className="option-letter">{optionLetters[index]}.</span> {option}
+                  {showAnswers[item.id] && item.correctAnswer === index && <span className="correct-badge">✓</span>}
+                </div>
+              ))}
+            </div>
+            <div className="button-container">
+              <Button
+                className="answer-button"
+                appearance="subtle"
+                onClick={() => toggleAnswers(item.id)}
+              >
+                {showAnswers[item.id] ? 'Masquer la réponse' : 'Afficher la réponse'}
+              </Button>
+              <Button
+                className="explanation-button"
+                appearance="subtle"
+                onClick={() => toggleExplanation(item.id)}
+                disabled={!showAnswers[item.id]}
+              >
+                {showExplanation[item.id] ? 'Masquer l\'explication' : 'Afficher l\'explication'}
+              </Button>
+            </div>
+            {showExplanation[item.id] && showAnswers[item.id] && (
+  <div className="explanation-box">
+    <h4>Explication:</h4>
+    <p>{item.explanation}</p>
+    
+    {item.examples && (
+      <div className="examples-section">
+        <h4>Exemples:</h4>
+        <p>{item.examples}</p>
+      </div>
+    )}
+    
+    {item.usefulLinks && item.usefulLinks.length > 0 && (
+      <div className="links-section">
+        <h4>Liens utiles:</h4>
+        <ul>
+          {item.usefulLinks.map((link, index) => (
+            <li key={index}>
+              <a href={link} target="_blank" rel="noopener noreferrer">
+                {link}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )}
+  </div>
+)}
+          </Panel>
+        ))}
+      </Content>
+      <Footer className="qcm-footer">
+        <p>© 2025 - QCM d'Informatique</p>
+      </Footer>
+    </Container>
   );
 };
 
-export default SignIn;
+export default App;
+
+// https://waytolearnx.com/2018/11/qcm-en-informatique-generale-partie-1.html

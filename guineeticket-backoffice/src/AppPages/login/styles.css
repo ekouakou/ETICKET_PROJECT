@@ -1,0 +1,312 @@
+/* styles.css */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --text-color: #333;
+    --light-bg: #f9f9f9;
+    --correct-color: #27ae60;
+    --panel-border: #e0e0e0;
+    --explanation-bg: #f8f9fa;
+    --option-letter-bg: #eaeaea;
+    --control-bg: #f0f4f8;
+  }
+  
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-bg);
+  }
+  
+  .qcm-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .qcm-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 10px 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .qcm-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 600;
+  }
+  
+  .header-controls {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .pdf-button {
+    background-color: white !important;
+    color: var(--primary-color) !important;
+    font-weight: 600;
+    border: none !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .pdf-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  }
+  
+  .global-controls {
+    background-color: var(--control-bg);
+    padding: 15px;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    max-width: 900px;
+    width: calc(100% - 40px);
+  }
+  
+  .global-controls .rs-btn-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+  
+  .global-controls .rs-btn-group {
+    margin-bottom: 10px;
+  }
+  
+  .global-controls .rs-btn {
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
+    background-color: white !important;
+  }
+  
+  .global-controls .rs-btn:hover {
+    background-color: rgba(52, 152, 219, 0.1) !important;
+  }
+  
+  .qcm-content {
+    flex: 1;
+    padding: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  .qcm-intro {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  
+  .qcm-intro h2 {
+    color: var(--primary-color);
+    margin-top: 0;
+  }
+  
+  .question-panel {
+    margin-bottom: 15px !important;
+    border-radius: 8px !important;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--panel-border) !important;
+    transition: all 0.3s ease;
+    page-break-inside: avoid;
+  }
+  
+  .question-panel:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  }
+  
+  .rs-panel-header {
+    background-color: white !important;
+    padding: 15px 20px !important;
+    font-weight: 600 !important;
+    color: var(--text-color) !important;
+    cursor: pointer;
+    font-size: 16px !important;
+  }
+  
+  .rs-panel-body {
+    padding: 20px !important;
+    background-color: white;
+  }
+  
+  .options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  
+  .option {
+    padding: 12px 15px;
+    background-color: var(--light-bg);
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+  }
+  
+  .option:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .option-letter {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 28px;
+    height: 28px;
+    background-color: var(--option-letter-bg);
+    border-radius: 50%;
+    margin-right: 12px;
+    font-weight: bold;
+    color: var(--primary-color);
+    flex-shrink: 0;
+  }
+  
+  .correct-answer {
+    background-color: rgba(39, 174, 96, 0.15);
+    border-left: 4px solid var(--correct-color);
+  }
+  
+  .correct-badge {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: var(--correct-color);
+    color: white;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 12px;
+  }
+  
+  .button-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+  }
+  
+  .answer-button, .explanation-button {
+    color: var(--primary-color) !important;
+    padding: 8px 15px !important;
+    font-size: 14px !important;
+  }
+  
+  .explanation-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .explanation-box {
+    background-color: var(--explanation-bg);
+    border-radius: 8px;
+    padding: 15px;
+    margin-top: 10px;
+    border-left: 4px solid var(--primary-color);
+  }
+  
+  .explanation-box h4 {
+    margin-top: 0;
+    color: var(--primary-color);
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  
+  .explanation-box p {
+    margin: 0;
+    line-height: 1.6;
+    color: var(--text-color);
+  }
+  
+  .qcm-footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #333;
+    color: white;
+    margin-top: 30px;
+    border-radius: 10px 10px 0 0;
+  }
+  
+  /* Optimisations pour l'impression PDF */
+  @media print {
+    .global-controls, .header-controls, .button-container {
+      display: none !important;
+    }
+    
+    .question-panel {
+      break-inside: avoid;
+      margin-bottom: 30px !important;
+      border: 1px solid #ddd !important;
+      box-shadow: none !important;
+    }
+    
+    .qcm-header {
+      background: #3498db !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    .qcm-footer {
+      background: #333 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    .correct-answer {
+      background-color: rgba(39, 174, 96, 0.15) !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+      border-left: 4px solid #27ae60 !important;
+    }
+    
+    .option-letter {
+      background-color: #eaeaea !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    
+    .explanation-box {
+      background-color: #f8f9fa !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .qcm-header {
+      flex-direction: column;
+      gap: 15px;
+      text-align: center;
+    }
+    
+    .qcm-content {
+      padding: 15px;
+    }
+    
+    .button-container {
+      flex-direction: column;
+    }
+    
+    .global-controls .rs-btn-toolbar {
+      flex-direction: column;
+    }
+    
+    .global-controls .rs-btn-group {
+      display: flex;
+      flex-direction: column;
+    }
+  }

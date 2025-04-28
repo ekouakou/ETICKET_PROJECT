@@ -18,8 +18,13 @@ import {
 } from "react-router-dom";
 import SignIn from "./AppPages/login/SignIn";
 import SaveEvent from "./AppPages/EticketEvent/SaveEvent";
-import SaveTypeActivite from "./AppPages/EticketEvent/SaveTypeActivite";
-import SaveCategoriePlace from "./AppPages/EticketEvent/SaveCategoriePlace";
+import SaveTypeActivite from "./AppPages/EticketParameter/SaveTypeActivite";
+import SaveCategoriePlace from "./AppPages/EticketParameter/SaveCategoriePlace";
+
+import ListeTypeActivite from "./AppPages/EticketParameter/ListeTypeActivite";
+import ListeCategoriePlace from "./AppPages/EticketParameter/ListeCategoriePlace";
+
+
 // import EventListPage from './AppPages/EticketEvent/ListeEventData.js';
 import SaveBannerPage from "./AppPages/EticketBanner/SaveBanner.js";
 import ListeClient from './AppPages/EticketClient/ListeClient';
@@ -61,6 +66,10 @@ const AppContent = () => {
     saveEvent: process.env.REACT_APP_SAVE_EVENT,
     saveTypeActivite: process.env.REACT_APP_SAVE_TYPE_ACTIVITE,
     saveCategoriePlace: process.env.REACT_APP_SAVE_CATEGORIE_PLACE,
+
+    listTypeActivite: process.env.REACT_APP_LISTE_TYPE_ACTIVITE,
+    listCategoriePlace: process.env.REACT_APP_LISTE_CATEGORIE_PLACE,
+
     eventDetails: process.env.REACT_APP_EVENT_DETAILS,
     eventList: process.env.REACT_APP_EVENT_LIST,
     saveBanner: process.env.REACT_APP_SAVE_BANNER,
@@ -286,8 +295,15 @@ const AppContent = () => {
 
                 {/* <Route path={paths.dashboard} element={<DashboardAnnonceur />} /> */}
                 <Route path={paths.saveEventData} element={<SaveEvent />} />
+
                 <Route path={paths.saveTypeActivite} element={<SaveTypeActivite />} />
                 <Route path={paths.saveCategoriePlace} element={<SaveCategoriePlace />} />
+
+                <Route path={paths.listTypeActivite} element={<ListeTypeActivite />} />
+                <Route path={paths.listCategoriePlace} element={<ListeCategoriePlace />} />
+
+                /
+
                 {/* <Route path={paths.listeEventData} element={<ListeEvent />} /> */}
                 <Route path={paths.listeEventData} element={<EventsDataTable />} />
                 <Route path={paths.ticketList} element={<ListeTicket />} />
