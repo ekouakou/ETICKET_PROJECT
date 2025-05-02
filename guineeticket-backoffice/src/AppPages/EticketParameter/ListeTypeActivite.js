@@ -33,7 +33,7 @@ import {
 } from "../../utils/dateUtils";
 import usePostData from "../../services/usePostData";
 import useDataTable from "../../services/useDataTable";
-import { getEventColumns } from "../../services/dataTableColumns";
+import { getTypeActiviteColumns } from "../../services/dataTableColumns";
 import "rsuite/dist/rsuite.min.css";
 
 const { Title } = Typography;
@@ -68,8 +68,9 @@ const ListeTypeActivite = () => {
 
   // Référence aux paramètres de recherche pour useDataTable
   const [searchParams, setSearchParams] = useState({
-    mode: process.env.REACT_APP_LISTE_EVENT_MODE,
+    mode: "listListe", //process.env.REACT_APP_LISTE_EVENT_MODE,
     STR_UTITOKEN: user?.STR_UTITOKEN,
+    LG_TYLID: "5",
     LG_AGEID: user?.LG_AGEID,
     DT_BEGIN: convertDateFormat_YMDHM(formatDate(startDate) + " 00:00"),
     DT_END: convertDateFormat_YMDHM(formatDate(endDate) + " 23:59"),
@@ -83,7 +84,7 @@ const ListeTypeActivite = () => {
     handleSearch,
     refreshData,
   } = useDataTable(
-    process.env.REACT_APP_TICKET_MANAGER_API_URL,
+    process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL,
     searchParams,
     "data",
     {
@@ -140,8 +141,8 @@ const ListeTypeActivite = () => {
 
   // Fonction pour éditer un événement
   const handleEdit = (event) => {
-    navigate(process.env.REACT_APP_SAVE_EVENT_DATA, {
-      state: { LG_EVEID: event.LG_EVEID },
+    navigate(process.env.REACT_APP_SAVE_TYPE_ACTIVITE, {
+      state: { LG_LSTID: event.LG_LSTID },
     });
   };
 
@@ -152,7 +153,7 @@ const ListeTypeActivite = () => {
         mode: "deleteEvenement",
         STR_UTITOKEN: user.STR_UTITOKEN,
         LG_AGEID: user.LG_AGEID,
-        LG_EVEID: record.LG_EVEID,
+        LG_LSTID: record.LG_LSTID,
       });
 
       notification.success({
@@ -178,7 +179,7 @@ const ListeTypeActivite = () => {
         mode: "deleteEvenement", // Mode utilisé pour le changement de statut
         STR_UTITOKEN: user.STR_UTITOKEN,
         LG_AGEID: user.LG_AGEID,
-        LG_EVEID: id,
+        LG_LSTID: id,
         STR_EVESTATUT: newStatus,
       });
 
@@ -200,7 +201,7 @@ const ListeTypeActivite = () => {
   };
 
   // Configuration des colonnes
-  const columns = getEventColumns(
+  const columns = getTypeActiviteColumns(
     handleEdit,
     handleDeleteItem,
     handleToggleStatus,
@@ -221,11 +222,11 @@ const ListeTypeActivite = () => {
           >
             {/* Titre et fil d'Ariane */}
             <div>
-              <Title level={3}>Liste des évenements</Title>
+              <Title level={3}>Liste des types d'activités</Title>
               <Breadcrumb
                 items={[
-                  { title: "Evenement" },
-                  { title: "Liste des évènements" },
+                  { title: "Type d'activité" },
+                  { title: "Liste des types d'activités" },
                 ]}
               />
             </div>
@@ -234,9 +235,9 @@ const ListeTypeActivite = () => {
             <Button
               type="primary"
               icon={<PlusOutlined />}
-              onClick={() => navigate(process.env.REACT_APP_SAVE_EVENT_DATA)}
+              onClick={() => navigate(process.env.REACT_APP_SAVE_TYPE_ACTIVITE)}
             >
-              Ajouter un évenement
+              Ajouter un type d'activité
             </Button>
           </div>
         </div>
@@ -303,7 +304,7 @@ const ListeTypeActivite = () => {
                 <Table
                   columns={columns}
                   dataSource={allEventsData}
-                  rowKey="LG_EVEID"
+                  rowKey="LG_LSTID"
                   pagination={pagination}
                   onChange={handleTableChange}
                   bordered

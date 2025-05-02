@@ -40,9 +40,9 @@ import { DatePicker, TimePicker } from "rsuite";
 import { SelectPicker, VStack } from "rsuite";
 import CardHeader from "../CardHeader";
 import { Loader, Placeholder } from "rsuite";
-import { Spin } from 'antd';
-import 'antd/dist/reset.css';
-import LoadingOverlay from '../../AppComponents/LoadingOverlay'
+import { Spin } from "antd";
+import "antd/dist/reset.css";
+import LoadingOverlay from "../../AppComponents/LoadingOverlay";
 
 const SaveTypeActivite = () => {
   const navigate = useNavigate();
@@ -50,8 +50,6 @@ const SaveTypeActivite = () => {
   const location = useLocation();
   const [banniereId, setbanniereId] = useState(null);
   const [loading, setLoading] = useState(false);
-
-
 
   const endPoint = process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL;
   const TicketendPoint = process.env.REACT_APP_TICKET_MANAGER_API_URL;
@@ -68,12 +66,15 @@ const SaveTypeActivite = () => {
   }, [navigate]);
 
   const initialFormData = (userData = {}) => ({
-    STR_LSTNAME: "",
-    STR_LSTESCRIPTION: "",
+    STR_LSTDESCRIPTION: "",
+    STR_LSTVALUE: "",
+    LG_TYLID: "5",
+    STR_LSTOTHERVALUE2: "5",
+    STR_LSTOTHERVALUE: "0000000000000000000000000000000000000782",
     LG_AGEREQUESTID: userData?.LG_AGEID || "",
     LG_AGEID: userData?.LG_AGEID || "",
     STR_UTITOKEN: userData?.STR_UTITOKEN || "",
-    mode: "createBanniere",
+    mode: "createListe",
   });
 
   const [formData, setFormData] = useState(initialFormData(userData));
@@ -89,7 +90,8 @@ const SaveTypeActivite = () => {
     setPreviewPic(null);
   };
   // ++++++++++++++++++++++++++++++++++++++++++ FONCTION GLOBALLE ++++++++++++++++++++++++++++++++++++++++++
-  const handleInputTextChange = (e) => handleFormChange(e, formData, setFormData);
+  const handleInputTextChange = (e) =>
+    handleFormChange(e, formData, setFormData);
   // ++++++++++++++++++++++++++++++++++++++++++ GESTION DES MODIFICATION D'UN EVENEMENT ++++++++++++++++++++++++++++++++++++++++++
   useEffect(() => {
     if (location.state && location.state.LG_LSTID) {
@@ -97,7 +99,7 @@ const SaveTypeActivite = () => {
       // LISTES DES CATEGORIE DE TICKET DE L'EVENEMENT
       fetchData(
         {
-          mode: "getBanniere",
+          mode: "getListe",
           LG_LSTID: location.state.LG_LSTID,
         },
         endPoint,
@@ -106,23 +108,22 @@ const SaveTypeActivite = () => {
     }
   }, [location.state]);
 
-
   // ++++++++++++++++++++++++++++++++++++++++++ GESTION DES COMBOBOX ++++++++++++++++++++++++++++++++++++++++++
 
   useEffect(() => {
     if (eventDetails) {
       const {
-        STR_LSTNAME = "",
+        STR_LSTDESCRIPTION = "",
         LG_AGEID = 1,
-        STR_LSTESCRIPTION = "",
+        STR_LSTVALUE = "",
       } = eventDetails;
 
       setFormData({
-        STR_LSTNAME,
+        STR_LSTDESCRIPTION,
         LG_AGEID,
         LG_AGEREQUESTID: LG_AGEID,
-        STR_LSTESCRIPTION,
-        mode: "updateBanniere",
+        STR_LSTVALUE,
+        mode: "updateListe",
         STR_UTITOKEN: userData?.UTITOKEN || "",
       });
     }
@@ -135,7 +136,7 @@ const SaveTypeActivite = () => {
     const formDataToSend = new FormData();
 
     if (banniereId) {
-      formDataToSend.append("mode", "updateBanniere");
+      formDataToSend.append("mode", "updateListe");
       formDataToSend.append("LG_LSTID", banniereId);
       confirmAction(
         `Êtes-vous sûr de modifier l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
@@ -148,7 +149,7 @@ const SaveTypeActivite = () => {
         setLoading
       );
     } else {
-      formDataToSend.append("mode", "createBanniere");
+      formDataToSend.append("mode", "createListe");
       confirmAction(
         `Êtes-vous sûr de l'enregistrement de l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
         "create",
@@ -219,11 +220,11 @@ const SaveTypeActivite = () => {
                                     <div className="input-group ">
                                       <input
                                         type="text"
-                                        id="STR_LSTNAME"
-                                        name="STR_LSTNAME"
+                                        id="STR_LSTDESCRIPTION"
+                                        name="STR_LSTDESCRIPTION"
                                         className="form-control form-control-solid"
                                         placeholder="Saisir le titre de l'activité"
-                                        value={formData.STR_LSTNAME}
+                                        value={formData.STR_LSTDESCRIPTION}
                                         onChange={handleInputTextChange}
                                       />
                                     </div>
@@ -239,12 +240,12 @@ const SaveTypeActivite = () => {
                                     </label>
                                     <textarea
                                       type="text"
-                                      id="STR_LSTESCRIPTION"
-                                      name="STR_LSTESCRIPTION"
+                                      id="STR_LSTVALUE"
+                                      name="STR_LSTVALUE"
                                       className="form-control form-control-solid"
                                       rows="4"
                                       placeholder="Saisir la description de l'activité"
-                                      value={formData.STR_LSTESCRIPTION}
+                                      value={formData.STR_LSTVALUE}
                                       onChange={handleInputTextChange}
                                     ></textarea>
                                   </div>

@@ -68,12 +68,12 @@ const SaveCategoriePlace = () => {
   }, [navigate]);
 
   const initialFormData = (userData = {}) => ({
-    STR_LSTNAME: "",
+    STR_LSTDESCRIPTION: "",
     STR_LSTESCRIPTION: "",
     LG_AGEREQUESTID: userData?.LG_AGEID || "",
     LG_AGEID: userData?.LG_AGEID || "",
     STR_UTITOKEN: userData?.STR_UTITOKEN || "",
-    mode: "createBanniere",
+    mode: "createListe",
   });
 
   const [formData, setFormData] = useState(initialFormData(userData));
@@ -97,7 +97,7 @@ const SaveCategoriePlace = () => {
       // LISTES DES CATEGORIE DE TICKET DE L'EVENEMENT
       fetchData(
         {
-          mode: "getBanniere",
+          mode: "getListe",
           LG_LSTID: location.state.LG_LSTID,
         },
         endPoint,
@@ -112,17 +112,17 @@ const SaveCategoriePlace = () => {
   useEffect(() => {
     if (eventDetails) {
       const {
-        STR_LSTNAME = "",
+        STR_LSTDESCRIPTION = "",
         LG_AGEID = 1,
         STR_LSTESCRIPTION = "",
       } = eventDetails;
 
       setFormData({
-        STR_LSTNAME,
+        STR_LSTDESCRIPTION,
         LG_AGEID,
         LG_AGEREQUESTID: LG_AGEID,
         STR_LSTESCRIPTION,
-        mode: "updateBanniere",
+        mode: "updateListe",
         STR_UTITOKEN: userData?.UTITOKEN || "",
       });
     }
@@ -135,7 +135,7 @@ const SaveCategoriePlace = () => {
     const formDataToSend = new FormData();
 
     if (banniereId) {
-      formDataToSend.append("mode", "updateBanniere");
+      formDataToSend.append("mode", "updateListe");
       formDataToSend.append("LG_LSTID", banniereId);
       confirmAction(
         `Êtes-vous sûr de modifier l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
@@ -148,7 +148,7 @@ const SaveCategoriePlace = () => {
         setLoading
       );
     } else {
-      formDataToSend.append("mode", "createBanniere");
+      formDataToSend.append("mode", "createListe");
       confirmAction(
         `Êtes-vous sûr de l'enregistrement de l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
         "create",
@@ -219,11 +219,11 @@ const SaveCategoriePlace = () => {
                                     <div className="input-group ">
                                       <input
                                         type="text"
-                                        id="STR_LSTNAME"
-                                        name="STR_LSTNAME"
+                                        id="STR_LSTDESCRIPTION"
+                                        name="STR_LSTDESCRIPTION"
                                         className="form-control form-control-solid"
                                         placeholder="Saisir le titre de l'activité"
-                                        value={formData.STR_LSTNAME}
+                                        value={formData.STR_LSTDESCRIPTION}
                                         onChange={handleInputTextChange}
                                       />
                                     </div>
