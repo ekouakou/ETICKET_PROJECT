@@ -1,61 +1,35 @@
-import React, { useContext, useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
-
-import Switch from "react-switch";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import Tippy from "@tippyjs/react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faPlus,
-  faTrash,
-  faInfoCircle,
-  faEllipsisV,
-} from "@fortawesome/free-solid-svg-icons";
-import { EventContext } from "../../contexts/EventProvider";
-import { Modal, Button, Form } from "react-bootstrap";
-import FileUploader from "../FileUploader/FileUploader";
-
-// import EventSummary from './EventSummary'
-import Swal from "sweetalert2"; // Importation de la bibliothèque pour afficher des boîtes de dialogue
-import { useLocation } from "react-router-dom";
-
-//
+import { Button, Form } from "react-bootstrap";
+import { SelectPicker } from "rsuite";
+import LoadingOverlay from "../../AppComponents/LoadingOverlay";
 
 import { loadStores, fetchData } from "../../services/apiUtils";
-import { urlToFile, processFile } from "../../utils/fileUtils";
 import { confirmAction } from "../../utils/notificationUtils";
 import { authService } from "../../services/AuthService";
-import { convertToFullDate } from "../../utils/dateUtils";
 import {
-  createCategoryChangeHandler,
   handleSelectChange,
-  convertTimeToFullDate,
   handleFormChange,
-  formatDate,
 } from "../../utils/formUtils";
 import PageTitle from "../PageTitle";
-import ActionButton from "../ActionButton";
-import { DatePicker, TimePicker } from "rsuite";
-import { SelectPicker, VStack } from "rsuite";
-import CardHeader from "../CardHeader";
-import { Loader, Placeholder } from "rsuite";
-import { Spin } from "antd";
-import "antd/dist/reset.css";
-import LoadingOverlay from "../../AppComponents/LoadingOverlay";
 
 const SaveTypeActivite = () => {
   const navigate = useNavigate();
-  const [eventData, setEventData] = useState([]);
   const location = useLocation();
-  const [banniereId, setbanniereId] = useState(null);
+  const [typeActiviteId, settypeActiviteId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [typeActiviteDetails, setTypeActiviteDetailsDetails] = useState(null);
+  const [userData, setUserData] = useState(null);
+  const [categorieActivite, setCategorieActiviteData] = useState([]);
 
   const endPoint = process.env.REACT_APP_CONFIGURATION_MANAGER_API_URL;
-  const TicketendPoint = process.env.REACT_APP_TICKET_MANAGER_API_URL;
-  const [eventDetails, setEventDetails] = useState(null);
-  const [previewPic, setPreviewPic] = useState(null);
-  const [userData, setUserData] = useState(null);
+
+  // Fix: Removed the incorrect backticks and properly defined handleChange
+  const handleChange = (value, fieldName) => {
+    handleSelectChange(setFormData, formData)(value, fieldName);
+  };
 
   useEffect(() => {
     const data = authService.checkAuth(navigate);
@@ -70,11 +44,11 @@ const SaveTypeActivite = () => {
     STR_LSTVALUE: "",
     LG_TYLID: "5",
     STR_LSTOTHERVALUE2: "5",
-    STR_LSTOTHERVALUE: "0000000000000000000000000000000000000782",
+    STR_LSTOTHERVALUE: "",
     LG_AGEREQUESTID: userData?.LG_AGEID || "",
     LG_AGEID: userData?.LG_AGEID || "",
     STR_UTITOKEN: userData?.STR_UTITOKEN || "",
-    mode: "createListe",
+    // mode: "createListe",
   });
 
   const [formData, setFormData] = useState(initialFormData(userData));
@@ -87,15 +61,26 @@ const SaveTypeActivite = () => {
 
   const resetForm = () => {
     setFormData(initialFormData(userData));
-    setPreviewPic(null);
   };
-  // ++++++++++++++++++++++++++++++++++++++++++ FONCTION GLOBALLE ++++++++++++++++++++++++++++++++++++++++++
+
+  // Function handler for input text changes
   const handleInputTextChange = (e) =>
     handleFormChange(e, formData, setFormData);
-  // ++++++++++++++++++++++++++++++++++++++++++ GESTION DES MODIFICATION D'UN EVENEMENT ++++++++++++++++++++++++++++++++++++++++++
+
+  // Load category data
+  useEffect(() => {
+    loadStores(
+      { mode: "listListe", LG_TYLID: "4", STR_UTITOKEN: userData?.STR_UTITOKEN || "", },
+      endPoint,
+      setCategorieActiviteData,
+      { valueKey: "LG_LSTID", labelKey: "STR_LSTDESCRIPTION" }
+    );
+  }, [userData, endPoint]);
+
+  // Load event details if editing
   useEffect(() => {
     if (location.state && location.state.LG_LSTID) {
-      setbanniereId(location.state.LG_LSTID);
+      settypeActiviteId(location.state.LG_LSTID);
       // LISTES DES CATEGORIE DE TICKET DE L'EVENEMENT
       fetchData(
         {
@@ -103,31 +88,36 @@ const SaveTypeActivite = () => {
           LG_LSTID: location.state.LG_LSTID,
         },
         endPoint,
-        setEventDetails
+        setTypeActiviteDetailsDetails
       );
     }
-  }, [location.state]);
+  }, [location.state, endPoint]);
 
-  // ++++++++++++++++++++++++++++++++++++++++++ GESTION DES COMBOBOX ++++++++++++++++++++++++++++++++++++++++++
-
+  // Set form data if editing an existing record
   useEffect(() => {
-    if (eventDetails) {
+    if (typeActiviteDetails) {
       const {
         STR_LSTDESCRIPTION = "",
         LG_AGEID = 1,
+        LG_TYLID = "",
+        STR_LSTOTHERVALUE = "",
+        STR_LSTOTHERVALUE2 = "",
         STR_LSTVALUE = "",
-      } = eventDetails;
+      } = typeActiviteDetails;
 
       setFormData({
         STR_LSTDESCRIPTION,
         LG_AGEID,
-        LG_AGEREQUESTID: LG_AGEID,
         STR_LSTVALUE,
+        LG_TYLID,
+        STR_LSTOTHERVALUE2,
+        LG_AGEREQUESTID: LG_AGEID,
+        STR_LSTOTHERVALUE,
         mode: "updateListe",
-        STR_UTITOKEN: userData?.UTITOKEN || "",
+        STR_UTITOKEN: userData?.STR_UTITOKEN || "",
       });
     }
-  }, [eventDetails, userData]);
+  }, [typeActiviteDetails, userData]);
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
@@ -135,29 +125,37 @@ const SaveTypeActivite = () => {
 
     const formDataToSend = new FormData();
 
-    if (banniereId) {
+    // Add form fields to FormData
+    Object.keys(formData).forEach(key => {
+      formDataToSend.append(key, formData[key]);
+    });
+
+    console.log(formDataToSend);
+    alert("ok");
+
+    if (typeActiviteId) {
       formDataToSend.append("mode", "updateListe");
-      formDataToSend.append("LG_LSTID", banniereId);
+      formDataToSend.append("LG_LSTID", typeActiviteId);
       confirmAction(
-        `Êtes-vous sûr de modifier l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
+        `Êtes-vous sûr de modifier l'événement : ${formData.STR_LSTDESCRIPTION || ""}`,
         "update",
         formDataToSend,
         resetForm,
         endPoint,
         navigate,
-        process.env.REACT_APP_LISTE_EVENT_BANNER,
+        process.env.REACT_APP_LISTE_TYPE_ACTIVITE,
         setLoading
       );
     } else {
       formDataToSend.append("mode", "createListe");
       confirmAction(
-        `Êtes-vous sûr de l'enregistrement de l'événement : ${formData.STR_UTIFIRSTLASTNAME}`,
+        `Êtes-vous sûr de l'enregistrement de l'événement : ${formData.STR_LSTDESCRIPTION || ""}`,
         "create",
         formDataToSend,
         resetForm,
         endPoint,
         navigate,
-        process.env.REACT_APP_LISTE_EVENT_BANNER,
+        process.env.REACT_APP_LISTE_TYPE_ACTIVITE,
         setLoading
       );
     }
@@ -181,10 +179,9 @@ const SaveTypeActivite = () => {
             className="app-container container-xxl d-flex flex-stack"
           >
             <PageTitle
-              heading="Enregistrement  d'un type d'activité"
+              heading="Enregistrement d'un type d'activité"
               breadcrumbs={breadcrumbs}
             />
-            {/* <ActionButton text="Liste bannière" link={process.env.REACT_APP_SAVE_BANNER} className="btn-primary" /> */}
           </div>
         </div>
         <div id="kt_app_content" className="app-content flex-column-fluid">
@@ -197,41 +194,63 @@ const SaveTypeActivite = () => {
                 <div className="card card-flush h-xl-100">
                   <div className="card-body pt-6">
                     <div
-                      className="app-main flex-column flex-row-fluid "
+                      className="app-main flex-column flex-row-fluid"
                       id="kt_app_main"
                     >
                       <div className="d-flex flex-column flex-column-fluid">
                         <div
                           id="kt_app_content"
-                          className="app-content  flex-column-fluid "
+                          className="app-content flex-column-fluid"
                         >
                           <div
                             id="kt_app_content_container"
-                            className="app-container  container-fluid "
+                            className="app-container container-fluid"
                           >
                             <ToastContainer />
                             <Form onSubmit={handleSubmit}>
                               <div className="row mt-5">
-                                <div className="col-lg-12">
+                                <div className="col-lg-6">
                                   <div className="form-group">
                                     <label className="required fs-6 form-label fw-bold text-gray-900">
                                       Titre de l'activité
                                     </label>
-                                    <div className="input-group ">
+                                    <div className="input-group">
                                       <input
                                         type="text"
                                         id="STR_LSTDESCRIPTION"
                                         name="STR_LSTDESCRIPTION"
                                         className="form-control form-control-solid"
                                         placeholder="Saisir le titre de l'activité"
-                                        value={formData.STR_LSTDESCRIPTION}
+                                        value={formData.STR_LSTDESCRIPTION || ""}
                                         onChange={handleInputTextChange}
                                       />
                                     </div>
                                   </div>
                                 </div>
+                                <div className="col-lg-6">
+                                  <div className="form-group mb-5">
+                                    <label className="required fs-6 form-label fw-bold text-gray-900">
+                                      Catégorie d'activité
+                                    </label>
+                                    <Form.Group
+                                      controlId="formDate"
+                                      className="w-100"
+                                    >
+                                      <SelectPicker
+                                        data={categorieActivite}
+                                        style={{ width: "100%" }}
+                                        size="lg"
+                                        onChange={(value) =>
+                                          handleChange(value, "STR_LSTOTHERVALUE")
+                                        }
+                                        value={formData.STR_LSTOTHERVALUE || null}
+                                        placeholder="Sélectionnez un type d'activité"
+                                        className="basic-multi-select"
+                                      />
+                                    </Form.Group>
+                                  </div>
+                                </div>
                               </div>
-
                               <div className="row mt-5 mb-5">
                                 <div className="col-lg-12">
                                   <div className="form-group">
@@ -245,7 +264,7 @@ const SaveTypeActivite = () => {
                                       className="form-control form-control-solid"
                                       rows="4"
                                       placeholder="Saisir la description de l'activité"
-                                      value={formData.STR_LSTVALUE}
+                                      value={formData.STR_LSTVALUE || ""}
                                       onChange={handleInputTextChange}
                                     ></textarea>
                                   </div>
