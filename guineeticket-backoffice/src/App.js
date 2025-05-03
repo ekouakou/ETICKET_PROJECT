@@ -37,9 +37,12 @@ import DashboardAnnonceur from "./AppPages/EticketDashboard/DashboardAnnonceur.j
 import SaveUser from "./AppPages/EticketUtilisateur/SaveUser";
 import ListeUser from "./AppPages/EticketUtilisateur/ListeUser";
 import ListeTicket from "./AppPages/EticketHistoriqueTicket/ListeTicket";
+import StatisticEvent from "./AppPages/EticketHistoriqueTicket/StatisticEvent";
 
 import ListeProfil from "./AppPages/EticketProfil/ListeProfil";
 import SaveProfil from "./AppPages/EticketProfil/SaveProfil";
+
+
 
 
 
@@ -51,6 +54,7 @@ import SaveProfil from "./AppPages/EticketProfil/SaveProfil";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import { statistic } from "antd/es/theme/internal.js";
 
 const AppContent = () => {
   const [isRoot, setIsRoot] = useState(false);
@@ -90,6 +94,7 @@ const AppContent = () => {
 
     listeProfil: process.env.REACT_APP_LISTE_PROFIL,
     saveProfil: process.env.REACT_APP_SAVE_PROFIL,
+    statisticEvent: process.env.REACT_APP_STATISTIC_EVENT,
 
   };
 
@@ -317,6 +322,10 @@ const AppContent = () => {
 
                 <Route path={paths.listeProfil} element={<ListeProfil />} />
                 <Route path={paths.saveProfil} element={<SaveProfil />} />
+
+                <Route path={paths.statisticEvent} element={<StatisticEvent />} />
+
+                
 
                 <Route path={paths.notFound} element={<NotFound />} />
                 <Route

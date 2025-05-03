@@ -276,7 +276,7 @@ const DashboardAnnonceur = () => {
                       <EventComponent />
                     
                     <div className="col-xxl-6 mb-5 h-100">
-                      <SalesStatisticsCard2 />
+                      {/* <SalesStatisticsCard2 /> */}
                     </div>
 
                     <div className="col-xxl-6 d-none h-100">

@@ -1,31 +1,21 @@
 import React, { useState, useEffect } from "react";
 import {
   Button,
-  Space,
-  Spin,
-  Switch,
-  Image,
-  notification,
-  Breadcrumb,
-  Typography,
-  Input,
-  Row,
-  Col,
-  Card,
+  DatePicker,
+  SelectPicker,
+  Form,
   Pagination,
-  Select,
-} from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  PlusOutlined,
-  CheckOutlined,
-  CloseOutlined,
-  SendOutlined,
-  SearchOutlined,
-  EyeOutlined,
-} from "@ant-design/icons";
-import { DatePicker } from "rsuite";
+  Loader,
+  Panel,
+  FlexboxGrid,
+  Input,
+  InputGroup,
+  Stack,
+  Breadcrumb,
+  Container,
+  Content,
+  Header
+} from "rsuite";
 import { useNavigate } from "react-router-dom";
 import { authService } from "../../services/AuthService";
 import {
@@ -35,21 +25,13 @@ import {
 } from "../../utils/dateUtils";
 import {
   loadStores,
-  fetchCategorieData,
-  useLoadStores,
 } from "../../services/apiUtils";
 import usePostData from "../../services/usePostData";
-import useDataTable from "../../services/useDataTable";
-import { getTicketColumns } from "../../services/dataTableColumns";
-import "rsuite/dist/rsuite.min.css";
 import TicketCard from "./TicketCard";
-import { SelectPicker, VStack } from "rsuite";
-import { Form } from "react-bootstrap";
+import SearchIcon from '@rsuite/icons/Search';
+import SendIcon from '@rsuite/icons/Send';
 
-const { Title } = Typography;
-const { Search } = Input;
-const { Meta } = Card;
-const { Option } = Select;
+import "rsuite/dist/rsuite.min.css";
 
 const ListeTicket = () => {
   const navigate = useNavigate();
@@ -57,18 +39,20 @@ const ListeTicket = () => {
     const storedUser = localStorage.getItem("userConnectedData");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  const [startDate, setStartDate] = useState(
-    getDateInPastMonths(new Date(), 2)
-  );
+  
+  // États pour la pagination et le filtrage
+  const [startDate, setStartDate] = useState(getDateInPastMonths(new Date(), 2));
   const [endDate, setEndDate] = useState(getCurrentDate());
   const [searchText, setSearchText] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [agencesList, setAgencesList] = useState([]);
   const [selectedAgence, setSelectedAgence] = useState(null);
-  const [agence, setAgenceData] = useState([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  
+  // États pour la pagination
+  const [activePage, setActivePage] = useState(1);
+  const [displayLength, setDisplayLength] = useState(12);
   const [totalRecords, setTotalRecords] = useState(0);
+  
   const [ticketData, setTicketData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -94,8 +78,8 @@ const ListeTicket = () => {
       LG_AGEID: selectedAgence || user?.LG_AGEID,
       DT_BEGIN: formatDate(startDate),
       DT_END: formatDate(endDate),
-      page: currentPage,
-      pageSize: pageSize,
+      page: activePage,
+      pageSize: displayLength,
     };
 
     if (searchText) {
@@ -127,10 +111,8 @@ const ListeTicket = () => {
       }
     } catch (error) {
       console.error("Error loading ticket data:", error);
-      notification.error({
-        message: "Erreur",
-        description: "Impossible de charger les tickets.",
-      });
+      // Notification avec React Suite à la place d'Ant Design
+      alert("Erreur: Impossible de charger les tickets.");
       setTicketData([]);
       setTotalRecords(0);
     } finally {
@@ -143,9 +125,9 @@ const ListeTicket = () => {
     if (user?.STR_UTITOKEN) {
       loadTicketData();
     }
-  }, [user, currentPage, pageSize]);
+  }, [user, activePage, displayLength]);
 
-  //LISTE DES TYPE D'ACTIVITE
+  // LISTE DES AGENCES
   useEffect(() => {
     loadStores(
       { mode: "listAgence" },
@@ -155,37 +137,20 @@ const ListeTicket = () => {
     );
   }, []);
 
-  // Fonction pour gérer le changement de la date de début
-  const handleStartDateChange = (date) => {
-    setStartDate(date);
-  };
-
-  // Fonction pour gérer le changement de la date de fin
-  const handleEndDateChange = (date) => {
-    setEndDate(date);
-  };
-
-  // Fonction pour gérer le changement du filtre de statut
-  const handleStatusChange = (value) => {
-    setStatusFilter(value);
-  };
-
-  // Fonction pour gérer le changement du filtre d'agence
-  const handleAgenceChange = (value) => {
-    setSelectedAgence(value);
-  };
-
   // Gérer la recherche avec filtres
   const handleSearchWithFilters = () => {
-    setCurrentPage(1); // Réinitialise à la première page lors du filtrage
+    setActivePage(1); // Réinitialise à la première page lors du filtrage
     loadTicketData();
   };
 
-  // Gérer la recherche par texte
-  const handleSearch = (value) => {
-    setSearchText(value);
-    setCurrentPage(1); // Réinitialise à la première page lors de la recherche
-    loadTicketData();
+  // Gérer la pagination
+  const handleChangePage = (page) => {
+    setActivePage(page);
+  };
+
+  const handleChangeLength = (length) => {
+    setDisplayLength(length);
+    setActivePage(1); // Reset to first page when changing display length
   };
 
   // Fonction pour envoyer un ticket
@@ -199,277 +164,219 @@ const ListeTicket = () => {
         LG_TICID: record.LG_TICID,
       });
 
-      notification.success({
-        message: "Succès",
-        description: `Ticket envoyé avec succès.`,
-      });
-
+      alert("Succès: Ticket envoyé avec succès.");
       loadTicketData();
     } catch (error) {
-      notification.error({ 
-        message: "Erreur",
-        description: `Impossible d'envoyer le ticket.`,
-      });
+      alert("Erreur: Impossible d'envoyer le ticket.");
     }
-  };
-
-  // Gérer le changement de pagination
-  const handlePaginationChange = (page, pageSizeParam) => {
-    setCurrentPage(page);
-    if (pageSizeParam !== undefined && pageSizeParam !== pageSize) {
-      setPageSize(pageSizeParam);
-    }
-    // Les données seront rechargées via l'effet qui surveille currentPage et pageSize
   };
 
   if (!user) {
     return navigate(process.env.REACT_APP_SIGN_IN);
   }
 
-  return (
-    <div className="app-main flex-column flex-row-fluid" id="kt_app_main">
-      <div className="d-flex flex-column flex-column-fluid">
-        <div id="kt_app_toolbar" className="app-toolbar py-3 py-lg-6">
-          <div
-            id="kt_app_toolbar_container"
-            className="app-container container-xxl d-flex flex-stack"
-          >
-            {/* Titre et fil d'Ariane */}
-            <div>
-              <Title level={3}>Liste des tickets</Title>
-              <Breadcrumb
-                items={[
-                  { title: "Historique des tickets" },
-                  { title: "Liste des tickets" },
-                ]}
-              />
-            </div>
-          </div>
-        </div>
+  // Les options pour le statut
+  const statusOptions = [
+    { label: 'Tous', value: 'all' },
+    { label: 'Actif', value: 'enable' },
+    { label: 'Inactif', value: 'disable' }
+  ];
 
-        <div id="kt_app_content" className="app-content flex-column-fluid">
-          <div
-            id="kt_app_content_container"
-            className="app-container container-xxl"
-          >
-            <div className="row">
-              <div className="col-lg-2">
-                <div className="form-group mb-5">
-                  <label className=" fs-6 form-label fw-bold text-gray-900">
-                    Date de début
-                  </label>
-                  <Form.Group controlId="formDate" className="w-100">
-                    <DatePicker
-                      value={startDate}
-                      onChange={handleStartDateChange}
-                      format="dd/MM/yyyy"
-                      size="lg"
-                      style={{ minWidth: "140px" }}
-                      placeholder="Date début"
+  // Les options pour la taille de la page
+  const lengthOptions = [
+    { label: '12', value: 12 },
+    { label: '24', value: 24 },
+    { label: '48', value: 48 },
+    { label: '96', value: 96 }
+  ];
+
+  return (
+    <Container className="app-main">
+      <Header className="py-3 py-lg-6">
+        <Container>
+          <div>
+            <h3>Liste des tickets</h3>
+            <Breadcrumb>
+              <Breadcrumb.Item>Historique des tickets</Breadcrumb.Item>
+              <Breadcrumb.Item>Liste des tickets</Breadcrumb.Item>
+            </Breadcrumb>
+          </div>
+        </Container>
+      </Header>
+
+      <Content className="app-content">
+        <Container>
+          <Panel shaded>
+            <Form fluid>
+              <FlexboxGrid justify="space-between" align="middle">
+                <FlexboxGrid.Item colspan={5}>
+                  <Form.Group>
+                    <Form.ControlLabel>Date de début</Form.ControlLabel>
+                    <DatePicker 
+                      format="dd/MM/yyyy" 
+                      value={startDate} 
+                      onChange={setStartDate} 
+                      block 
                     />
                   </Form.Group>
-                </div>
-              </div>
-              <div className="col-lg-2">
-                <div className="form-group mb-5">
-                  <label className=" fs-6 form-label fw-bold text-gray-900">
-                    Date de fin
-                  </label>
-                  <Form.Group controlId="formDate" className="w-100">
-                    <DatePicker
-                      value={endDate}
-                      onChange={handleEndDateChange}
-                      format="dd/MM/yyyy"
-                      style={{ minWidth: "140px" }}
-                      placeholder="Date fin"
-                      size="lg"
+                </FlexboxGrid.Item>
+                
+                <FlexboxGrid.Item colspan={5}>
+                  <Form.Group>
+                    <Form.ControlLabel>Date de fin</Form.ControlLabel>
+                    <DatePicker 
+                      format="dd/MM/yyyy" 
+                      value={endDate} 
+                      onChange={setEndDate} 
+                      block 
                     />
                   </Form.Group>
-                </div>
-              </div>
-              <div className="col-lg-2">
-                <div className="form-group mb-5">
-                  <label className=" fs-6 form-label fw-bold text-gray-900">
-                    Annonceur
-                  </label>
-                  <Form.Group controlId="formDate" className="w-100">
+                </FlexboxGrid.Item>
+                
+                <FlexboxGrid.Item colspan={5}>
+                  <Form.Group>
+                    <Form.ControlLabel>Annonceur</Form.ControlLabel>
                     <SelectPicker
                       data={agencesList}
-                      style={{ width: "100%" }}
-                      size="lg"
-                      onChange={(value) => handleAgenceChange(value)}
-                      value={selectedAgence || null}
-                      placeholder="Sélectionnez un type d'activité"
-                      className="basic-multi-select"
+                      block
+                      value={selectedAgence}
+                      onChange={setSelectedAgence}
+                      placeholder="Sélectionnez un annonceur"
                     />
                   </Form.Group>
-                </div>
-              </div>
-
-              <div className="col-lg-2">
-                <div className="form-group mb-5">
-                  <label className=" fs-6 form-label fw-bold text-gray-900">
-                    Statut
-                  </label>
-                  <Form.Group controlId="formDate" className="w-100">
-                    <Select
-                      placeholder="Statut"
+                </FlexboxGrid.Item>
+                
+                <FlexboxGrid.Item colspan={5}>
+                  <Form.Group>
+                    <Form.ControlLabel>Statut</Form.ControlLabel>
+                    <SelectPicker
+                      data={statusOptions}
+                      block
                       value={statusFilter}
-                      size="lg"
-                      onChange={handleStatusChange}
-                      style={{ minWidth: "120px" }}
-                    >
-                      <Option value="all">Tous</Option>
-                      <Option value="enable">Actif</Option>
-                      <Option value="disable">Inactif</Option>
-                    </Select>
+                      onChange={setStatusFilter}
+                      placeholder="Statut"
+                    />
                   </Form.Group>
-                </div>
-              </div>
-              <div className="col-lg-2">
-                <div className="form-group mb-5">
-                  <label className=" fs-6 form-label fw-bold text-gray-900">
-                    Rechercher
-                  </label>
-                  <Form.Group controlId="formDate" className="w-100">
-                    <Button
-                      type="primary"
-                      icon={<SearchOutlined />}
-                      onClick={handleSearchWithFilters}
-                    >
-                      Filtrer
+                </FlexboxGrid.Item>
+                
+                <FlexboxGrid.Item colspan={4}>
+                  <Form.Group>
+                    <Form.ControlLabel>Rechercher</Form.ControlLabel>
+                    <Button appearance="primary" onClick={handleSearchWithFilters}>
+                      <SearchIcon /> Filtrer
                     </Button>
                   </Form.Group>
-                </div>
-              </div>
-            </div>
-            <Card className="shadow-sm">
-              <Row gutter={[16, 16]} className="mb-4">
-                {/* Zone de recherche alignée à droite */}
-                <Col
-                  xs={24}
-                  lg={8}
-                  style={{ display: "flex", justifyContent: "flex-end" }}
-                >
-                  <Search
-                    placeholder="Rechercher par nom, lieu ou date..."
-                    allowClear
-                    enterButton="Rechercher"
-                    size="middle"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
-                    onSearch={handleSearch}
-                    style={{ width: "100%", maxWidth: "450px" }}
-                  />
-                </Col>
-              </Row>
-
-              <Spin
-                spinning={isLoading || postLoading}
-                tip="Chargement des données..."
-              >
-                {/* Affichage en grille de cartes */}
-                <Row gutter={[16, 16]} className="mt-4">
-                  {ticketData &&
-                    ticketData.map((ticket) => (
-                      <Col
-                        xs={24}
-                        sm={12}
-                        md={8}
-                        lg={6}
-                        key={ticket.LG_TICID}
-                        className="mb-4"
-                      >
-                        <Card
-                          hoverable
-                          cover={
-                            <div
-                              style={{
-                                height: "100px",
-                                overflow: "hidden",
-                                display: "flex",
-                                justifyContent: "center",
-                                alignItems: "center",
-                              }}
-                            >
-                              {ticket.STR_EVEPIC ? (
-                                <TicketCard event={ticket} />
-                              ) : (
-                                <div
-                                  style={{
-                                    width: "100%",
-                                    height: "100%",
-                                    background: "#f0f2f5",
-                                    display: "flex",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                  }}
-                                >
-                                  <span>Pas d'image</span>
-                                </div>
-                              )}
-                            </div>
-                          }
-                          actions={[
-                            <span key="send" onClick={() => handleSend(ticket)}>
-                              <SendOutlined style={{ marginRight: "5px" }} />
-                              Envoyer
-                            </span>,
-                          ]}
-                        >
-                          <Meta
-                            title={ticket.STR_EVENAME}
-                            description={
-                              <div>
-                                <p className="mb-1 mt-0">
-                                  <strong>Lieu:</strong>{" "}
-                                  {ticket.LG_LSTPLACEID || "Non défini"}
-                                </p>
-                                <p className="mb-1 mt-0">
-                                  <strong>Date:</strong> {ticket.DT_TCIVALIDATED}{" "}
-                                </p>
-                                <p className="mb-1 mt-0">
-                                  <strong>Téléphone:</strong>{" "}
-                                  {ticket.STR_TICPHONE}{" "}
-                                </p>
-                              </div>
-                            }
-                          />
-                        </Card>
-                      </Col>
-                    ))}
-                </Row>
-
-                {/* Pagination améliorée */}
-                {ticketData && ticketData.length > 0 && (
-                  <div style={{ marginTop: 20, textAlign: "center" }}>
-                    <Pagination
-                      current={currentPage}
-                      pageSize={pageSize}
-                      total={totalRecords}
-                      onChange={handlePaginationChange}
-                      onShowSizeChange={handlePaginationChange}
-                      showSizeChanger
-                      pageSizeOptions={['10', '20', '50', '100']}
-                      showTotal={(total, range) =>
-                        `${range[0]}-${range[1]} sur ${total} éléments`
-                      }
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+              
+              <FlexboxGrid justify="end" style={{ marginTop: 20 }}>
+                <FlexboxGrid.Item colspan={12}>
+                  <InputGroup inside>
+                    <Input 
+                      placeholder="Rechercher par nom, lieu ou date..." 
+                      value={searchText}
+                      onChange={(value) => setSearchText(value)}
+                      onPressEnter={handleSearchWithFilters}
                     />
-                  </div>
-                )}
+                    <InputGroup.Button onClick={handleSearchWithFilters}>
+                      <SearchIcon />
+                    </InputGroup.Button>
+                  </InputGroup>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+            </Form>
 
-                {/* Message si aucune donnée */}
-                {(!ticketData || ticketData.length === 0) && !isLoading && (
-                  <div style={{ textAlign: "center", padding: "40px 0" }}>
+            {isLoading || postLoading ? (
+              <div style={{ textAlign: 'center', padding: '40px' }}>
+                <Loader size="lg" content="Chargement des données..." />
+              </div>
+            ) : (
+              <div>
+                {ticketData && ticketData.length > 0 ? (
+                  <div className="row" justify="start" style={{ marginTop: 20 }} wrap>
+                    {ticketData.map((ticket) => (
+                      <div className="col-lg-3 col-md-4 col-sm-6" colspan={24} md={12} lg={8} xl={6} key={ticket.LG_TICID} style={{ padding: 10 }}>
+                        <Panel shaded bordered bodyFill style={{ height: '100%' }}>
+                          <div style={{ height: 100, overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                            {ticket.STR_EVEPIC ? (
+                              <TicketCard event={ticket} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', background: '#f0f2f5', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                                <span>Pas d'image</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          <Panel header={ticket.STR_EVENAME}>
+                            <p><strong>Lieu:</strong> {ticket.LG_LSTPLACEID || "Non défini"}</p>
+                            <p><strong>Date:</strong> {ticket.DT_TCIVALIDATED}</p>
+                            <p><strong>Téléphone:</strong> {ticket.STR_TICPHONE}</p>
+                            
+                            <div style={{ textAlign: 'center', marginTop: 10 }}>
+                              <Button appearance="default" onClick={() => handleSend(ticket)}>
+                                <SendIcon className="me-3" /> Envoyer
+                              </Button>
+                            </div>
+                          </Panel>
+                        </Panel>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div style={{ textAlign: 'center', padding: '40px 0' }}>
                     <p>Aucun ticket trouvé</p>
                   </div>
                 )}
-              </Spin>
-            </Card>
-          </div>
-        </div>
-      </div>
-    </div>
+              </div>
+            )}
+            
+            {/* Pagination avec React Suite */}
+            {ticketData && ticketData.length > 0 && (
+              <div style={{ marginTop: 20 }}>
+                <FlexboxGrid justify="space-between" align="middle">
+                  <FlexboxGrid.Item colspan={12}>
+                    <div>
+                      Afficher 
+                      <SelectPicker 
+                        data={lengthOptions}
+                        searchable={false}
+                        cleanable={false}
+                        value={displayLength}
+                        onChange={handleChangeLength}
+                        style={{ width: 80, margin: '0 10px' }}
+                      />
+                      par page | {(activePage - 1) * displayLength + 1} - {Math.min(activePage * displayLength, totalRecords)} sur {totalRecords} éléments
+                    </div>
+                  </FlexboxGrid.Item>
+                  
+                  <FlexboxGrid.Item colspan={12}>
+                    <div style={{ textAlign: 'right' }}>
+                      <Pagination
+                        prev
+                        next
+                        first
+                        last
+                        ellipsis
+                        boundaryLinks
+                        maxButtons={5}
+                        size="md"
+                        layout={['total', '-', 'pager', 'skip']}
+                        total={totalRecords}
+                        limitOptions={[12, 24, 48, 96]}
+                        limit={displayLength}
+                        activePage={activePage}
+                        onChangePage={handleChangePage}
+                        onChangeLimit={handleChangeLength}
+                      />
+                    </div>
+                  </FlexboxGrid.Item>
+                </FlexboxGrid>
+              </div>
+            )}
+          </Panel>
+        </Container>
+      </Content>
+    </Container>
   );
 };
 

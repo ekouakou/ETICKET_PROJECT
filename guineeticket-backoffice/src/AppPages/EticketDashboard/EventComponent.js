@@ -10,10 +10,11 @@ import {
 import { convertDateFormat_YMDHM, getCurrentDate } from "../../utils/dateUtils";
 import { authService } from "../../services/AuthService";
 import useFetchData from "../../services/useFetchData";
+import { urlBaseImage, baseUrl } from "../../services/urlUtils";
+
 
 const EventComponent = () => {
   const [loading, setLoading] = useState(true);
-  const urlBaseImage = localStorage.getItem("urlBaseImage");
   const navigate = useNavigate();
 
   const DEFAULT_LIST_LENGTH = 1;
