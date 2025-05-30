@@ -17,6 +17,8 @@ import { useTheme } from "../../contexts/ThemeProvider";
 import { Helmet } from "react-helmet";
 import { useLocation } from "react-router-dom";
 import BannerSkeleton from "../Skeleton/BannerSkeleton";
+import { getDeviceId, getFingerprint } from "../../utils/deviceUtils"; // chemin vers ton utilitaire
+
 import {
   SkeletonElement,
   Card,
@@ -104,6 +106,34 @@ function Detail() {
 
   const [isLoading, setIsLoading] = useState(true);
   const { PARAM_LG_EVEID } = useParams();
+  const [deviceId, setDeviceId] = useState(null);
+
+  useEffect(() => {
+    const fetchDeviceId = async () => {
+      try {
+        const id = await getFingerprint();
+        console.log("je suis l'id", id);
+        setDeviceId(id);
+
+        // Tu peux ici appeler ton backend pour enregistrer la vue
+        // Exemple :
+        // await fetch(`${baseUrl}/enregistrer_vue.php`, {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json'
+        //   },
+        //   body: JSON.stringify({ STR_DEVICEID: id, LG_EVEID: PARAM_LG_EVEID, })
+        // });
+      } catch (error) {
+        console.error("Erreur lors de la récupération du fingerprint :", error);
+      }
+    };
+
+    fetchDeviceId();
+  }, []);
+
+  console.log("je suis l'id");
+  console.log(deviceId);
 
   useEffect(() => {
     setConditionsAccepted(false);
