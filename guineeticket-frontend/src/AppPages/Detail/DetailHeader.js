@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { getDeviceId, getFingerprint } from "../../utils/deviceUtils"; // chemin vers ton utilitaire
+
 import {
   faCalendar,
   faClock,
+  faEye,
   faMapMarkerAlt,
   faTags,
 } from "@fortawesome/free-solid-svg-icons";
@@ -17,6 +20,35 @@ const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
   const [countSeconde, setCountSeconde] = useState("");
   const [datePassed, setDatePassed] = useState(false);
   const [eventStarted, setEventStarted] = useState(false);
+
+    const [deviceId, setDeviceId] = useState(null);
+  
+    useEffect(() => {
+      const fetchDeviceId = async () => {
+        try {
+          const id = await getFingerprint();
+          console.log("je suis l'id", id);
+          setDeviceId(id);
+  
+          // Tu peux ici appeler ton backend pour enregistrer la vue
+          // Exemple :
+          // await fetch(`${baseUrl}/enregistrer_vue.php`, {
+          //   method: 'POST',
+          //   headers: {
+          //     'Content-Type': 'application/json'
+          //   },
+          //   body: JSON.stringify({ STR_DEVICEID: id, LG_EVEID: evenement.PARAM_LG_EVEID, })
+          // });
+        } catch (error) {
+          console.error("Erreur lors de la récupération du fingerprint :", error);
+        }
+      };
+  
+      fetchDeviceId();
+    }, []);
+  
+    console.log("je suis l'id");
+    console.log(deviceId);
 
   useEffect(() => {
     if (!evenement) return; // Protection contre evenement null/undefined
@@ -90,6 +122,10 @@ const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
     // Nettoyer l'intervalle lors du démontage du composant
     return () => clearInterval(interval);
   };
+
+  function formatNumberWithSpaces(number) {
+  return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
 
   const isDatePassed = (dateString, timeString) => {
     if (!dateString || !timeString) return false; // Protection contre les valeurs null/undefined
@@ -178,13 +214,12 @@ const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
                   <div className="duration-area d-flex align-items-center">
                     <div className="d-flex">
                       <a
-                        className={`p-3 badge me-2 ${
-                          !datePassed
+                        className={`p-3 badge me-2 ${!datePassed
                             ? evenement.STR_EVESTATUTFREE == 1
                               ? "badge-danger" // Payant
                               : "badge-success" // Gratuit
                             : "badge-warning" // Terminé
-                        }`}
+                          }`}
                       >
                         {!datePassed
                           ? evenement.STR_EVESTATUTFREE == 1
@@ -200,13 +235,13 @@ const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
                         </a>
                       )}
                     </div>
-                    <div className="d-flex align-items-center me-5 me-xl-13">
+                    <div className="d-flex align-items-center me-5 me-xl-13 ms-2">
                       {/* Icone Date */}
                       <div className="symbol symbol-30px symbol-circle me-3">
-                        <span className="symbol-label bg-info-subtle">
+                        <span className="symbol-label bg-danger-subtle">
                           <FontAwesomeIcon
                             icon={faCalendar}
-                            className="fs-5 text-info"
+                            className="fs-5 text-danger"
                           />
                         </span>
                       </div>
@@ -223,10 +258,10 @@ const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
                     <div className="d-flex align-items-center me-5 me-xl-13">
                       {/* Icone Heure */}
                       <div className="symbol symbol-30px symbol-circle me-3">
-                        <span className="symbol-label bg-info-subtle">
+                        <span className="symbol-label bg-success-subtle">
                           <FontAwesomeIcon
                             icon={faClock}
-                            className="fs-5 text-info"
+                            className="fs-5 text-success"
                           />
                         </span>
                       </div>
@@ -236,6 +271,28 @@ const DetailHeader = ({ evenement, onDatePassedUpdate }) => {
                         </span>
                         <span className="fw-bold text-gray-800 fs-7 text-theme">
                           {evenement.HR_EVEBEGIN}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="d-flex align-items-center me-5 me-xl-13">
+                      {/* Icone Heure */}
+                      <div className="symbol symbol-30px symbol-circle me-3">
+                        <span className="symbol-label bg-primary-subtle">
+                          <FontAwesomeIcon
+                            icon={faEye}
+                            className="fs-5 text-primary"
+                          />
+                        </span>
+                      </div>
+                      <div className="m-0">
+                        <span className="fw-semibold text-gray-500 d-block fs-8">
+                          Nombre de vue
+                        </span>
+                        <span className="fw-bold text-gray-800 fs-7 text-theme">
+                          {/* {evenement.HR_EVEBEGIN} */}
+                           {formatNumberWithSpaces("1000000")}
+                          
                         </span>
                       </div>
                     </div>

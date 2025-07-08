@@ -60,7 +60,7 @@ useEffect(() => {
     error,
   } = useFetchData(process.env.REACT_APP_TICKET_MANAGER_API_URL, {
     mode: process.env.REACT_APP_LIST_EVENEMENT_FRONT_MODE,
-    DT_BEGIN: formatDate(getDateInPastMonths(new Date(), 2)),
+    DT_BEGIN: formatDate(getDateInPastMonths(new Date(), 12)),
     DT_END: formatDate(getDateInFutureMonths(new Date(), 12)),
   }, "data");
 
